@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.BellApp" parent="Base.Theme.BellApp" />
+
+    <style name="Theme.NavigationDrawer.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.NavigationDrawer.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

@@ -1,4 +1,4 @@
-package com.example.bellapp
+package it.fnorg.bellapp
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

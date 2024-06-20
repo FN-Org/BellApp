@@ -10,7 +10,11 @@
             android:title="@string/menu_home" />
         <item
             android:id="@+id/nav_add_sys"
-            android:icon="@drawable/ic_gear"
+            android:icon="@drawable/ic_add_sys"
             android:title="@string/menu_add_sys" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/menu_settings" />
     </group>
 </menu>

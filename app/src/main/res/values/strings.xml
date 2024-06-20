@@ -10,4 +10,5 @@
 
     <string name="menu_home">Home</string>
     <string name="menu_add_sys">Add System</string>
+    <string name="menu_settings">Settings</string>
 </resources>

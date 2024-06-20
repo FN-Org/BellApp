@@ -5,4 +5,16 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WelcomeActivity"/>
+    tools:context=".WelcomeActivity">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_welcome"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/welcome_navigation" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,4 +11,7 @@
     <string name="menu_home">Home</string>
     <string name="menu_add_sys">Add System</string>
     <string name="menu_settings">Settings</string>
+
+    <string name="mail_fede">fedegarau02@gmail.com</string>
+    <string name="mail_nicco">nicolotrebino@gmail.com</string>
 </resources>

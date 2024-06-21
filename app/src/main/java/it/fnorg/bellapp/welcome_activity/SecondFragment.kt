@@ -1,5 +1,6 @@
 package it.fnorg.bellapp.welcome_activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.navigation.findNavController
+import it.fnorg.bellapp.LogInActivity
 import it.fnorg.bellapp.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -44,11 +46,19 @@ class SecondFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val nextButton : Button = view.findViewById(R.id.nButton2)
         val previousButton : Button = view.findViewById(R.id.pButton2)
+        val skipButton : Button = view.findViewById(R.id.sButton2)
+
         nextButton.setOnClickListener {
             view.findNavController().navigate(R.id.action_secondFragment_to_thirdFragment)
         }
+
         previousButton.setOnClickListener {
             view.findNavController().navigate(R.id.action_secondFragment_to_firstFragment)
+        }
+
+        skipButton.setOnClickListener {
+            val intent = Intent(requireContext(), LogInActivity::class.java)
+            startActivity(intent)
         }
     }
 

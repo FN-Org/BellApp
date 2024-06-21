@@ -1,5 +1,6 @@
 package it.fnorg.bellapp.main_activity
 
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -9,6 +10,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.firebase.ui.auth.AuthUI
+import it.fnorg.bellapp.LogInActivity
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainActivityMainBinding
 
@@ -37,6 +40,20 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        // OnClickListener for signing-out
+        navView.menu.findItem(R.id.nav_sign_out).setOnMenuItemClickListener {
+            AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener {
+                    val intent = Intent(this, LogInActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            // Per chiudere il drawer dopo il sign-out ma probabilmente non serve
+            // drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

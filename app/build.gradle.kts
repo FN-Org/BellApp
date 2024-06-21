@@ -68,7 +68,13 @@ dependencies {
 
     implementation("com.google.android.material:material:1.12.0")
 
+    // Navigation fragment
     val navVersion = "2.7.7"
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+
+    // For authentication
+    implementation("com.firebaseui:firebase-ui-auth:7.2.0")
+    // If you target Android 12
+    implementation("com.google.android.gms:play-services-auth:20.0.1")
 }

@@ -1,4 +1,4 @@
-package it.fnorg.bellapp.home
+package it.fnorg.bellapp.main_activity.home
 
 import androidx.lifecycle.ViewModel
 

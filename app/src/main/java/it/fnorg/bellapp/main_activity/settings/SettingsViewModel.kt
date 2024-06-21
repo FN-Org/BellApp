@@ -1,4 +1,4 @@
-package it.fnorg.bellapp.settings
+package it.fnorg.bellapp.main_activity.settings
 
 import androidx.lifecycle.ViewModel
 

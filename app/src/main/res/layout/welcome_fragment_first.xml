@@ -2,50 +2,53 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout3"
+    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ThirdFragment">
+    tools:context=".welcome_activity.FirstFragment">
+
+    <!-- TODO: Update blank fragment layout -->
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/imageView1"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginStart="100dp"
         android:layout_marginTop="150dp"
         android:layout_marginEnd="100dp"
-        android:src="@drawable/image_third_fragment"
+        android:src="@drawable/image_first_fragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/title3"
+        android:id="@+id/title1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
         android:layout_marginTop="50dp"
         android:layout_marginEnd="100dp"
         android:textStyle="bold"
-        android:text="Play Your Bells in Real-Time"
+        android:text="Manage All Your Bell Systems in One App"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView1" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/textView1"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="100dp"
-        android:text="Connect directly to your bell system and use the piano-like keypad view to play your bells in real-time. Compose any melody you desire on the spot."
+        android:gravity="center"
+        android:text="With our app, you can manage all your bell systems from one place. Control everything remotely or directly connected to the system, as long as you have an internet connection."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title3" />
+        app:layout_constraintTop_toBottomOf="@+id/title1" />
 
     <Button
-        android:id="@+id/nButton3"
+        android:id="@+id/nButton1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
@@ -55,17 +58,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/pButton3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="30dp"
-        android:text="@string/previous_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/sButton3"
+        android:id="@+id/sButton1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
@@ -76,5 +69,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title3" />
+        app:layout_constraintTop_toBottomOf="@+id/title1" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

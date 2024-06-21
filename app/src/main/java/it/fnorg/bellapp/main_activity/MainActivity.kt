@@ -1,4 +1,4 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.main_activity
 
 import android.os.Bundle
 import com.google.android.material.navigation.NavigationView
@@ -9,17 +9,18 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
-import it.fnorg.bellapp.databinding.ActivityMainBinding
+import it.fnorg.bellapp.R
+import it.fnorg.bellapp.databinding.MainActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: MainActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = MainActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.mainToolbar.toolbar)

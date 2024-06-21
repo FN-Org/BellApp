@@ -1,4 +1,4 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.welcome_activity
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.navigation.findNavController
+import it.fnorg.bellapp.R
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -36,7 +37,7 @@ class ThirdFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_third, container, false)
+        return inflater.inflate(R.layout.welcome_fragment_third, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

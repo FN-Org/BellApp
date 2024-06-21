@@ -7,18 +7,18 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="it.fnorg.bellapp.home.HomeFragment"
+        android:name="it.fnorg.bellapp.main_activity.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_add_sys"
-        android:name="it.fnorg.bellapp.addsys.AddSysFragment"
+        android:name="it.fnorg.bellapp.main_activity.addsys.AddSysFragment"
         android:label="@string/menu_add_sys"
         tools:layout="@layout/fragment_add_sys" />
     <fragment
         android:id="@+id/nav_settings"
-        android:name="it.fnorg.bellapp.settings.SettingsFragment"
+        android:name="it.fnorg.bellapp.main_activity.settings.SettingsFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>

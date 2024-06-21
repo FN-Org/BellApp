@@ -1,4 +1,4 @@
-package it.fnorg.bellapp.addsys
+package it.fnorg.bellapp.main_activity.addsys
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -26,6 +26,6 @@ class AddSysFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_add_sys, container, false)
+        return inflater.inflate(R.layout.main_fragment_add_sys, container, false)
     }
 }

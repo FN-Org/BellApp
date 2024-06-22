@@ -39,7 +39,7 @@ android {
 
     buildFeatures {
         viewBinding = true
-        // dataBinding = true
+        dataBinding = true
     }
 }
 
@@ -77,4 +77,14 @@ dependencies {
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
     // If you target Android 12
     implementation("com.google.android.gms:play-services-auth:20.0.1")
+
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    // For control over item selection of both touch and mouse driven selection
+    implementation("androidx.recyclerview:recyclerview-selection:1.1.0")
+
+    val lifecycleVersion = "2.7.0"
+    val activityVersion = "1.8.2"
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.activity:activity-ktx:$activityVersion")
+    implementation("androidx.databinding:databinding-runtime:8.3.1")
 }

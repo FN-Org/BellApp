@@ -18,7 +18,7 @@ class LogInActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_log_in)
+        setContentView(R.layout.login_activity_log_in)
 
         // Choose authentication providers
         val providers = arrayListOf(

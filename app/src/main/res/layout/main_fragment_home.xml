@@ -5,9 +5,11 @@
     android:layout_height="match_parent"
     tools:context=".main_activity.home.HomeFragment">
 
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_home"
+        android:scrollbars="vertical"
+        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:layout_height="match_parent" />
 
 </FrameLayout>

@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 
-
 data class System(
     val id: String = "",
     val name: String = "",
@@ -41,6 +40,4 @@ class HomeViewModel : ViewModel() {
                 Log.d("HomeViewModel", "get failed with ", exception)
             }
     }
-
-
 }

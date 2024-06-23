@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue">#284C7E</color>
+    <color name="lapis">#3562A3</color>
+    <color name="seasalt">#F9F9F9</color>
+
 </resources>

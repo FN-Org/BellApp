@@ -1,4 +1,4 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.login_activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +12,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.firestore
+import it.fnorg.bellapp.R
 import it.fnorg.bellapp.main_activity.MainActivity
 
 class LogInActivity : AppCompatActivity() {

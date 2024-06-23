@@ -20,7 +20,10 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:background="@color/seasalt"
         app:headerLayout="@layout/main_nav_header"
+        app:itemTextColor="@color/black"
+        app:itemIconTint="@color/black"
         app:menu="@menu/main_drawer">
 
         <!-- Include footer layout -->

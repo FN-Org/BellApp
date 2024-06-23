@@ -44,8 +44,8 @@ class HomeFragment : Fragment() {
         viewModel.systems.observe(viewLifecycleOwner, Observer
         { systems ->
             // Update the RecyclerView
-            val HomeListAdapter = HomeListAdapter(requireContext(), systems)
-            binding.rvHome.adapter = HomeListAdapter
+            val homeListAdapter = HomeListAdapter(requireContext(), systems)
+            binding.rvHome.adapter = homeListAdapter
         })
 
         val user = FirebaseAuth.getInstance().currentUser

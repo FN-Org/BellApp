@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.navigation.findNavController
-import it.fnorg.bellapp.LogInActivity
+import it.fnorg.bellapp.login_activity.LogInActivity
 import it.fnorg.bellapp.R
 
 // TODO: Rename parameter arguments, choose names that match

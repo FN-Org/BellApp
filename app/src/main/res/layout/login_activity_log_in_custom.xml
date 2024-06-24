@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".login_activity.LogInActivity">
+
+    <Button
+        android:id="@+id/email_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="157dp"
+        android:layout_marginTop="573dp"
+        android:layout_marginEnd="167dp"
+        android:layout_marginBottom="7dp"
+        android:background="@drawable/custom_button"
+        android:text="email sign in"
+        app:layout_constraintBottom_toTopOf="@+id/google_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/google_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="154dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="169dp"
+        android:layout_marginBottom="55dp"
+        android:background="@drawable/custom_button"
+        android:text="google sign in"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_button" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="244dp"
+        android:layout_height="290dp"
+        android:layout_marginStart="83dp"
+        android:layout_marginTop="99dp"
+        android:layout_marginEnd="84dp"
+        android:layout_marginBottom="181dp"
+        app:layout_constraintBottom_toTopOf="@+id/email_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_bell_app" />
+</androidx.constraintlayout.widget.ConstraintLayout>

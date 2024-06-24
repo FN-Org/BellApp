@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -34,19 +35,31 @@ class LogInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity_log_in)
 
+        // You must provide a custom layout XML resource and configure at least one
+        // provider button ID. It's important that you set the button ID for every provider
+        // that you have enabled.
+        val customLayout = AuthMethodPickerLayout
+            .Builder(R.layout.login_activity_log_in_custom)
+            .setGoogleButtonId(R.id.google_button)
+            .setEmailButtonId(R.id.email_button)
+            .build()
+
         // Choose authentication providers
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build()
         )
+
         // Create and launch sign-in intent
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
-            .setLogo(R.drawable.image_first_fragment)
+            .setAuthMethodPickerLayout(customLayout)
             .build()
+
         signInLauncher.launch(signInIntent)
     }
+
 
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse

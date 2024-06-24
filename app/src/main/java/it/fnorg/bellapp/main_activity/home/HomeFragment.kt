@@ -1,5 +1,6 @@
 package it.fnorg.bellapp.main_activity.home
 
+import android.content.Intent
 import androidx.lifecycle.Observer
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -7,8 +8,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
+import it.fnorg.bellapp.CalendarActivity
+import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainFragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -24,7 +28,6 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         // TODO: Use the ViewModel
     }

@@ -1,95 +1,163 @@
 package it.fnorg.bellapp
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
-import com.kizitonwose.calendar.core.Week
-import com.kizitonwose.calendar.core.WeekDay
-import com.kizitonwose.calendar.core.atStartOfMonth
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.CalendarMonth
+import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
+import com.kizitonwose.calendar.core.nextMonth
+import com.kizitonwose.calendar.core.previousMonth
+import com.kizitonwose.calendar.view.MonthDayBinder
+import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
-import com.kizitonwose.calendar.view.WeekCalendarView
-import com.kizitonwose.calendar.view.WeekDayBinder
-import com.kizitonwose.calendar.view.WeekHeaderFooterBinder
+import it.fnorg.bellapp.databinding.CalendarActivityCalendarBinding
+import it.fnorg.bellapp.databinding.CalendarDayBinding
+import it.fnorg.bellapp.databinding.CalendarHeaderBinding
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.TextStyle
-import java.util.Locale
 
 class CalendarActivity : AppCompatActivity() {
+
+    private var selectedDate: LocalDate? = null
+
+    private val eventsAdapter = EventListAdapter()
+    private val events = generateEvents().groupBy { it.time.toLocalDate() }
+
+    private lateinit var binding: CalendarActivityCalendarBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.calendar_activity_calendar)
+        binding = CalendarActivityCalendarBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val weekCalendarView: WeekCalendarView = findViewById(R.id.calendarView)
+        binding.exFiveRv.apply {
+            layoutManager = LinearLayoutManager(this@CalendarActivity, RecyclerView.VERTICAL, false)
+            adapter = eventsAdapter
+        }
+        eventsAdapter.notifyDataSetChanged()
 
-        weekCalendarView.dayBinder = object : WeekDayBinder<DayViewContainer> {
-            // Called only when a new container is needed.
-            override fun create(view: View) = DayViewContainer(view)
+        val daysOfWeek = daysOfWeek()
+        val currentMonth = YearMonth.now()
+        val startMonth = currentMonth.minusMonths(200)
+        val endMonth = currentMonth.plusMonths(200)
+        configureBinders(daysOfWeek)
+        binding.exFiveCalendar.setup(startMonth, endMonth, daysOfWeek.first())
+        binding.exFiveCalendar.scrollToMonth(currentMonth)
 
-            // Called every time we need to reuse a container.
-            override fun bind(container: DayViewContainer, data: WeekDay) {
-                container.textView.text = data.date.dayOfMonth.toString()
+        binding.exFiveCalendar.monthScrollListener = { month ->
+            binding.exFiveMonthYearText.text = month.yearMonth.displayText()
+
+            selectedDate?.let {
+                // Clear selection if we scroll to a new month.
+                selectedDate = null
+                binding.exFiveCalendar.notifyDateChanged(it)
+                updateAdapterForDate(null)
             }
         }
 
-        val currentDate = LocalDate.now()
-        val currentMonth = YearMonth.now()
-        val startDate = currentMonth.minusMonths(100).atStartOfMonth() // Adjust as needed
-        val endDate = currentMonth.plusMonths(100).atEndOfMonth()  // Adjust as needed
-        val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
-        weekCalendarView.setup(startDate, endDate, daysOfWeek.first())
-        weekCalendarView.scrollToWeek(currentDate)
-
-        val titlesContainer = findViewById<ViewGroup>(R.id.titlesContainer)
-        titlesContainer.children
-            .map { it as TextView }
-            .forEachIndexed { index, textView ->
-                val dayOfWeek = daysOfWeek[index]
-                val title = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                textView.text = title
+        binding.exFiveNextMonthImage.setOnClickListener {
+            binding.exFiveCalendar.findFirstVisibleMonth()?.let {
+                binding.exFiveCalendar.smoothScrollToMonth(it.yearMonth.nextMonth)
             }
+        }
 
-        weekCalendarView.weekHeaderBinder = object : WeekHeaderFooterBinder<MonthViewContainer> {
-            override fun create(view: View) = MonthViewContainer(view)
+        binding.exFivePreviousMonthImage.setOnClickListener {
+            binding.exFiveCalendar.findFirstVisibleMonth()?.let {
+                binding.exFiveCalendar.smoothScrollToMonth(it.yearMonth.previousMonth)
+            }
+        }
+    }
 
-            override fun bind(container: MonthViewContainer, data: Week) {
-                // Remember that the header is reused so this will be called for each month.
-                // However, the first day of the week will not change so no need to bind
-                // the same view every time it is reused.
-                if (container.titlesContainer.tag == null) {
-                    // container.titlesContainer.tag = data.yearMonth
-                    container.titlesContainer.children.map { it as TextView }
-                        .forEachIndexed { index, textView ->
-                            val dayOfWeek = daysOfWeek[index]
-                            val title = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                            textView.text = title
-                            // In the code above, we use the same `daysOfWeek` list
-                            // that was created when we set up the calendar.
-                            // However, we can also get the `daysOfWeek` list from the month data:
-                            // val daysOfWeek = data.weekDays.first().map { it.date.dayOfWeek }
-                            // Alternatively, you can get the value for this specific index:
-                            // val dayOfWeek = data.weekDays.first()[index].date.dayOfWeek
+    private fun updateAdapterForDate(date: LocalDate?) {
+        eventsAdapter.events.clear()
+        eventsAdapter.events.addAll(events[date].orEmpty())
+        eventsAdapter.notifyDataSetChanged()
+    }
+
+    private fun configureBinders(daysOfWeek: List<DayOfWeek>) {
+        class DayViewContainer(view: View) : ViewContainer(view) {
+            lateinit var day: CalendarDay // Will be set when this container is bound.
+            val binding = CalendarDayBinding.bind(view)
+
+            init {
+                view.setOnClickListener {
+                    if (day.position == DayPosition.MonthDate) {
+                        if (selectedDate != day.date) {
+                            val oldDate = selectedDate
+                            selectedDate = day.date
+                            val binding = this@CalendarActivity.binding
+                            binding.exFiveCalendar.notifyDateChanged(day.date)
+                            oldDate?.let { binding.exFiveCalendar.notifyDateChanged(it) }
+                            updateAdapterForDate(day.date)
                         }
+                    }
                 }
             }
         }
-    }
+        binding.exFiveCalendar.dayBinder = object : MonthDayBinder<DayViewContainer> {
+            override fun create(view: View) = DayViewContainer(view)
+            override fun bind(container: DayViewContainer, data: CalendarDay) {
+                container.day = data
+                val context = container.binding.root.context
+                val textView = container.binding.exFiveDayText
+                val layout = container.binding.exFiveDayLayout
+                textView.text = data.date.dayOfMonth.toString()
 
-    class DayViewContainer(view: View) : ViewContainer(view) {
-        val textView = view.findViewById<TextView>(R.id.calendarDayText)
+                val flightTopView = container.binding.exFiveDayFlightTop
+                val flightBottomView = container.binding.exFiveDayFlightBottom
+                flightTopView.background = null
+                flightBottomView.background = null
 
-        // With ViewBinding
-        // val textView = CalendarDayLayoutBinding.bind(view).calendarDayText
-    }
+                if (data.position == DayPosition.MonthDate) {
+                    textView.setTextColorRes(R.color.seasalt)
+                    layout.setBackgroundResource(if (selectedDate == data.date) R.drawable.calendar_day_selected else 0)
 
-    class MonthViewContainer(view: View) : ViewContainer(view) {
-        // Alternatively, you can add an ID to the container layout and use findViewById()
-        val titlesContainer = view as ViewGroup
+//                    val events = events[data.date]
+//                    if (events != null) {
+//                        if (events.count() == 1) {
+//                            flightBottomView.setBackgroundColor(context.getColorCompat(events[0].color))
+//                        } else {
+//                            flightTopView.setBackgroundColor(context.getColorCompat(events[0].color))
+//                            flightBottomView.setBackgroundColor(context.getColorCompat(events[1].color))
+//                        }
+//                    }
+                } else {
+                    textView.setTextColorRes(R.color.seasalt)
+                    layout.background = null
+                }
+            }
+        }
+
+        class MonthViewContainer(view: View) : ViewContainer(view) {
+            val legendLayout = CalendarHeaderBinding.bind(view).legendLayout.root
+        }
+
+        val typeFace = Typeface.create("sans-serif-light", Typeface.NORMAL)
+        binding.exFiveCalendar.monthHeaderBinder =
+            object : MonthHeaderFooterBinder<MonthViewContainer> {
+                override fun create(view: View) = MonthViewContainer(view)
+                override fun bind(container: MonthViewContainer, data: CalendarMonth) {
+                    // Setup each header day text if we have not done that already.
+                    if (container.legendLayout.tag == null) {
+                        container.legendLayout.tag = data.yearMonth
+                        container.legendLayout.children.map { it as TextView }
+                            .forEachIndexed { index, tv ->
+                                tv.text = daysOfWeek[index].displayText(uppercase = true)
+                                tv.setTextColorRes(R.color.white)
+                                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+                                tv.typeface = typeFace
+                            }
+                    }
+                }
+            }
     }
 }
-

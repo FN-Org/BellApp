@@ -30,6 +30,9 @@ android {
         }
     }
     compileOptions {
+        // Enable support for the new language APIs
+        isCoreLibraryDesugaringEnabled = true
+        // Set Java compatibility (version can be higher if desired)
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -88,4 +91,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.activity:activity-ktx:$activityVersion")
     implementation("androidx.databinding:databinding-runtime:8.3.1")
+
+    val libraryVersion = "2.0.4"
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:$libraryVersion")
+
+    val calendarVersion = "2.0.1"
+    // The view calendar library
+    implementation("com.kizitonwose.calendar:view:$calendarVersion")
+    // The compose calendar library
+    implementation("com.kizitonwose.calendar:compose:$calendarVersion")
 }

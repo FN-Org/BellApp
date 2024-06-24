@@ -17,6 +17,6 @@
     <string name="mail_nicco">nicolotrebino@gmail.com</string>
 
     <string name="skip_button">SKIP</string>
-    <string name="next_button">Next</string>
-    <string name="previous_button">Previous</string>
+    <string name="next_button">NEXT</string>
+    <string name="previous_button">PREVIOUS</string>
 </resources>

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import it.fnorg.bellapp.databinding.MainHomeListItemBinding
 
-class HomeListAdapter (var mContext: Context, var sysList: List<String>) : RecyclerView.Adapter<HomeListAdapter.SysHolder>() {
+class HomeListAdapter (var mContext: Context, var sysList: List<System>) : RecyclerView.Adapter<HomeListAdapter.SysHolder>() {
 
     inner class SysHolder(val view: MainHomeListItemBinding) : RecyclerView.ViewHolder(view.root)
 
@@ -22,9 +22,11 @@ class HomeListAdapter (var mContext: Context, var sysList: List<String>) : Recyc
 
     override fun onBindViewHolder(holder: SysHolder, position: Int)
     {
-        val subject = sysList.get(position)
+        val sys = sysList.get(position)
         val view = holder.view
-        // view.subjectItem.text = subject.name
+        if (sys.name != "") view.sysTitle.text = sys.name;
+        else view.sysTitle.text = sys.id
+        //view.calendarButton.setOnClickListener(OpenCalendarView(sys.id))
         // view.gradeItem.text = subject.grade.toString()
         // view.creditItem.text = subject.credits.toString()
     }

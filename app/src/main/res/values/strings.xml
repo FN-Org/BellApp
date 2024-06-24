@@ -19,4 +19,7 @@
     <string name="skip_button">SKIP</string>
     <string name="next_button">NEXT</string>
     <string name="previous_button">PREVIOUS</string>
+
+    <string name="login_email_button">Sign in with email</string>
+    <string name="login_google_button">Sign in with Google</string>
 </resources>

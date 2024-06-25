@@ -17,16 +17,51 @@ fun generateEvents(): List<Event> = buildList {
     currentMonth.atDay(17).also { date ->
         add(
             Event(
-                date.atTime(14, 0),
+                date.atTime(10, 0),
                 3,
                 "Ave Maria"
             ),
         )
         add(
             Event(
-                date.atTime(21, 30),
+                date.atTime(12, 30),
+                5,
+                "AC/DC"
+            ),
+        )
+        add(
+            Event(
+                date.atTime(13, 30),
+                5,
+                "AC/DC"
+            ),
+        )
+        add(
+            Event(
+                date.atTime(16, 30),
+                5,
+                "AC/DC"
+            ),
+        )
+        add(
+            Event(
+                date.atTime(17, 30),
                 1,
                 "Coldplay"
+            ),
+        )
+        add(
+            Event(
+                date.atTime(21, 30),
+                2,
+                "Trilli"
+            ),
+        )
+        add(
+            Event(
+                date.atTime(23, 30),
+                5,
+                "AC/DC"
             ),
         )
     }

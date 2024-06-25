@@ -2,6 +2,7 @@ package it.fnorg.bellapp
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import it.fnorg.bellapp.databinding.CalendarEventItemViewBinding
 
@@ -23,17 +24,14 @@ class EventListAdapter :
 
     inner class EventsViewHolder(val binding: CalendarEventItemViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(flight: Event) {
-            binding.itemFlightDateText.apply {
-                text = eventDateTimeFormatter.format(flight.time)
-//                setBackgroundColor(itemView.context.getColorCompat(event.color))
+        fun bind(event: Event) {
+            binding.itemEventDateText.apply {
+                text = eventDateTimeFormatter.format(event.time)
+                setBackgroundColor(ContextCompat.getColor(context, R.color.lapis))
             }
 
-//            binding.itemDepartureAirportCodeText.text = flight.departure.code
-//            binding.itemDepartureAirportCityText.text = flight.departure.city
-//
-//            binding.itemDestinationAirportCodeText.text = flight.destination.code
-//            binding.itemDestinationAirportCityText.text = flight.destination.city
+            binding.itemMelodyNumberText.text = event.melody.toString()
+            binding.itemMelodyNameText.text = event.name
         }
     }
 }

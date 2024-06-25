@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Main palette -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#284C7E</color>
     <color name="lapis">#3562A3</color>
     <color name="seasalt">#F9F9F9</color>
 
-    <color name="example_5_page_bg_color">#0E0E0E</color>
-    <color name="example_5_item_view_bg_color">#1B1B1B</color>
-    <color name="example_5_toolbar_color">#282828</color>
-    <color name="example_5_text_grey">#DCDCDC</color>
-    <color name="example_5_text_grey_light">#616161</color>
-    <color name="brown_700">#5D4037</color>
+    <!-- Events color -->
+    <color name="naples">#F8DB64</color>
+    <color name="lightred">#F87575</color>
+    <color name="jade">#57A773</color>
 
 </resources>

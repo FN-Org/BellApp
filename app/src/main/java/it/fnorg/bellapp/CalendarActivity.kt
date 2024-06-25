@@ -4,8 +4,10 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,7 +41,7 @@ class CalendarActivity : AppCompatActivity() {
         binding = CalendarActivityCalendarBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.exFiveRv.apply {
+        binding.calendarRv.apply {
             layoutManager = LinearLayoutManager(this@CalendarActivity, RecyclerView.VERTICAL, false)
             adapter = eventsAdapter
         }
@@ -50,29 +52,29 @@ class CalendarActivity : AppCompatActivity() {
         val startMonth = currentMonth.minusMonths(200)
         val endMonth = currentMonth.plusMonths(200)
         configureBinders(daysOfWeek)
-        binding.exFiveCalendar.setup(startMonth, endMonth, daysOfWeek.first())
-        binding.exFiveCalendar.scrollToMonth(currentMonth)
+        binding.calendarView.setup(startMonth, endMonth, daysOfWeek.first())
+        binding.calendarView.scrollToMonth(currentMonth)
 
-        binding.exFiveCalendar.monthScrollListener = { month ->
-            binding.exFiveMonthYearText.text = month.yearMonth.displayText()
+        binding.calendarView.monthScrollListener = { month ->
+            binding.calendarMonthYearText.text = month.yearMonth.displayText()
 
             selectedDate?.let {
                 // Clear selection if we scroll to a new month.
                 selectedDate = null
-                binding.exFiveCalendar.notifyDateChanged(it)
+                binding.calendarView.notifyDateChanged(it)
                 updateAdapterForDate(null)
             }
         }
 
-        binding.exFiveNextMonthImage.setOnClickListener {
-            binding.exFiveCalendar.findFirstVisibleMonth()?.let {
-                binding.exFiveCalendar.smoothScrollToMonth(it.yearMonth.nextMonth)
+        binding.calendarNextMonthImage.setOnClickListener {
+            binding.calendarView.findFirstVisibleMonth()?.let {
+                binding.calendarView.smoothScrollToMonth(it.yearMonth.nextMonth)
             }
         }
 
-        binding.exFivePreviousMonthImage.setOnClickListener {
-            binding.exFiveCalendar.findFirstVisibleMonth()?.let {
-                binding.exFiveCalendar.smoothScrollToMonth(it.yearMonth.previousMonth)
+        binding.calendarPreviousMonthImage.setOnClickListener {
+            binding.calendarView.findFirstVisibleMonth()?.let {
+                binding.calendarView.smoothScrollToMonth(it.yearMonth.previousMonth)
             }
         }
     }
@@ -95,43 +97,58 @@ class CalendarActivity : AppCompatActivity() {
                             val oldDate = selectedDate
                             selectedDate = day.date
                             val binding = this@CalendarActivity.binding
-                            binding.exFiveCalendar.notifyDateChanged(day.date)
-                            oldDate?.let { binding.exFiveCalendar.notifyDateChanged(it) }
+                            binding.calendarView.notifyDateChanged(day.date)
+                            oldDate?.let { binding.calendarView.notifyDateChanged(it) }
                             updateAdapterForDate(day.date)
                         }
                     }
                 }
             }
         }
-        binding.exFiveCalendar.dayBinder = object : MonthDayBinder<DayViewContainer> {
+        binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
             override fun bind(container: DayViewContainer, data: CalendarDay) {
                 container.day = data
                 val context = container.binding.root.context
-                val textView = container.binding.exFiveDayText
-                val layout = container.binding.exFiveDayLayout
+                val textView = container.binding.calendarDayText
+                val layout = container.binding.calendarDayLayout
                 textView.text = data.date.dayOfMonth.toString()
 
-                val flightTopView = container.binding.exFiveDayFlightTop
-                val flightBottomView = container.binding.exFiveDayFlightBottom
-                flightTopView.background = null
-                flightBottomView.background = null
+                val eventTopView = container.binding.calendarDayEventTop
+                val eventBottomView = container.binding.calendarDayEventBottom
+                val eventsContainer = container.binding.containerMoreEvents
+                eventTopView.background = null
+                eventBottomView.background = null
 
                 if (data.position == DayPosition.MonthDate) {
-                    textView.setTextColorRes(R.color.seasalt)
+                    textView.setTextColorRes(R.color.white) // Days of the current month text color
                     layout.setBackgroundResource(if (selectedDate == data.date) R.drawable.calendar_day_selected else 0)
 
-//                    val events = events[data.date]
-//                    if (events != null) {
-//                        if (events.count() == 1) {
-//                            flightBottomView.setBackgroundColor(context.getColorCompat(events[0].color))
-//                        } else {
-//                            flightTopView.setBackgroundColor(context.getColorCompat(events[0].color))
-//                            flightBottomView.setBackgroundColor(context.getColorCompat(events[1].color))
-//                        }
-//                    }
+                    val events = events[data.date]
+                    if (events != null) {
+                        if (events.count() == 1) {
+                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, R.color.naples))
+                        }
+                        else {
+                            eventTopView.setBackgroundColor(ContextCompat.getColor(context, R.color.naples))
+                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, R.color.naples))
+
+                            if (events.count() > 2) {
+                                eventsContainer.removeAllViews()
+                                for (i in 2 until events.size) {
+                                    val dot = View(this@CalendarActivity).apply {
+                                        layoutParams = LinearLayout.LayoutParams(16, 16).apply {
+                                            marginEnd = 8
+                                        }
+                                        setBackgroundResource(R.drawable.calendar_dot_event)
+                                    }
+                                    eventsContainer.addView(dot)
+                                }
+                            }
+                        }
+                    }
                 } else {
-                    textView.setTextColorRes(R.color.seasalt)
+                    textView.setTextColorRes(R.color.naples)
                     layout.background = null
                 }
             }
@@ -142,7 +159,7 @@ class CalendarActivity : AppCompatActivity() {
         }
 
         val typeFace = Typeface.create("sans-serif-light", Typeface.NORMAL)
-        binding.exFiveCalendar.monthHeaderBinder =
+        binding.calendarView.monthHeaderBinder =
             object : MonthHeaderFooterBinder<MonthViewContainer> {
                 override fun create(view: View) = MonthViewContainer(view)
                 override fun bind(container: MonthViewContainer, data: CalendarMonth) {

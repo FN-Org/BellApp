@@ -121,17 +121,17 @@ class CalendarActivity : AppCompatActivity() {
                 eventBottomView.background = null
 
                 if (data.position == DayPosition.MonthDate) {
-                    textView.setTextColorRes(R.color.white) // Days of the current month text color
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.white)) // Days of the current month text color
                     layout.setBackgroundResource(if (selectedDate == data.date) R.drawable.calendar_day_selected else 0)
 
                     val events = events[data.date]
                     if (events != null) {
                         if (events.count() == 1) {
-                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, R.color.naples))
+                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, events[0].color))
                         }
                         else {
-                            eventTopView.setBackgroundColor(ContextCompat.getColor(context, R.color.naples))
-                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, R.color.naples))
+                            eventTopView.setBackgroundColor(ContextCompat.getColor(context, events[0].color))
+                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, events[1].color))
 
                             if (events.count() > 2) {
                                 eventsContainer.removeAllViews()
@@ -140,7 +140,7 @@ class CalendarActivity : AppCompatActivity() {
                                         layoutParams = LinearLayout.LayoutParams(16, 16).apply {
                                             marginEnd = 8
                                         }
-                                        setBackgroundResource(R.drawable.calendar_dot_event)
+                                        setBackgroundColor(ContextCompat.getColor(context, events[i].color))
                                     }
                                     eventsContainer.addView(dot)
                                 }
@@ -148,7 +148,7 @@ class CalendarActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    textView.setTextColorRes(R.color.naples)
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.naples))
                     layout.background = null
                 }
             }
@@ -166,10 +166,11 @@ class CalendarActivity : AppCompatActivity() {
                     // Setup each header day text if we have not done that already.
                     if (container.legendLayout.tag == null) {
                         container.legendLayout.tag = data.yearMonth
+                        val context = container.legendLayout.context
                         container.legendLayout.children.map { it as TextView }
                             .forEachIndexed { index, tv ->
                                 tv.text = daysOfWeek[index].displayText(uppercase = true)
-                                tv.setTextColorRes(R.color.white)
+                                tv.setTextColor(ContextCompat.getColor(context, R.color.white))
                                 tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
                                 tv.typeface = typeFace
                             }

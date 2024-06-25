@@ -66,9 +66,3 @@ fun dpToPx(dp: Int, context: Context): Int =
 
 internal val Context.inputMethodManager
     get() = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-internal fun Context.getColorCompat(@ColorRes color: Int) =
-    ContextCompat.getColor(this, color)
-
-internal fun TextView.setTextColorRes(@ColorRes color: Int) =
-    setTextColor(context.getColorCompat(color))

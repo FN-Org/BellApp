@@ -27,7 +27,7 @@ class EventListAdapter :
         fun bind(event: Event) {
             binding.itemEventDateText.apply {
                 text = eventDateTimeFormatter.format(event.time)
-                setBackgroundColor(ContextCompat.getColor(context, R.color.lapis))
+                setBackgroundColor(ContextCompat.getColor(context, event.color))
             }
 
             binding.itemMelodyNumberText.text = event.melody.toString()

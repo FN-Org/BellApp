@@ -1,5 +1,6 @@
 package it.fnorg.bellapp
 
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
@@ -23,6 +24,7 @@ import com.kizitonwose.calendar.view.ViewContainer
 import it.fnorg.bellapp.databinding.CalendarActivityCalendarBinding
 import it.fnorg.bellapp.databinding.CalendarDayBinding
 import it.fnorg.bellapp.databinding.CalendarHeaderBinding
+import it.fnorg.bellapp.main_activity.MainActivity
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -47,7 +49,7 @@ class CalendarActivity : AppCompatActivity() {
         }
         eventsAdapter.notifyDataSetChanged()
 
-        val daysOfWeek = daysOfWeek()
+        val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusMonths(200)
         val endMonth = currentMonth.plusMonths(200)
@@ -77,6 +79,11 @@ class CalendarActivity : AppCompatActivity() {
                 binding.calendarView.smoothScrollToMonth(it.yearMonth.previousMonth)
             }
         }
+
+        binding.calendarBackArrow.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun updateAdapterForDate(date: LocalDate?) {
@@ -105,6 +112,7 @@ class CalendarActivity : AppCompatActivity() {
                 }
             }
         }
+
         binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
             override fun bind(container: DayViewContainer, data: CalendarDay) {
@@ -158,7 +166,7 @@ class CalendarActivity : AppCompatActivity() {
             val legendLayout = CalendarHeaderBinding.bind(view).legendLayout.root
         }
 
-        val typeFace = Typeface.create("sans-serif-light", Typeface.NORMAL)
+        val typeFace = Typeface.create("sans-serif-light", Typeface.BOLD)
         binding.calendarView.monthHeaderBinder =
             object : MonthHeaderFooterBinder<MonthViewContainer> {
                 override fun create(view: View) = MonthViewContainer(view)
@@ -170,7 +178,7 @@ class CalendarActivity : AppCompatActivity() {
                         container.legendLayout.children.map { it as TextView }
                             .forEachIndexed { index, tv ->
                                 tv.text = daysOfWeek[index].displayText(uppercase = true)
-                                tv.setTextColor(ContextCompat.getColor(context, R.color.white))
+                                tv.setTextColor(ContextCompat.getColor(context, R.color.blue))
                                 tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
                                 tv.typeface = typeFace
                             }

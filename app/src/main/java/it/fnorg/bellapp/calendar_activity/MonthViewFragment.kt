@@ -1,4 +1,4 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.calendar_activity
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -15,6 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.navigation.findNavController
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -24,6 +26,7 @@ import com.kizitonwose.calendar.core.previousMonth
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
+import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.CalendarDayBinding
 import it.fnorg.bellapp.databinding.CalendarFragmentMonthViewBinding
 import it.fnorg.bellapp.databinding.CalendarHeaderBinding
@@ -102,6 +105,11 @@ class MonthViewFragment : Fragment() {
         binding.calendarBackArrow.setOnClickListener {
             val intent = Intent(requireActivity(), MainActivity::class.java)
             startActivity(intent)
+        }
+
+        val addEventButton: FloatingActionButton = binding.root.findViewById(R.id.calendarAddEventButton)
+        addEventButton.setOnClickListener {
+            view.findNavController().navigate(R.id.action_monthViewFragment_to_addEventFragment)
         }
 
         // TODO: Use the ViewModel

@@ -30,7 +30,7 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".CalendarActivity"
+            android:name=".calendar_activity.CalendarActivity"
             android:exported="true">
         </activity>
     </application>

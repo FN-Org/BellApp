@@ -1,7 +1,8 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.calendar_activity
 
 import androidx.annotation.ColorRes
 import androidx.lifecycle.ViewModel
+import it.fnorg.bellapp.R
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter

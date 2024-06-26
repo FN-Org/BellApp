@@ -1,4 +1,4 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.calendar_activity
 
 import android.app.Activity
 import android.content.Context
@@ -11,11 +11,7 @@ import java.time.Month
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
-import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
-import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
 
 fun YearMonth.displayText(short: Boolean = false): String {
     return "${this.month.displayText(short = short)} ${this.year}"

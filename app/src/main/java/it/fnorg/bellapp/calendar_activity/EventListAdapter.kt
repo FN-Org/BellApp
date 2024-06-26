@@ -1,4 +1,4 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.calendar_activity
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

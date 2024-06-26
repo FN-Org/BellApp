@@ -22,4 +22,8 @@
 
     <string name="login_email_button">Sign in with email</string>
     <string name="login_google_button">Sign in with Google</string>
+
+    <string name="add_time">Time</string>
+    <string name="add_date">Date</string>
+    <string name="select_melody">Select a melody</string>
 </resources>

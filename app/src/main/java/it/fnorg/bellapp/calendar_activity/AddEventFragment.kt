@@ -51,31 +51,25 @@ class AddEventFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.calendar_fragment_add_event, container, false)
 
-        // Dentro il metodo onCreateView o onViewCreated del tuo Fragment
-        val spinner: Spinner = view.findViewById(R.id.spinner_options)
-        val spinnerTextView: TextView = view.findViewById(R.id.melody_selection)
+        // Spinner for melodies selection
+        val spinner1: Spinner = view.findViewById(R.id.spinner_options_melodies)
+
         val melodiesList = listOf(
             Melody(1, "Opzione 1"),
             Melody(2, "Opzione 2"),
             Melody(3, "Opzione 3"),
-            // Aggiungi altre opzioni se necessario
         )
 
-        // Crea un ArrayAdapter utilizzando i dati recuperati dal database
-        val adapter = ArrayAdapter(
+        val adapter1 = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            melodiesList.map { it.name } // Utilizza il nome dell'opzione come testo da visualizzare nello Spinner
+            melodiesList.map { it.name }
         )
 
-        // Specifica il layout per la visualizzazione delle opzioni nel dropdown
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner1.adapter = adapter1
 
-        // Collega l'ArrayAdapter allo Spinner
-        spinner.adapter = adapter
-
-        // Gestisci la selezione dell'opzione nello Spinner
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        spinner1.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 // Esegui le azioni desiderate con l'opzione selezionata
             }
@@ -85,7 +79,29 @@ class AddEventFragment : Fragment() {
             }
         }
 
-        // Inflate the layout for this fragment
+        // Spinner for colors selection
+        val spinner2: Spinner = view.findViewById(R.id.spinner_options_colors)
+
+        val colorsList = listOf(
+            Color("Yellow", R.color.naples),
+            Color("Red", R.color.lightred),
+            Color("Green", R.color.jade)
+        )
+
+        val adapter2 = ColorAdapter(requireContext(), colorsList)
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner2.adapter = adapter2
+
+        spinner2.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // Esegui le azioni desiderate con l'opzione selezionata
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Non esegue alcuna azione quando non viene selezionata alcuna opzione
+            }
+        }
+
         return view
     }
 

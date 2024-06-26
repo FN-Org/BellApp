@@ -15,6 +15,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import it.fnorg.bellapp.R
 
 data class Melody(
@@ -36,6 +37,15 @@ class AddEventFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    //Safe args
+    val args: AddEventFragmentArgs by navArgs()
+
+    val colorsList = listOf(
+        Color("Yellow", R.color.naples),
+        Color("Red", R.color.lightred),
+        Color("Green", R.color.jade)
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,11 +92,7 @@ class AddEventFragment : Fragment() {
         // Spinner for colors selection
         val spinner2: Spinner = view.findViewById(R.id.spinner_options_colors)
 
-        val colorsList = listOf(
-            Color("Yellow", R.color.naples),
-            Color("Red", R.color.lightred),
-            Color("Green", R.color.jade)
-        )
+
 
         val adapter2 = ColorAdapter(requireContext(), colorsList)
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -141,7 +147,7 @@ class AddEventFragment : Fragment() {
             val datePickerDialog = DatePickerDialog(
                 requireContext(),
                 { view, year, monthOfYear, dayOfMonth ->
-                    dateTextView.setText(dayOfMonth.toString() + "/" + (monthOfYear + 1) + "/" + year)
+                    dateTextView.setText(dayOfMonth.toString() + "-" + (monthOfYear + 1) + "-" + year)
                 },
                 year,
                 month,
@@ -150,6 +156,29 @@ class AddEventFragment : Fragment() {
 
             datePickerDialog.show()
         }
+
+        val fragmentTitle : TextView = view.findViewById(R.id.fragment_title)
+
+        //Safe args
+        if (args.eventTime != "default"){
+            fragmentTitle.text = "Modify Event"
+
+            timeTextView.setText(args.eventTime)
+            dateTextView.setText(args.eventDate)
+
+            val spinnerMelodies: Spinner = view.findViewById(R.id.spinner_options_melodies)
+            spinnerMelodies.setSelection(args.eventMelody)
+
+            val spinnerColors : Spinner = view.findViewById(R.id.spinner_options_colors)
+            // TODO: colorsList.indexOfFirst { it.colorResId == args.eventColor } or something to
+            // find the right index of the color in the spinner instead of pre-defined 0
+            spinnerColors.setSelection(0)
+        }
+        else fragmentTitle.text = "Add Event"
+
+
+
+
     }
 
     companion object {

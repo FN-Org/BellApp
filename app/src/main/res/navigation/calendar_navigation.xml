@@ -22,5 +22,21 @@
         <action
             android:id="@+id/action_addEventFragment_to_monthViewFragment"
             app:destination="@id/monthViewFragment" />
+        <argument
+            android:name="event_time"
+            app:argType="string"
+            android:defaultValue="default" />
+        <argument
+            android:name="event_date"
+            app:argType="string"
+            android:defaultValue="default" />
+        <argument
+            android:name="event_melody"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="event_color"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
 </navigation>

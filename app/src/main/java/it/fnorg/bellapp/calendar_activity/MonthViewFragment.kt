@@ -39,15 +39,9 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.ZoneOffset
 
-
-fun Timestamp.toLocalDateTime(): LocalDateTime {
-    return this.toDate().toInstant().atZone(ZoneOffset.UTC).toLocalDateTime()
-}
-
 class MonthViewFragment : Fragment() {
 
-    private lateinit var viewModel: CalendarActivityViewModel
-
+    val viewModel: CalendarActivityViewModel by activityViewModels()
 
     private var selectedDate: LocalDate? = null
 
@@ -58,8 +52,6 @@ class MonthViewFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(requireActivity())[CalendarActivityViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -73,8 +65,6 @@ class MonthViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.fetchEventsData(viewModel.sysId)
-        // Inizializzare l'adapter senza dati
         eventsAdapter = EventListAdapter(requireContext(), emptyList())
         binding.calendarRv.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)

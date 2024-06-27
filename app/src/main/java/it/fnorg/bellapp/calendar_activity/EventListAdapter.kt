@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +16,7 @@ class EventListAdapter(
 ) :
     RecyclerView.Adapter<EventListAdapter.EventsViewHolder>() {
 
+        // TODO: capire!!!
     private val ViewModel: CalendarActivityViewModel by lazy {
         // Assicurati che il context sia un LifecycleOwner
         val activity = context as? FragmentActivity
@@ -50,8 +50,10 @@ class EventListAdapter(
 
             //on click, goes to the add event fragment passing safe args
             itemView.setOnClickListener{
-                val time = event.time.toLocalDateTime().toLocalTime().toString()
-                val date = event.time.toLocalDateTime().toLocalDate().toString()
+                val time = event.time.toLocalDateTime().toLocalTime().format(
+                    timeFormatter)
+                val date = event.time.toLocalDateTime().toLocalDate().format(
+                    dateFormatter)
                 val melody = event.melodyNumber
                 val color = event.color
                 val action = MonthViewFragmentDirections.actionMonthViewFragmentToAddEventFragment(time,date,melody,color)

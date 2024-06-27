@@ -10,7 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import it.fnorg.bellapp.R
 import java.time.LocalDateTime
-import java.time.YearMonth
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 data class Event(
@@ -33,6 +33,14 @@ data class Color(
 
 val eventDateTimeFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("EEE'\n'dd MMM'\n'HH:mm")
+
+// Formattatori
+val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+fun Timestamp.toLocalDateTime(): LocalDateTime {
+    return this.toDate().toInstant().atZone(ZoneOffset.ofHours(2)).toLocalDateTime()
+}
 
 class CalendarActivityViewModel : ViewModel() {
     // TODO: Implement the ViewModel
@@ -58,9 +66,13 @@ class CalendarActivityViewModel : ViewModel() {
         Color("Green", R.color.jade)
     )
 
-    fun fetchEventsData(sysId: String) {
+    fun fetchEventsData() {
+        if (sysId.isEmpty()) {
+            Log.w("BellAppDB", "sysId is empty, cannot fetch events.")
+            return
+        }
         db.collection("systems")
-            .document("KkEsJ6nVzUb4SSZhLANG")
+            .document(sysId)
             .collection("events")
             .get()
             .addOnSuccessListener { result ->
@@ -78,7 +90,11 @@ class CalendarActivityViewModel : ViewModel() {
             }
     }
 
-    fun fetchMelodiesData(sysId: String) {
+    fun fetchMelodiesData() {
+        if (sysId.isEmpty()) {
+            Log.w("BellAppDB", "sysId is empty, cannot fetch melodies.")
+            return
+        }
         db.collection("systems")
             .document(sysId)
             .collection("melodies")

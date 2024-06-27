@@ -45,8 +45,6 @@ class AddEventFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.fetchMelodiesData(viewModel.sysId)
-
         val spinnerMelodies: Spinner = view.findViewById(R.id.spinner_options_melodies)
         val spinnerColors: Spinner = view.findViewById(R.id.spinner_options_colors)
         val timeTextView: EditText = view.findViewById(R.id.editTextTime)
@@ -60,13 +58,33 @@ class AddEventFragment : Fragment() {
 
         // Melodies' observer & spinner for melodies
         viewModel.melodies.observe(viewLifecycleOwner) { melodies ->
-            val adapter1 = ArrayAdapter(
+            val adapter1 = MelodyAdapter(
                 requireContext(),
-                android.R.layout.simple_spinner_item,
-                melodies.map { it.name }
+                melodies
             )
             adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerMelodies.adapter = adapter1
+
+            // Safe args
+            if (args.eventTime != "default") {
+                fragmentTitle.text = requireContext().getString(R.string.modify_event)
+
+                timeTextView.setText(args.eventTime)
+                dateTextView.setText(args.eventDate)
+
+                // Trova l'indice della melodia da selezionare
+                val selectedMelodyIndex = melodies.indexOfFirst { it.number == args.eventMelody }
+                if (selectedMelodyIndex != -1) {
+                    spinnerMelodies.setSelection(selectedMelodyIndex)
+                }
+
+                spinnerColors.setSelection(args.eventColor - 1)
+            } else {
+                fragmentTitle.text = requireContext().getString(R.string.add_event)
+            }
+
+            // Notifica all'adapter che i dati sono cambiati
+            adapter1.notifyDataSetChanged()
         }
 
         spinnerMelodies.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -133,21 +151,6 @@ class AddEventFragment : Fragment() {
 
             datePickerDialog.show()
         }
-
-        // Safe args
-        if (args.eventTime != "default"){
-            fragmentTitle.text = requireContext().getString(R.string.modify_event)
-
-            timeTextView.setText(args.eventTime)
-            dateTextView.setText(args.eventDate)
-
-            val spinnerMelodies: Spinner = view.findViewById(R.id.spinner_options_melodies)
-            spinnerMelodies.setSelection(args.eventMelody-1)
-
-            val spinnerColors : Spinner = view.findViewById(R.id.spinner_options_colors)
-            spinnerColors.setSelection(args.eventColor-1)
-        }
-        else fragmentTitle.text = requireContext().getString(R.string.add_event)
 
     }
 }

@@ -20,12 +20,12 @@ class CalendarActivity : AppCompatActivity() {
         if (sysId != null) {
             viewModel.sysId = sysId
 
-            Log.w("BellApp-CalendarActViewModel", "Obtained sysId: $sysId")
+            Log.w("BellApp-CalendarActViewModel", "Obtained sysId: -$sysId-")
         }
 
         val navController = findNavController(R.id.nav_host_calendar)
 
-        //viewModel.fetchEventsData(sysId.toString())
-        //viewModel.fetchMelodiesData(sysId.toString())
+        viewModel.fetchEventsData()
+        viewModel.fetchMelodiesData()
     }
 }

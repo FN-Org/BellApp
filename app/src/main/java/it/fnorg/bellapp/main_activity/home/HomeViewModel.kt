@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 
 data class System(
     val id: String = "",
@@ -26,12 +27,11 @@ class HomeViewModel : ViewModel() {
         val db = FirebaseFirestore.getInstance()
         db.collection("users").document(uid).collection("systems")
             .get()
-            .addOnSuccessListener { querySnapshot ->
+            .addOnSuccessListener { result ->
                 val systemsList = mutableListOf<System>()
-                for (document in querySnapshot.documents) {
-                    val system = document.toObject(System::class.java)
-                    system?.let {
-                        systemsList.add(it)
+                for (document in result) {
+                    document.toObject<System>().let { system ->
+                        systemsList.add(system)
                     }
                 }
                 _systems.value = systemsList

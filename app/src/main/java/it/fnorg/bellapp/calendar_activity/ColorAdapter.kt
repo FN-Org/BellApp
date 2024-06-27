@@ -8,11 +8,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import it.fnorg.bellapp.R
 
-data class Color(
-    val name: String,
-    val colorResId: Int
-)
-
 class ColorAdapter(
         context: Context,
         private val options: List<Color>
@@ -35,7 +30,7 @@ class ColorAdapter(
 
             val option = options[position]
             colorNameTextView.text = option.name
-            colorPreviewView.background.setTint(ContextCompat.getColor(context, option.colorResId))
+            colorPreviewView.background.setTint(ContextCompat.getColor(context, option.color))
 
             return view
         }

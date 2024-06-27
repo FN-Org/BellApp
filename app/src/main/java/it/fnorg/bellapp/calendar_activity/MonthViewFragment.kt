@@ -7,7 +7,7 @@ import android.util.TypedValue
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -37,16 +37,12 @@ import java.time.YearMonth
 
 class MonthViewFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = MonthViewFragment()
-    }
-
-    private val viewModel: MonthViewViewModel by viewModels()
+    val viewModel: CalendarActivityViewModel by activityViewModels()
 
     private var selectedDate: LocalDate? = null
 
-    private val eventsAdapter = EventListAdapter()
-    private val events = generateEvents().groupBy { it.time.toLocalDate() }
+    private lateinit var eventsAdapter: EventListAdapter
+    private var events: Map<LocalDate, List<Event>> = emptyMap()
 
     private lateinit var binding: CalendarFragmentMonthViewBinding
 
@@ -65,11 +61,18 @@ class MonthViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Inizializzare l'adapter senza dati
+        eventsAdapter = EventListAdapter(requireContext(), emptyList())
         binding.calendarRv.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = eventsAdapter
         }
-        eventsAdapter.notifyDataSetChanged()
+
+        viewModel.events.observe(viewLifecycleOwner) { eventsList ->
+            events = eventsList.groupBy { it.time.toLocalDate() }
+            updateAdapterForDate(selectedDate)
+            binding.calendarView.notifyCalendarChanged() // Notify the calendar to update its views
+        }
 
         val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
         val currentMonth = YearMonth.now()
@@ -83,7 +86,6 @@ class MonthViewFragment : Fragment() {
             binding.calendarMonthYearText.text = month.yearMonth.displayText()
 
             selectedDate?.let {
-                // Clear selection if we scroll to a new month.
                 selectedDate = null
                 binding.calendarView.notifyDateChanged(it)
                 updateAdapterForDate(null)
@@ -111,19 +113,17 @@ class MonthViewFragment : Fragment() {
         addEventButton.setOnClickListener {
             view.findNavController().navigate(R.id.action_monthViewFragment_to_addEventFragment)
         }
-
-        // TODO: Use the ViewModel
     }
 
     private fun updateAdapterForDate(date: LocalDate?) {
-        eventsAdapter.events.clear()
-        eventsAdapter.events.addAll(events[date].orEmpty())
-        eventsAdapter.notifyDataSetChanged()
+        val eventsForDate = events[date].orEmpty()
+        eventsAdapter = EventListAdapter(requireContext(), eventsForDate)
+        binding.calendarRv.adapter = eventsAdapter
     }
 
     private fun configureBinders(daysOfWeek: List<DayOfWeek>) {
         class DayViewContainer(view: View) : ViewContainer(view) {
-            lateinit var day: CalendarDay // Will be set when this container is bound.
+            lateinit var day: CalendarDay
             val binding = CalendarDayBinding.bind(view)
 
             init {
@@ -134,9 +134,7 @@ class MonthViewFragment : Fragment() {
                             selectedDate = day.date
                             this@MonthViewFragment.binding.calendarView.notifyDateChanged(day.date)
                             oldDate?.let {
-                                this@MonthViewFragment.binding.calendarView.notifyDateChanged(
-                                    it
-                                )
+                                this@MonthViewFragment.binding.calendarView.notifyDateChanged(it)
                             }
                             updateAdapterForDate(day.date)
                         }
@@ -161,10 +159,10 @@ class MonthViewFragment : Fragment() {
                 eventBottomView.background = null
 
                 if (data.position == DayPosition.MonthDate) {
-                    textView.setTextColor(ContextCompat.getColor(context, R.color.white)) // Days of the current month text color
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.white))
                     layout.setBackgroundResource(if (selectedDate == data.date) R.drawable.calendar_day_selected else 0)
 
-                    val events = events[data.date]
+                    val events = this@MonthViewFragment.events[data.date]
                     if (events != null) {
                         if (events.count() == 1) {
                             eventBottomView.setBackgroundColor(ContextCompat.getColor(context, events[0].color))
@@ -202,7 +200,6 @@ class MonthViewFragment : Fragment() {
             object : MonthHeaderFooterBinder<MonthViewContainer> {
                 override fun create(view: View) = MonthViewContainer(view)
                 override fun bind(container: MonthViewContainer, data: CalendarMonth) {
-                    // Setup each header day text if we have not done that already.
                     if (container.legendLayout.tag == null) {
                         container.legendLayout.tag = data.yearMonth
                         val context = container.legendLayout.context

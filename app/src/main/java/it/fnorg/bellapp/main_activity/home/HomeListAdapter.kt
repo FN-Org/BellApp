@@ -37,7 +37,9 @@ class HomeListAdapter (var mContext: Context, var sysList: List<System>) : Recyc
         // view.creditItem.text = subject.credits.toString()
 
         binding.calendarButton.setOnClickListener {
-            val intent = Intent(mContext, CalendarActivity::class.java)
+            val intent = Intent(mContext, CalendarActivity::class.java).apply {
+                putExtra("id", sys.id)
+            }
             mContext.startActivity(intent)
         }
     }

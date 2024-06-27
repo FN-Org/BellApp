@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
@@ -17,7 +17,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.firebase.Timestamp
 import it.fnorg.bellapp.R
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /**
  * A simple [Fragment] subclass.
@@ -51,6 +55,7 @@ class AddEventFragment : Fragment() {
         val dateTextView: EditText = view.findViewById(R.id.editTextDate)
         val fragmentTitle: TextView = view.findViewById(R.id.fragment_title)
         val backArrow: ImageView = view.findViewById(R.id.eventBackArrow)
+        val saveButton: Button = view.findViewById(R.id.save_button)
 
         backArrow.setOnClickListener {
             view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
@@ -66,7 +71,7 @@ class AddEventFragment : Fragment() {
             spinnerMelodies.adapter = adapter1
 
             // Safe args
-            if (args.eventTime != "default") {
+            if (args.eventId != "default") {
                 fragmentTitle.text = requireContext().getString(R.string.modify_event)
 
                 timeTextView.setText(args.eventTime)
@@ -121,7 +126,8 @@ class AddEventFragment : Fragment() {
             val timePickerDialog = TimePickerDialog(
                 requireContext(),
                 { view, hourOfDay, minute ->
-                    timeTextView.setText("$hourOfDay:$minute")
+                    val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
+                    timeTextView.setText(formattedTime)
                 },
                 hour,
                 minute,
@@ -142,7 +148,8 @@ class AddEventFragment : Fragment() {
             val datePickerDialog = DatePickerDialog(
                 requireContext(),
                 { view, year, monthOfYear, dayOfMonth ->
-                    dateTextView.setText(dayOfMonth.toString() + "-" + (monthOfYear + 1) + "-" + year)
+                    val formattedDate = String.format("%02d-%02d-%02d", dayOfMonth, monthOfYear, year)
+                    dateTextView.setText(formattedDate)
                 },
                 year,
                 month,
@@ -150,6 +157,38 @@ class AddEventFragment : Fragment() {
             )
 
             datePickerDialog.show()
+        }
+
+        saveButton.setOnClickListener {
+            val time = timeTextView.text.toString()
+            val date = dateTextView.text.toString()
+
+            // LocalDateTime
+            val dateTimeString = "$date $time"
+            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
+            val dateTime = LocalDateTime.parse(dateTimeString, formatter)
+
+            // Converte LocalDateTime in istante di tempo in millisecondi UNIX
+            val epochMillis = dateTime.toInstant(ZoneOffset.UTC).toEpochMilli()
+
+            // Creazione di un oggetto Timestamp per Firebase Firestore
+            val timestamp = Timestamp(epochMillis / 1000, (epochMillis % 1000).toInt())
+
+            val selectedMelody = spinnerMelodies.selectedItem as Melody
+            val melodyNumber = selectedMelody.number
+            val melodyName = selectedMelody.name
+
+            val color = spinnerColors.selectedItemPosition + 1
+
+            val event = Event(
+                id = "", // L'ID verrà generato automaticamente da Firestore
+                time = timestamp,
+                melodyName = melodyName,
+                melodyNumber = melodyNumber,
+                color = color
+            )
+
+            viewModel.saveEvent(event, args.eventId)
         }
 
     }

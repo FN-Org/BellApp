@@ -65,7 +65,7 @@ class MonthViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        eventsAdapter = EventListAdapter(requireContext(), emptyList())
+        eventsAdapter = EventListAdapter(requireContext(), this ,emptyList())
         binding.calendarRv.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = eventsAdapter
@@ -121,7 +121,7 @@ class MonthViewFragment : Fragment() {
 
     private fun updateAdapterForDate(date: LocalDate?) {
         val eventsForDate = events[date].orEmpty()
-        eventsAdapter = EventListAdapter(requireContext(), eventsForDate)
+        eventsAdapter = EventListAdapter(requireContext(), this, eventsForDate)
         binding.calendarRv.adapter = eventsAdapter
     }
 

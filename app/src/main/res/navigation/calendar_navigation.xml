@@ -23,6 +23,10 @@
             android:id="@+id/action_addEventFragment_to_monthViewFragment"
             app:destination="@id/monthViewFragment" />
         <argument
+            android:name="event_id"
+            app:argType="string"
+            android:defaultValue="default" />
+        <argument
             android:name="event_time"
             app:argType="string"
             android:defaultValue="default" />

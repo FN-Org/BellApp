@@ -1,12 +1,14 @@
 package it.fnorg.bellapp.calendar_activity
 
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import it.fnorg.bellapp.R
 import java.time.LocalDateTime
@@ -14,7 +16,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 data class Event(
-    val id: String = "",
+    var id: String = "",
     val time: Timestamp = Timestamp.now(),
     val melodyName: String = "",
     val melodyNumber: Int = 1,
@@ -43,14 +45,14 @@ fun Timestamp.toLocalDateTime(): LocalDateTime {
 }
 
 class CalendarActivityViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
+
     private val _events = MutableLiveData<List<Event>>()
     val events: LiveData<List<Event>> get() = _events
 
     private val _melodies = MutableLiveData<List<Melody>>()
     val melodies: LiveData<List<Melody>> get() = _melodies
 
-    private val db = FirebaseFirestore.getInstance()
+    private val db = Firebase.firestore
 
     var sysId:String = ""
 
@@ -112,5 +114,37 @@ class CalendarActivityViewModel : ViewModel() {
             .addOnFailureListener { exception ->
                 Log.w("BellAppDB", "Error getting documents.", exception)
             }
+    }
+
+    fun saveEvent(event: Event, identifier: String) {
+        if (identifier == "default") {
+            val newEvent = db.collection("systems")
+                .document(sysId)
+                .collection("events")
+                .document()
+
+            event.id = newEvent.id
+
+            newEvent.set(event)
+        }
+        else {
+            val modifiedEvent = db.collection("systems")
+                .document(sysId)
+                .collection("events")
+                .document(identifier)
+
+            // Update ref
+            modifiedEvent.update("color", event.color,
+                "melodyName", event.melodyName,
+                                    "melodyNumber", event.melodyNumber,
+                                    "time", event.time)
+                .addOnSuccessListener {
+                    // TODO: add Toast
+                    Log.d("GradeTrackerDB", "Grade successfully updated!")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("GradeTrackerDB", "Error updating document", e)
+                }
+        }
     }
 }

@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -12,17 +12,15 @@ import it.fnorg.bellapp.databinding.CalendarEventItemViewBinding
 
 class EventListAdapter(
     context: Context,
+    private val fragment: Fragment,
     val events: List<Event>
 ) :
     RecyclerView.Adapter<EventListAdapter.EventsViewHolder>() {
 
-        // TODO: capire!!!
-    private val ViewModel: CalendarActivityViewModel by lazy {
-        // Assicurati che il context sia un LifecycleOwner
-        val activity = context as? FragmentActivity
-            ?: throw IllegalStateException("Context is not a FragmentActivity")
+    private var viewModel: CalendarActivityViewModel
 
-        ViewModelProvider(activity)[CalendarActivityViewModel::class.java]
+    init {
+        viewModel = ViewModelProvider(fragment).get(CalendarActivityViewModel::class.java)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventsViewHolder {
@@ -42,21 +40,22 @@ class EventListAdapter(
         fun bind(event: Event) {
             binding.itemEventDateText.apply {
                 text = eventDateTimeFormatter.format(event.time.toLocalDateTime())
-                setBackgroundColor(ContextCompat.getColor(context, ViewModel.colorsList[event.color-1].color))
+                setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[event.color-1].color))
             }
 
             binding.itemMelodyNumberText.text = event.melodyNumber.toString()
             binding.itemMelodyNameText.text = event.melodyName
 
-            //on click, goes to the add event fragment passing safe args
+            // On click, goes to the add event fragment passing safe args
             itemView.setOnClickListener{
+                val id = event.id
                 val time = event.time.toLocalDateTime().toLocalTime().format(
                     timeFormatter)
                 val date = event.time.toLocalDateTime().toLocalDate().format(
                     dateFormatter)
                 val melody = event.melodyNumber
                 val color = event.color
-                val action = MonthViewFragmentDirections.actionMonthViewFragmentToAddEventFragment(time,date,melody,color)
+                val action = MonthViewFragmentDirections.actionMonthViewFragmentToAddEventFragment(id, time,date,melody,color)
                 binding.root.findNavController().navigate(action)
             }
         }

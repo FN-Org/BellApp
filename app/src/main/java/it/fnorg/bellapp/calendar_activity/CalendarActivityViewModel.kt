@@ -140,11 +140,24 @@ class CalendarActivityViewModel : ViewModel() {
                                     "time", event.time)
                 .addOnSuccessListener {
                     // TODO: add Toast
-                    Log.d("GradeTrackerDB", "Grade successfully updated!")
+                    Log.d("BellAppDB", "Event successfully updated!")
                 }
                 .addOnFailureListener { e ->
-                    Log.w("GradeTrackerDB", "Error updating document", e)
+                    Log.w("BellAppDB", "Error updating document", e)
                 }
         }
+    }
+
+    fun deleteEvent(eventId: String) {
+        db.collection("systems")
+            .document(sysId)
+            .collection("events")
+            .document(eventId).delete()
+            .addOnSuccessListener {
+                Log.d("BellAppDB", "Event successfully deleted")
+            }
+            .addOnFailureListener{ e ->
+                Log.w("BellAppDB", "Error deleting document", e)
+            }
     }
 }

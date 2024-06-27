@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -56,6 +57,7 @@ class AddEventFragment : Fragment() {
         val fragmentTitle: TextView = view.findViewById(R.id.fragment_title)
         val backArrow: ImageView = view.findViewById(R.id.eventBackArrow)
         val saveButton: Button = view.findViewById(R.id.save_button)
+        val deleteButton: Button = view.findViewById(R.id.delete_button)
 
         backArrow.setOnClickListener {
             view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
@@ -148,7 +150,7 @@ class AddEventFragment : Fragment() {
             val datePickerDialog = DatePickerDialog(
                 requireContext(),
                 { view, year, monthOfYear, dayOfMonth ->
-                    val formattedDate = String.format("%02d-%02d-%02d", dayOfMonth, monthOfYear, year)
+                    val formattedDate = String.format("%02d-%02d-%02d", dayOfMonth, monthOfYear+1, year)
                     dateTextView.setText(formattedDate)
                 },
                 year,
@@ -163,13 +165,18 @@ class AddEventFragment : Fragment() {
             val time = timeTextView.text.toString()
             val date = dateTextView.text.toString()
 
+            if (time.isBlank()||date.isBlank()){
+                Toast.makeText(requireActivity(), R.string.incorrect_saved, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
             // LocalDateTime
             val dateTimeString = "$date $time"
             val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
-            val dateTime = LocalDateTime.parse(dateTimeString, formatter)
+            val dateTime = LocalDateTime.parse(dateTimeString.trim(), formatter)
 
             // Converte LocalDateTime in istante di tempo in millisecondi UNIX
-            val epochMillis = dateTime.toInstant(ZoneOffset.UTC).toEpochMilli()
+            val epochMillis = dateTime.toInstant(ZoneOffset.ofHours(2)).toEpochMilli()
 
             // Creazione di un oggetto Timestamp per Firebase Firestore
             val timestamp = Timestamp(epochMillis / 1000, (epochMillis % 1000).toInt())
@@ -189,7 +196,19 @@ class AddEventFragment : Fragment() {
             )
 
             viewModel.saveEvent(event, args.eventId)
+
+
+            view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
+
         }
 
+        deleteButton.setOnClickListener{
+            if (args.eventId != "default")
+                viewModel.deleteEvent(args.eventId)
+
+            Toast.makeText(requireActivity(), R.string.deleted, Toast.LENGTH_SHORT).show()
+
+            view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
+        }
     }
 }

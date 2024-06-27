@@ -28,7 +28,13 @@
     <string name="select_melody">Select a melody</string>
     <string name="select_color">Select a color</string>
     <string name="save_event">SAVE</string>
+    <string name="delete_event">DELETE</string>
 
     <string name="add_event">Add Event</string>
     <string name="modify_event">Modify Event</string>
+
+    <string name="saved">Successfully  saved</string>
+    <string name="incorrect_saved">Please provide all the informations</string>
+    <string name="deleted">Successfully  deleted</string>
+
 </resources>

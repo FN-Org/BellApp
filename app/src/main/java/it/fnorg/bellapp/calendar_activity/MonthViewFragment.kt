@@ -15,10 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.Timestamp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -35,9 +33,7 @@ import it.fnorg.bellapp.databinding.CalendarHeaderBinding
 import it.fnorg.bellapp.main_activity.MainActivity
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
-import java.time.ZoneOffset
 
 class MonthViewFragment : Fragment() {
 
@@ -217,5 +213,15 @@ class MonthViewFragment : Fragment() {
                     }
                 }
             }
+    }
+
+
+    //Every time that it re-became visible, it does this
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.fetchEventsData()
+        viewModel.fetchMelodiesData()
+
     }
 }

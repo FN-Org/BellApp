@@ -5,6 +5,7 @@ import androidx.annotation.ColorRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import it.fnorg.bellapp.R
@@ -13,11 +14,11 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 data class Event(
-    val id: String,
-    val time: LocalDateTime,
-    val melodyName: String,
-    val melodyNumber: Int,
-    val color: Int
+    val id: String = "",
+    val time: Timestamp = Timestamp.now(),
+    val melodyName: String = "",
+    val melodyNumber: Int = 1,
+    val color: Int = 1
 )
 
 data class Melody(
@@ -43,6 +44,8 @@ class CalendarActivityViewModel : ViewModel() {
 
     private val db = FirebaseFirestore.getInstance()
 
+    var sysId:String = ""
+
     // Initialize with an empty list
     init {
         _events.value = emptyList()
@@ -57,7 +60,7 @@ class CalendarActivityViewModel : ViewModel() {
 
     fun fetchEventsData(sysId: String) {
         db.collection("systems")
-            .document(sysId)
+            .document("KkEsJ6nVzUb4SSZhLANG")
             .collection("events")
             .get()
             .addOnSuccessListener { result ->

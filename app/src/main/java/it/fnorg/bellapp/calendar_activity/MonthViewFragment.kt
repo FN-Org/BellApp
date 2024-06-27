@@ -15,8 +15,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.Timestamp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -33,11 +35,19 @@ import it.fnorg.bellapp.databinding.CalendarHeaderBinding
 import it.fnorg.bellapp.main_activity.MainActivity
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.ZoneOffset
+
+
+fun Timestamp.toLocalDateTime(): LocalDateTime {
+    return this.toDate().toInstant().atZone(ZoneOffset.UTC).toLocalDateTime()
+}
 
 class MonthViewFragment : Fragment() {
 
-    val viewModel: CalendarActivityViewModel by activityViewModels()
+    private lateinit var viewModel: CalendarActivityViewModel
+
 
     private var selectedDate: LocalDate? = null
 
@@ -48,6 +58,8 @@ class MonthViewFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProvider(requireActivity())[CalendarActivityViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -61,6 +73,7 @@ class MonthViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.fetchEventsData(viewModel.sysId)
         // Inizializzare l'adapter senza dati
         eventsAdapter = EventListAdapter(requireContext(), emptyList())
         binding.calendarRv.apply {
@@ -69,7 +82,7 @@ class MonthViewFragment : Fragment() {
         }
 
         viewModel.events.observe(viewLifecycleOwner) { eventsList ->
-            events = eventsList.groupBy { it.time.toLocalDate() }
+            events = eventsList.groupBy { it.time.toLocalDateTime().toLocalDate() }
             updateAdapterForDate(selectedDate)
             binding.calendarView.notifyCalendarChanged() // Notify the calendar to update its views
         }
@@ -113,6 +126,7 @@ class MonthViewFragment : Fragment() {
         addEventButton.setOnClickListener {
             view.findNavController().navigate(R.id.action_monthViewFragment_to_addEventFragment)
         }
+
     }
 
     private fun updateAdapterForDate(date: LocalDate?) {
@@ -165,10 +179,10 @@ class MonthViewFragment : Fragment() {
                     val events = this@MonthViewFragment.events[data.date]
                     if (events != null) {
                         if (events.count() == 1) {
-                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, events[0].color))
+                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[0].color-1].color))
                         } else {
-                            eventTopView.setBackgroundColor(ContextCompat.getColor(context, events[0].color))
-                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, events[1].color))
+                            eventTopView.setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[0].color-1].color))
+                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[1].color-1].color))
 
                             if (events.count() > 2) {
                                 eventsContainer.removeAllViews()
@@ -177,7 +191,7 @@ class MonthViewFragment : Fragment() {
                                         layoutParams = LinearLayout.LayoutParams(16, 16).apply {
                                             marginEnd = 8
                                         }
-                                        setBackgroundColor(ContextCompat.getColor(context, events[i].color))
+                                        setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[i].color-1].color))
                                     }
                                     eventsContainer.addView(dot)
                                 }

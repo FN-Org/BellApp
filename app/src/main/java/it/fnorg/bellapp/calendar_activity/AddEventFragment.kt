@@ -44,6 +44,9 @@ class AddEventFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.fetchMelodiesData(viewModel.sysId)
+
         val spinnerMelodies: Spinner = view.findViewById(R.id.spinner_options_melodies)
         val spinnerColors: Spinner = view.findViewById(R.id.spinner_options_colors)
         val timeTextView: EditText = view.findViewById(R.id.editTextTime)
@@ -133,18 +136,18 @@ class AddEventFragment : Fragment() {
 
         // Safe args
         if (args.eventTime != "default"){
-            fragmentTitle.text = "Modify Event"
+            fragmentTitle.text = requireContext().getString(R.string.modify_event)
 
             timeTextView.setText(args.eventTime)
             dateTextView.setText(args.eventDate)
 
             val spinnerMelodies: Spinner = view.findViewById(R.id.spinner_options_melodies)
-            spinnerMelodies.setSelection(args.eventMelody)
+            spinnerMelodies.setSelection(args.eventMelody-1)
 
             val spinnerColors : Spinner = view.findViewById(R.id.spinner_options_colors)
-            spinnerColors.setSelection(viewModel.colorsList.indexOfFirst { it.color == args.eventColor })
+            spinnerColors.setSelection(args.eventColor-1)
         }
-        else fragmentTitle.text = "Add Event"
+        else fragmentTitle.text = requireContext().getString(R.string.add_event)
 
     }
 }

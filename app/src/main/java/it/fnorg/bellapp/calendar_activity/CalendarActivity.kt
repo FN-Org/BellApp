@@ -1,6 +1,7 @@
 package it.fnorg.bellapp.calendar_activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -16,9 +17,15 @@ class CalendarActivity : AppCompatActivity() {
 
         val sysId = intent.getStringExtra("id")
 
+        if (sysId != null) {
+            viewModel.sysId = sysId
+
+            Log.w("BellApp-CalendarActViewModel", "Obtained sysId: $sysId")
+        }
+
         val navController = findNavController(R.id.nav_host_calendar)
 
-        viewModel.fetchEventsData(sysId.toString())
-        viewModel.fetchMelodiesData(sysId.toString())
+        //viewModel.fetchEventsData(sysId.toString())
+        //viewModel.fetchMelodiesData(sysId.toString())
     }
 }

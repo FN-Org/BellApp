@@ -28,4 +28,7 @@
     <string name="select_melody">Select a melody</string>
     <string name="select_color">Select a color</string>
     <string name="save_event">SAVE</string>
+
+    <string name="add_event">Add Event</string>
+    <string name="modify_event">Modify Event</string>
 </resources>

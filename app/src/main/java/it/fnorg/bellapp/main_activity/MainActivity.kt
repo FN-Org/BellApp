@@ -2,6 +2,7 @@ package it.fnorg.bellapp.main_activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -53,6 +54,18 @@ class MainActivity : AppCompatActivity() {
             // Per chiudere il drawer dopo il sign-out ma probabilmente non serve
             // drawerLayout.closeDrawer(GravityCompat.START)
             true
+        }
+
+        val headerView = navView.getHeaderView(0)
+
+        // TODO: funziona, ma se arrivi dalla calendar activty non hai più ste robe nell'intent e quindi non va più
+        if (!intent.getStringExtra("FullName").isNullOrBlank() ||
+            !intent.getStringExtra("Email").isNullOrBlank()) {
+            val fullNameText: TextView = headerView.findViewById(R.id.fullNameTextView)
+            fullNameText.text = intent.getStringExtra("FullName")
+
+            val emailText: TextView = headerView.findViewById(R.id.emailTextView)
+            emailText.text = intent.getStringExtra("Email")
         }
     }
 

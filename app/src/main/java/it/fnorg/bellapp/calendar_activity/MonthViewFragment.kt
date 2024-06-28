@@ -61,6 +61,11 @@ class MonthViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
+        val currentMonth = YearMonth.now()
+        val startMonth = currentMonth.minusMonths(200)
+        val endMonth = currentMonth.plusMonths(200)
+
         eventsAdapter = EventListAdapter(requireContext(), this ,emptyList())
         binding.calendarRv.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -70,14 +75,10 @@ class MonthViewFragment : Fragment() {
         viewModel.events.observe(viewLifecycleOwner) { eventsList ->
             events = eventsList.groupBy { it.time.toLocalDateTime().toLocalDate() }
             updateAdapterForDate(selectedDate)
+            configureBinders(daysOfWeek)
             binding.calendarView.notifyCalendarChanged() // Notify the calendar to update its views
         }
 
-        val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
-        val currentMonth = YearMonth.now()
-        val startMonth = currentMonth.minusMonths(200)
-        val endMonth = currentMonth.plusMonths(200)
-        configureBinders(daysOfWeek)
         binding.calendarView.setup(startMonth, endMonth, daysOfWeek.first())
         binding.calendarView.scrollToMonth(currentMonth)
 
@@ -116,10 +117,11 @@ class MonthViewFragment : Fragment() {
     }
 
     private fun updateAdapterForDate(date: LocalDate?) {
-        val eventsForDate = events[date].orEmpty()
+        val eventsForDate = events[date].orEmpty().sortedBy { it.time.toLocalDateTime().toLocalTime() }
         eventsAdapter = EventListAdapter(requireContext(), this, eventsForDate)
         binding.calendarRv.adapter = eventsAdapter
     }
+
 
     private fun configureBinders(daysOfWeek: List<DayOfWeek>) {
         class DayViewContainer(view: View) : ViewContainer(view) {
@@ -162,7 +164,7 @@ class MonthViewFragment : Fragment() {
                     textView.setTextColor(ContextCompat.getColor(context, R.color.white))
                     layout.setBackgroundResource(if (selectedDate == data.date) R.drawable.calendar_day_selected else 0)
 
-                    val events = this@MonthViewFragment.events[data.date]
+                    val events = this@MonthViewFragment.events[data.date]?.sortedBy { it.time.toLocalDateTime().toLocalTime() }
                     if (events != null) {
                         if (events.count() == 1) {
                             eventBottomView.setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[0].color-1].color))
@@ -214,7 +216,6 @@ class MonthViewFragment : Fragment() {
                 }
             }
     }
-
 
     //Every time that it re-became visible, it does this
     override fun onResume() {

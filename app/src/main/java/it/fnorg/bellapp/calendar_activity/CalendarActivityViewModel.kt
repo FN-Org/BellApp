@@ -1,7 +1,6 @@
 package it.fnorg.bellapp.calendar_activity
 
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

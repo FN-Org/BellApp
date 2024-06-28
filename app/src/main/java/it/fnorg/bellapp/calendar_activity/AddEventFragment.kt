@@ -63,6 +63,10 @@ class AddEventFragment : Fragment() {
             view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
         }
 
+        // deleteButton invisible and not clickable as default options
+        deleteButton.visibility = View.GONE
+        deleteButton.isEnabled = false
+
         // Melodies' observer & spinner for melodies
         viewModel.melodies.observe(viewLifecycleOwner) { melodies ->
             val adapter1 = MelodyAdapter(
@@ -86,6 +90,15 @@ class AddEventFragment : Fragment() {
                 }
 
                 spinnerColors.setSelection(args.eventColor - 1)
+
+                // defaultButton become visible and clickable in the Modify Event
+                deleteButton.visibility = View.VISIBLE
+                deleteButton.isEnabled = true
+                deleteButton.setOnClickListener{
+                    viewModel.deleteEvent(args.eventId)
+                    Toast.makeText(requireActivity(), R.string.deleted, Toast.LENGTH_SHORT).show()
+                    view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
+                }
             } else {
                 fragmentTitle.text = requireContext().getString(R.string.add_event)
             }
@@ -200,15 +213,6 @@ class AddEventFragment : Fragment() {
 
             view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
 
-        }
-
-        deleteButton.setOnClickListener{
-            if (args.eventId != "default")
-                viewModel.deleteEvent(args.eventId)
-
-            Toast.makeText(requireActivity(), R.string.deleted, Toast.LENGTH_SHORT).show()
-
-            view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
         }
     }
 }

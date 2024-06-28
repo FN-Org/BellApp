@@ -1,6 +1,8 @@
 package it.fnorg.bellapp.main_activity
 
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +10,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
+import it.fnorg.bellapp.R
 
 data class System(
     val id: String = "",
@@ -69,6 +72,22 @@ class MainViewModel : ViewModel() {
                 }
                 .addOnFailureListener {
 
+                }
+        }
+    }
+
+    fun changeSysName(sysId : String,name : String){
+        if (uid != null && name.isNotBlank()) {
+            db.collection("users")
+                .document(uid)
+                .collection("systems")
+                .document(sysId)
+                .update("name", name)
+                .addOnSuccessListener {
+
+                }
+                .addOnFailureListener { exception ->
+                    Log.d("HomeViewModel", "change name failed with ", exception)
                 }
         }
     }

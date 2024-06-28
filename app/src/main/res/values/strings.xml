@@ -16,6 +16,11 @@
     <string name="mail_fede">fedegarau02@gmail.com</string>
     <string name="mail_nicco">nicolotrebino@gmail.com</string>
 
+    <string name="calendar">Calendar</string>
+    <string name="change_name">Change name</string>
+
+    <string name="name_changed">Name successfully changed!</string>
+
     <string name="skip_button">SKIP</string>
     <string name="next_button">NEXT</string>
     <string name="previous_button">PREVIOUS</string>

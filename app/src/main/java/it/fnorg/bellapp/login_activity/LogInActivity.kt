@@ -35,15 +35,6 @@ class LogInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity_log_in)
 
-        // You must provide a custom layout XML resource and configure at least one
-        // provider button ID. It's important that you set the button ID for every provider
-        // that you have enabled.
-        val customLayout = AuthMethodPickerLayout
-            .Builder(R.layout.login_activity_log_in_custom)
-            .setGoogleButtonId(R.id.google_button)
-            .setEmailButtonId(R.id.email_button)
-            .build()
-
         // Choose authentication providers
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
@@ -54,12 +45,13 @@ class LogInActivity : AppCompatActivity() {
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
-            .setAuthMethodPickerLayout(customLayout)
+            .setLogo(R.mipmap.ic_bell_app)
+            .setTheme(R.style.LoginTheme)
+            .setTosAndPrivacyPolicyUrls("https://github.com/FN-Org/BellApp", "https://zoomquilt.org")
             .build()
 
         signInLauncher.launch(signInIntent)
     }
-
 
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse

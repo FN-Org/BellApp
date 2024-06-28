@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/calendar_navigation"
+    app:startDestination="@id/monthViewFragment">
+
+    <fragment
+        android:id="@+id/monthViewFragment"
+        android:name="it.fnorg.bellapp.calendar_activity.MonthViewFragment"
+        android:label="calendar_fragment_month_view"
+        tools:layout="@layout/calendar_fragment_month_view" >
+        <action
+            android:id="@+id/action_monthViewFragment_to_addEventFragment"
+            app:destination="@id/addEventFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addEventFragment"
+        android:name="it.fnorg.bellapp.calendar_activity.AddEventFragment"
+        android:label="calendar_fragment_add_event"
+        tools:layout="@layout/calendar_fragment_add_event" >
+        <action
+            android:id="@+id/action_addEventFragment_to_monthViewFragment"
+            app:destination="@id/monthViewFragment" />
+        <argument
+            android:name="event_id"
+            app:argType="string"
+            android:defaultValue="default" />
+        <argument
+            android:name="event_time"
+            app:argType="string"
+            android:defaultValue="default" />
+        <argument
+            android:name="event_date"
+            app:argType="string"
+            android:defaultValue="default" />
+        <argument
+            android:name="event_melody"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="event_color"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+</navigation>

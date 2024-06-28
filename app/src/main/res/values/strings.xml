@@ -19,4 +19,22 @@
     <string name="skip_button">SKIP</string>
     <string name="next_button">NEXT</string>
     <string name="previous_button">PREVIOUS</string>
+
+    <string name="login_email_button">Sign in with email</string>
+    <string name="login_google_button">Sign in with Google</string>
+
+    <string name="add_time">Time</string>
+    <string name="add_date">Date</string>
+    <string name="select_melody">Select a melody</string>
+    <string name="select_color">Select a color</string>
+    <string name="save_event">SAVE</string>
+    <string name="delete_event">DELETE</string>
+
+    <string name="add_event">Add Event</string>
+    <string name="modify_event">Modify Event</string>
+
+    <string name="saved">Successfully  saved</string>
+    <string name="incorrect_saved">Please provide all the informations</string>
+    <string name="deleted">Successfully  deleted</string>
+
 </resources>

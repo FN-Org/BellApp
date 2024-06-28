@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Main palette -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#284C7E</color>
     <color name="lapis">#3562A3</color>
+    <color name="persianorange">#EC985C</color>
     <color name="seasalt">#F9F9F9</color>
+
+    <!-- Events color -->
+    <color name="naples">#F8DB64</color>
+    <color name="lightred">#F87575</color>
+    <color name="jade">#57A773</color>
 
 </resources>

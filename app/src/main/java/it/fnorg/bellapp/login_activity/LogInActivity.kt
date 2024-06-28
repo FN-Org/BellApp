@@ -4,14 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.main_activity.MainActivity
 
@@ -34,19 +35,31 @@ class LogInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity_log_in)
 
+        // You must provide a custom layout XML resource and configure at least one
+        // provider button ID. It's important that you set the button ID for every provider
+        // that you have enabled.
+        val customLayout = AuthMethodPickerLayout
+            .Builder(R.layout.login_activity_log_in_custom)
+            .setGoogleButtonId(R.id.google_button)
+            .setEmailButtonId(R.id.email_button)
+            .build()
+
         // Choose authentication providers
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build()
         )
+
         // Create and launch sign-in intent
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
-            .setLogo(R.drawable.image_first_fragment)
+            .setAuthMethodPickerLayout(customLayout)
             .build()
+
         signInLauncher.launch(signInIntent)
     }
+
 
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
@@ -64,19 +77,21 @@ class LogInActivity : AppCompatActivity() {
                 val email = user.email ?: ""
                 val db = Firebase.firestore
                 val currentUserDocRef = db.collection("users").document(uid)
+                var userData : UserInfo
 
                 currentUserDocRef.get().addOnSuccessListener { document ->
                     if (!document.exists()) {
-                        val userData = UserInfo(uid, fullName, email, Timestamp.now())
+                        userData = UserInfo(uid, fullName, email, Timestamp.now())
                         currentUserDocRef.set(userData).addOnSuccessListener {
                             Log.d("LogInActivity", "User document created successfully")
                         }.addOnFailureListener { exception ->
                             Log.d("LogInActivity", "Failed to create user document: ", exception)
                         }
                     } else {
+                        userData = document.toObject<UserInfo>()!!
                         Log.d("LogInActivity", "User document already exists")
                     }
-                    navigateToMainActivity(user)
+                    navigateToMainActivity(userData)
                 }.addOnFailureListener { exception ->
                     Log.d("LogInActivity", "Failed to check user document: ", exception)
                 }
@@ -91,10 +106,12 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateToMainActivity(user: FirebaseUser) {
+    private fun navigateToMainActivity(user: UserInfo) {
         // Start the MainActivity
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("USER", user)
+        intent.putExtra("UserId", user.uid)
+        intent.putExtra("FullName", user.fullName)
+        intent.putExtra("Email", user.email)
         startActivity(intent)
     }
 }

@@ -3,6 +3,7 @@ package it.fnorg.bellapp.main_activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
+import androidx.activity.viewModels
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -12,6 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
+import com.google.firebase.auth.FirebaseAuth
 import it.fnorg.bellapp.login_activity.LogInActivity
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainActivityMainBinding
@@ -20,6 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: MainActivityMainBinding
+
+    val viewModel : MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,16 +60,14 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        val headerView = navView.getHeaderView(0)
+        viewModel.fetchUserData()
 
-        // TODO: funziona, ma se arrivi dalla calendar activty non hai più ste robe nell'intent e quindi non va più
-        if (!intent.getStringExtra("FullName").isNullOrBlank() ||
-            !intent.getStringExtra("Email").isNullOrBlank()) {
-            val fullNameText: TextView = headerView.findViewById(R.id.fullNameTextView)
-            fullNameText.text = intent.getStringExtra("FullName")
+        viewModel.email.observe(this) { email ->
+            binding.navView.getHeaderView(0).findViewById<TextView>(R.id.emailTextView).text = email
+        }
 
-            val emailText: TextView = headerView.findViewById(R.id.emailTextView)
-            emailText.text = intent.getStringExtra("Email")
+        viewModel.name.observe(this) { name ->
+            binding.navView.getHeaderView(0).findViewById<TextView>(R.id.fullNameTextView).text = name
         }
     }
 

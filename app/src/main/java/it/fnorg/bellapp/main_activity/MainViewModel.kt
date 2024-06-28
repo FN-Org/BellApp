@@ -1,0 +1,75 @@
+package it.fnorg.bellapp.main_activity
+
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
+
+data class System(
+    val id: String = "",
+    val name: String = "",
+    val location: String = ""
+)
+
+class MainViewModel : ViewModel() {
+
+    private val db = Firebase.firestore
+
+    private val _systems = MutableLiveData<List<System>>()
+    val systems: LiveData<List<System>> get() = _systems
+
+    private val _email = MutableLiveData<String>()
+    val email: LiveData<String> get() = _email
+
+    private val _name = MutableLiveData<String>()
+    val name: LiveData<String> get() = _name
+
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+    // Initialize with an empty list
+    init {
+        _systems.value = emptyList()
+    }
+
+    fun fetchSysData() {
+        if (uid != null) {
+            db.collection("users")
+                .document(uid)
+                .collection("systems")
+                .get()
+                .addOnSuccessListener { result ->
+                    val systemsList = mutableListOf<System>()
+                    for (document in result) {
+                        document.toObject<System>().let { system ->
+                            systemsList.add(system)
+                        }
+                    }
+                    _systems.value = systemsList
+                }
+                .addOnFailureListener { exception ->
+                    Log.d("HomeViewModel", "get failed with ", exception)
+                }
+        }
+    }
+
+    fun fetchUserData() {
+        if (uid != null) {
+            db.collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        _email.value = document.getString("email").toString()
+                        _name.value = document.getString("fullName").toString()
+                    }
+                }
+                .addOnFailureListener {
+
+                }
+        }
+    }
+}

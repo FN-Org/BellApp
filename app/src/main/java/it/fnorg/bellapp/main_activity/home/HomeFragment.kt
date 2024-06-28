@@ -1,15 +1,16 @@
 package it.fnorg.bellapp.main_activity.home
 
 import androidx.lifecycle.Observer
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import it.fnorg.bellapp.databinding.MainFragmentHomeBinding
+import it.fnorg.bellapp.main_activity.MainViewModel
 
 class HomeFragment : Fragment() {
 
@@ -17,7 +18,7 @@ class HomeFragment : Fragment() {
         fun newInstance() = HomeFragment()
     }
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: MainViewModel by activityViewModels()
 
     //binding connected to the specific layout of the fragment
     private lateinit var binding: MainFragmentHomeBinding
@@ -47,13 +48,6 @@ class HomeFragment : Fragment() {
             binding.rvHome.adapter = homeListAdapter
         })
 
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-            val uid = user.uid
-            // Ora puoi utilizzare l'UID per le tue operazioni
-            viewModel.fetchSysData(uid)
-        } else {
-            // Nessun utente attualmente autenticato
-        }
+        viewModel.fetchSysData()
     }
 }

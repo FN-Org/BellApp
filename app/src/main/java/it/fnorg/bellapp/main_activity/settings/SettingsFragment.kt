@@ -30,21 +30,18 @@ import it.fnorg.bellapp.main_activity.ReminderReceiver
 class SettingsFragment : Fragment() {
 
 
-    val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                // Permission is granted. Continue the action or workflow in your
-                // app.
-            } else {
-                // Explain to the user that the feature is unavailable because the
-                // feature requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
-            }
+    val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        val context = requireContext()
+        if (isGranted) {
+            // Il permesso è stato concesso
+            setPermissionRequested(context, true)
+        } else {
+            // Il permesso è stato negato, mostra un messaggio per andare nelle impostazioni
+            Toast.makeText(context, "Please enable notifications in settings", Toast.LENGTH_LONG).show()
         }
+    }
 
 
     private lateinit var alarmManager: AlarmManager
@@ -58,7 +55,6 @@ class SettingsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -72,24 +68,25 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val reminderSwitch : SwitchMaterial = view.findViewById(R.id.reminder_switch)
+        val reminderSwitch: SwitchMaterial = view.findViewById(R.id.reminder_switch)
 
         alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         reminderSwitch.setOnCheckedChangeListener { _, isChecked ->
-            val timeGroup : Group = view.findViewById(R.id.time_group)
+            val timeGroup: Group = view.findViewById(R.id.time_group)
             if (isChecked) {
-                if (checkNotifyPermission(view)){
+                if (checkNotifyPermission(view)) {
                     timeGroup.visibility = View.VISIBLE
+                } else {
+                    reminderSwitch.isChecked = false // Disabilita lo switch se i permessi non sono concessi
                 }
-                else reminderSwitch.isEnabled = false
             } else {
                 cancelAlarm(true)
                 timeGroup.visibility = View.GONE
             }
         }
 
-        val timeEditText : EditText = view.findViewById(R.id.reminderEditTextTime)
+        val timeEditText: EditText = view.findViewById(R.id.reminderEditTextTime)
 
         timeEditText.setOnClickListener {
             cancelAlarm(false)
@@ -102,8 +99,7 @@ class SettingsFragment : Fragment() {
                 { view, hourOfDay, minute ->
                     val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
                     timeEditText.setText(formattedTime)
-                    setDailyAlarm(hourOfDay,minute)
-
+                    setDailyAlarm(hourOfDay, minute)
                 },
                 hour,
                 minute,
@@ -112,8 +108,6 @@ class SettingsFragment : Fragment() {
 
             timePickerDialog.show()
         }
-
-
     }
 
     private fun setDailyAlarm(hour: Int, minute: Int) {
@@ -141,7 +135,6 @@ class SettingsFragment : Fragment() {
         Toast.makeText(requireContext(), "Daily Alarm Set", Toast.LENGTH_SHORT).show()
     }
 
-
     private fun cancelAlarm(show: Boolean) {
         if (::pendingIntent.isInitialized) {
             alarmManager.cancel(pendingIntent)
@@ -151,28 +144,49 @@ class SettingsFragment : Fragment() {
     }
 
     private fun checkNotifyPermission(view: View): Boolean {
+        val context = requireContext()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             when {
                 ContextCompat.checkSelfPermission(
-                    requireContext(),
+                    context,
                     Manifest.permission.POST_NOTIFICATIONS
                 ) == PackageManager.PERMISSION_GRANTED -> {
-                // You can use the API that requires the permission.
                     return true
                 }
-                else -> {
-
-                // You can directly ask for the permission.
-                // The registered ActivityResultCallback gets the result of this request.
-                requestPermissionLauncher.launch(
-                    Manifest.permission.POST_NOTIFICATIONS)
-
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    // Mostra un messaggio che spiega perché il permesso è necessario e chiede di andare nelle impostazioni
+                    Toast.makeText(context, "Please enable notifications in settings", Toast.LENGTH_LONG).show()
                     return false
-
+                }
+                else -> {
+                    if (!wasPermissionRequested(context)) {
+                        // Chiede il permesso per la prima volta
+                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        setPermissionRequested(context, true)
+                    } else {
+                        // Se il permesso è stato richiesto e negato, mostra un messaggio per andare nelle impostazioni
+                        Toast.makeText(context, "Please enable notifications in settings", Toast.LENGTH_LONG).show()
+                    }
+                    return false
                 }
             }
         }
         return false
     }
+
+
+    private fun setPermissionRequested(context: Context, value: Boolean) {
+        val sharedPref = context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE) ?: return
+        with (sharedPref.edit()) {
+            putBoolean("notification_permission_requested", value)
+            apply()
+        }
+    }
+
+    private fun wasPermissionRequested(context: Context): Boolean {
+        val sharedPref = context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE) ?: return false
+        return sharedPref.getBoolean("notification_permission_requested", false)
+    }
+
 
 }

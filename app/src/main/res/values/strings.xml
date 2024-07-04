@@ -42,4 +42,6 @@
     <string name="incorrect_saved">Please provide all the informations</string>
     <string name="deleted">Successfully  deleted</string>
 
+    <string name="set_reminder">Set a reminder</string>
+
 </resources>

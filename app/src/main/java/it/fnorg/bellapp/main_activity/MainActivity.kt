@@ -1,5 +1,6 @@
 package it.fnorg.bellapp.main_activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
@@ -12,10 +13,18 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.firebase.ui.auth.AuthUI
 import it.fnorg.bellapp.login_activity.LogInActivity
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainActivityMainBinding
+
+
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
 
 class MainActivity : AppCompatActivity() {
 

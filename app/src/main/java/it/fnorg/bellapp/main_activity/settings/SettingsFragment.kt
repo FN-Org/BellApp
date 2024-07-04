@@ -22,10 +22,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
+import it.fnorg.bellapp.main_activity.dataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class SettingsFragment : Fragment() {
 
@@ -46,6 +55,9 @@ class SettingsFragment : Fragment() {
 
     private lateinit var alarmManager: AlarmManager
     private lateinit var pendingIntent: PendingIntent
+
+    private val REMINDER_SET = booleanPreferencesKey("reminder_set")
+    private val REMINDER_TIME_SET = stringPreferencesKey("reminder_time_set")
 
     companion object {
         fun newInstance() = SettingsFragment()
@@ -72,6 +84,7 @@ class SettingsFragment : Fragment() {
 
         alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+
         reminderSwitch.setOnCheckedChangeListener { _, isChecked ->
             val timeGroup: Group = view.findViewById(R.id.time_group)
             if (isChecked) {
@@ -84,6 +97,9 @@ class SettingsFragment : Fragment() {
                 cancelAlarm(true)
                 timeGroup.visibility = View.GONE
             }
+
+            viewLifecycleOwner.lifecycleScope.launch {setReminderPreference(reminderSwitch.isChecked)}
+
         }
 
         val timeEditText: EditText = view.findViewById(R.id.reminderEditTextTime)
@@ -99,14 +115,33 @@ class SettingsFragment : Fragment() {
                 { view, hourOfDay, minute ->
                     val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
                     timeEditText.setText(formattedTime)
+                    viewLifecycleOwner.lifecycleScope.launch {setReminderTimePreference(formattedTime)}
                     setDailyAlarm(hourOfDay, minute)
                 },
                 hour,
                 minute,
-                false
+                true
             )
 
             timePickerDialog.show()
+        }
+
+        var reminderSetFlow: Flow<Boolean> = requireContext().dataStore.data.map { settings ->
+            settings[REMINDER_SET] == true
+        }
+
+        var reminderSetTimeFlow : Flow<String?> = requireContext().dataStore.data.map { settings ->
+            settings[REMINDER_TIME_SET]
+        }
+
+
+        viewLifecycleOwner.lifecycleScope.launch{
+            if (reminderSetFlow.first()) {
+                reminderSwitch.isChecked = true
+                val reminderSetTime = reminderSetTimeFlow.first()
+                if (reminderSetTime != null)
+                    timeEditText.setText(reminderSetTime)
+            }
         }
     }
 
@@ -188,5 +223,17 @@ class SettingsFragment : Fragment() {
         return sharedPref.getBoolean("notification_permission_requested", false)
     }
 
+
+    private suspend fun setReminderPreference(value: Boolean) {
+        requireContext().dataStore.edit { settings ->
+            settings[REMINDER_SET] = value
+        }
+    }
+
+    private suspend fun setReminderTimePreference(value: String) {
+        requireContext().dataStore.edit { settings ->
+            settings[REMINDER_TIME_SET] = value
+        }
+    }
 
 }

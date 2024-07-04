@@ -103,4 +103,7 @@ dependencies {
     implementation("com.kizitonwose.calendar:view:$calendarVersion")
     // The compose calendar library
     implementation("com.kizitonwose.calendar:compose:$calendarVersion")
+
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
 }

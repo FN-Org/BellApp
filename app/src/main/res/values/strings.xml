@@ -44,4 +44,19 @@
 
     <string name="set_reminder">Set a reminder</string>
 
+    <string name="insert_sys_id">Insert system id:</string>
+
+    <string name="search">Search</string>
+    <string name="found">Found:</string>
+    <string name="location">Location:</string>
+    <string name="melodies_number">Number of melodies:</string>
+    <string name="bells_number">Number of bells:</string>
+    <string name="id">Id:</string>
+    <string name="name">Name:</string>
+    <string name="insert_pin">Insert pin:</string>
+    <string name="add_sys">Add system</string>
+
+    <string name="none">none</string>
+    <string name="something_went_wrong">Something went wrong, please try again</string>
+    <string name="successfully_add_sys">System added successfully</string>
 </resources>

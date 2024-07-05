@@ -1,21 +1,23 @@
 package it.fnorg.bellapp.main_activity
 
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
-import it.fnorg.bellapp.R
 
 data class System(
     val id: String = "",
     val name: String = "",
-    val location: String = ""
+    val location: String = "",
+    var numBells: Int = 1,
+    var numMelodies : Int = 1,
+    val pin: String = "",
+    val timestamp: Timestamp = Timestamp.now()
 )
 
 class MainViewModel : ViewModel() {
@@ -32,6 +34,9 @@ class MainViewModel : ViewModel() {
     val name: LiveData<String> get() = _name
 
     val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+    private val _system = MutableLiveData<System>()
+    val system : LiveData<System> get() = _system
 
     // Initialize with an empty list
     init {
@@ -57,6 +62,7 @@ class MainViewModel : ViewModel() {
                     Log.d("HomeViewModel", "get failed with ", exception)
                 }
         }
+        else Log.d("HomeViewModelFetchSysdata", "uid was null")
     }
 
     fun fetchUserData() {
@@ -74,6 +80,7 @@ class MainViewModel : ViewModel() {
 
                 }
         }
+        else Log.d("HomeViewModelFetchUserData", "uid was null")
     }
 
     fun changeSysName(sysId : String,name : String){
@@ -90,5 +97,50 @@ class MainViewModel : ViewModel() {
                     Log.d("HomeViewModel", "change name failed with ", exception)
                 }
         }
+        else Log.d("HomeViewModelChangeSysName", "uid was null or name was blank")
+    }
+
+    fun fetchSysData(sysId: String, callback: (Boolean) -> Unit){
+            db.collection("systems")
+                .document(sysId)
+                .get()
+                .addOnSuccessListener { result ->
+                    result.toObject<System>().let { system ->
+                        if (system != null) {
+                            _system.value = system
+                            callback(true)
+                        }
+                        else {
+                            _system.value = System()
+                            callback(false)
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d("MainViewModel", "get failed with ", exception)
+                    callback(false)
+                }
+    }
+
+    fun addSys(sysId: String,location: String, name: String) {
+        val selectedFields = mapOf(
+            "id" to sysId,
+            "name" to name,
+            "location" to location
+        )
+        if (uid != null) {
+            db.collection("users")
+                .document(uid)
+                .collection("systems")
+                .document(sysId)
+                .set(selectedFields)
+                .addOnSuccessListener {
+                    Log.d("HomeViewModelAddSys", "Document successfully created")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("HomeViewModelAddSys", "Error writing document", e)
+                }
+        }
+        else Log.d("HomeViewModelAddSys", "uid was null")
     }
 }

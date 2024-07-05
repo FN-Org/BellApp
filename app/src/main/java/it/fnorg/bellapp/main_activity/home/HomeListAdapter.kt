@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarActivity
 import it.fnorg.bellapp.databinding.MainHomeListItemBinding
-import it.fnorg.bellapp.main_activity.MainActivity
 import it.fnorg.bellapp.main_activity.System
+import it.fnorg.bellapp.main_activity.MainActivity
 
 class HomeListAdapter (var mContext: Context, var sysList: List<System>) : RecyclerView.Adapter<HomeListAdapter.SysHolder>() {
 

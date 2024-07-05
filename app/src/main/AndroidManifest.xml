@@ -38,7 +38,7 @@
         </activity>
         <activity
             android:name=".calendar_activity.CalendarActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <receiver android:name=".main_activity.ReminderReceiver"/>

@@ -57,7 +57,7 @@ class AddSysFragment : Fragment() {
         val numBellTv : TextView = view.findViewById(R.id.num_bell_TV)
         val numMelodiesTv : TextView = view.findViewById(R.id.num_melodies_TV)
 
-        var sysPin = ""
+        var sysPin = 10
         var sysId = ""
         var sysLocation = ""
         var sysName = ""
@@ -65,8 +65,8 @@ class AddSysFragment : Fragment() {
 
         viewModel.system.observe(viewLifecycleOwner, Observer
         { system ->
-            numBellTv.text = system.numBells.toString()
-            numMelodiesTv.text = system.numMelodies.toString()
+            numBellTv.text = system.nBells.toString()
+            numMelodiesTv.text = system.nMelodies.toString()
             locationTv.text = system.location
             nameTv.text = system.name
             idTv.text = system.id
@@ -98,9 +98,9 @@ class AddSysFragment : Fragment() {
         }
 
         addSysButton.setOnClickListener{
-            if (pinEditTv.text.toString().isNotBlank() && pinEditTv.text.toString() == sysPin
+            if (pinEditTv.text.toString().isNotBlank()
                 && sysId.isNotBlank() && sysLocation.isNotBlank() && sysName.isNotBlank()
-                && pinEditTv.text.toString() == sysPin) {
+                && pinEditTv.text.toString().toInt() == sysPin) {
                 viewModel.addSys(sysId, sysLocation, sysName)
                 Toast.makeText(requireContext(),R.string.successfully_add_sys,Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_nav_add_sys_to_nav_home2)

@@ -14,9 +14,9 @@ data class System(
     val id: String = "",
     val name: String = "",
     val location: String = "",
-    var numBells: Int = 1,
-    var numMelodies : Int = 1,
-    val pin: String = "",
+    var nBells: Int = 1,
+    var nMelodies : Int = 1,
+    val pin: Int = 10,
     val timestamp: Timestamp = Timestamp.now()
 )
 
@@ -41,6 +41,7 @@ class MainViewModel : ViewModel() {
     // Initialize with an empty list
     init {
         _systems.value = emptyList()
+        _system.value = System()
     }
 
     fun fetchSysData() {

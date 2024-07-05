@@ -89,7 +89,7 @@ class AddSysFragment : Fragment() {
                         // Handle failure
                         foundTV.visibility = View.VISIBLE
                         foundTV.text = buildString {
-                            append(foundTV.text.toString())
+                            append(requireContext().getString(R.string.found))
                             append(requireContext().getString(R.string.none))
                         }
                     }

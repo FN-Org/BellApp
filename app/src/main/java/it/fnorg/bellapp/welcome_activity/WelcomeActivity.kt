@@ -21,4 +21,13 @@ class WelcomeActivity : AppCompatActivity() {
 
         val navController = findNavController(R.id.nav_host_welcome)
     }
+
+    override fun onResume()
+    {
+        super.onResume()
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+    }
 }

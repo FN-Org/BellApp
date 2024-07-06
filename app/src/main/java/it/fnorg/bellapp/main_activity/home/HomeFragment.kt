@@ -9,9 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
+import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainFragmentHomeBinding
 import it.fnorg.bellapp.main_activity.MainViewModel
 
@@ -29,7 +33,12 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: Use the ViewModel
+        requireActivity().onBackPressedDispatcher.addCallback(this){
+            Toast.makeText(requireContext(),getString(R.string.back_before_exit_toast),Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressedDispatcher.addCallback(requireActivity()){
+                requireActivity().finishAffinity()
+            }
+        }
     }
 
     override fun onCreateView(

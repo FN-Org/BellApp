@@ -17,6 +17,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.firebase.ui.auth.AuthUI
+import com.google.firebase.auth.FirebaseAuth
 import it.fnorg.bellapp.login_activity.LogInActivity
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainActivityMainBinding
@@ -35,6 +36,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            val intent = Intent(this, LogInActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
 
         binding = MainActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -77,10 +85,13 @@ class MainActivity : AppCompatActivity() {
         viewModel.name.observe(this) { name ->
             binding.navView.getHeaderView(0).findViewById<TextView>(R.id.fullNameTextView).text = name
         }
+
     }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+
 }

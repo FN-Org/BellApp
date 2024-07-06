@@ -15,7 +15,11 @@
         android:id="@+id/nav_add_sys"
         android:name="it.fnorg.bellapp.main_activity.addsys.AddSysFragment"
         android:label="@string/menu_add_sys"
-        tools:layout="@layout/main_fragment_add_sys" />
+        tools:layout="@layout/main_fragment_add_sys" >
+        <action
+            android:id="@+id/action_nav_add_sys_to_nav_home2"
+            app:destination="@id/nav_home" />
+    </fragment>
     <fragment
         android:id="@+id/nav_settings"
         android:name="it.fnorg.bellapp.main_activity.settings.SettingsFragment"

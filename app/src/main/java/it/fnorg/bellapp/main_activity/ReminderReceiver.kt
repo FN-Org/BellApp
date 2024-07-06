@@ -55,8 +55,8 @@ class ReminderReceiver : BroadcastReceiver() {
         val notificationId = 1
         val builder = NotificationCompat.Builder(context, CHANNELID)
             .setSmallIcon(R.mipmap.ic_bell_app)
-            .setContentTitle("Daily Reminder")
-            .setContentText("This is your daily reminder.")
+            .setContentTitle(context.getString(R.string.reminder_title))
+            .setContentText(context.getString(R.string.reminder_text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         with(NotificationManagerCompat.from(context)) {

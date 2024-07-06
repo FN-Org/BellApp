@@ -40,7 +40,9 @@ class MainActivity : AppCompatActivity() {
         if (FirebaseAuth.getInstance().currentUser == null) {
             val intent = Intent(this, LogInActivity::class.java)
             startActivity(intent)
+            finish()
         }
+
 
         binding = MainActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -83,10 +85,13 @@ class MainActivity : AppCompatActivity() {
         viewModel.name.observe(this) { name ->
             binding.navView.getHeaderView(0).findViewById<TextView>(R.id.fullNameTextView).text = name
         }
+
     }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+
 }

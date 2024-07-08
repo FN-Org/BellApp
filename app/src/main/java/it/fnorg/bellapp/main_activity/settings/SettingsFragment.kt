@@ -84,7 +84,6 @@ class SettingsFragment : Fragment() {
 
         alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-
         reminderSwitch.setOnCheckedChangeListener { _, isChecked ->
             val timeGroup: Group = view.findViewById(R.id.time_group)
             if (isChecked) {
@@ -99,7 +98,6 @@ class SettingsFragment : Fragment() {
             }
 
             viewLifecycleOwner.lifecycleScope.launch {setReminderPreference(reminderSwitch.isChecked)}
-
         }
 
         val timeEditText: EditText = view.findViewById(R.id.reminderEditTextTime)
@@ -133,7 +131,6 @@ class SettingsFragment : Fragment() {
         var reminderSetTimeFlow : Flow<String?> = requireContext().dataStore.data.map { settings ->
             settings[REMINDER_TIME_SET]
         }
-
 
         viewLifecycleOwner.lifecycleScope.launch{
             if (reminderSetFlow.first()) {

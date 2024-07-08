@@ -22,10 +22,7 @@ import it.fnorg.bellapp.login_activity.LogInActivity
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainActivityMainBinding
 
-
-
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,7 +39,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
 
         binding = MainActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -92,6 +88,4 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
-
-
 }

@@ -29,7 +29,6 @@ class ReminderReceiver : BroadcastReceiver() {
         }
     }
 
-
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "Daily Reminder Channel"

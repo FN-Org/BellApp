@@ -172,6 +172,7 @@ class SettingsFragment : Fragment() {
             alarmManager.cancel(pendingIntent)
 
             if (show) Toast.makeText(requireContext(), "Alarm Cancelled", Toast.LENGTH_SHORT).show()
+            Log.w("ReminderReceiver","Deleted the intent")
         }
     }
 

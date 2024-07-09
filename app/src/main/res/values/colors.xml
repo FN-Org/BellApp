@@ -13,4 +13,6 @@
     <color name="lightred">#F87575</color>
     <color name="jade">#57A773</color>
 
+    <color name="warning">#FF0F0F</color>
+
 </resources>

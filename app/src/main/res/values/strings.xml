@@ -63,4 +63,11 @@
     <string name="successfully_add_sys">System added successfully</string>
     
     <string name="back_before_exit_toast">Press back again to exit from the application</string>
+
+    <string name="coming_soon">COMING SOON!</string>
+
+    <string name="event_created">Event successfully created!</string>
+
+    <string name="connection_warning">Check your internet connection before creating or updating your events</string>
+    <string name="connection_warning_2">Chek your internet connection before trying to link a system</string>
 </resources>

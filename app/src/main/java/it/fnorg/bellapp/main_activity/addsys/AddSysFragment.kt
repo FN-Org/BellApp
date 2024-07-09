@@ -16,6 +16,7 @@ import it.fnorg.bellapp.databinding.MainFragmentAddSysBinding
 import it.fnorg.bellapp.main_activity.MainViewModel
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import it.fnorg.bellapp.isInternetAvailable
 
 class AddSysFragment : Fragment() {
 
@@ -62,7 +63,6 @@ class AddSysFragment : Fragment() {
         var sysLocation = ""
         var sysName = ""
 
-
         viewModel.system.observe(viewLifecycleOwner, Observer
         { system ->
             numBellTv.text = system.nBells.toString()
@@ -79,6 +79,9 @@ class AddSysFragment : Fragment() {
 
         searchButton.setOnClickListener {
             if (idEditTV.text.toString().trim().isNotBlank()) {
+                if (!isInternetAvailable(requireContext())) {
+                    Toast.makeText(requireContext(), requireContext().getString(R.string.connection_warning_2), Toast.LENGTH_SHORT).show()
+                }
                 viewModel.fetchSysData(idEditTV.text.toString().trim()) { success ->
                     if (success) {
                         // Handle success
@@ -99,14 +102,15 @@ class AddSysFragment : Fragment() {
         }
 
         addSysButton.setOnClickListener{
-            if (pinEditTv.text.toString().isNotBlank()
+            if ((pinEditTv.text.toString().isNotBlank()
                 && sysId.isNotBlank() && sysLocation.isNotBlank() && sysName.isNotBlank()
-                && pinEditTv.text.toString().toInt() == sysPin) {
+                && pinEditTv.text.toString().toInt() == sysPin)
+                || !isInternetAvailable(requireContext()))
+            {
                 viewModel.addSys(sysId, sysLocation, sysName)
                 Toast.makeText(requireContext(),R.string.successfully_add_sys,Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_nav_add_sys_to_nav_home2)
             }
-
             else Toast.makeText(requireContext(),R.string.something_went_wrong,Toast.LENGTH_LONG).show()
         }
 

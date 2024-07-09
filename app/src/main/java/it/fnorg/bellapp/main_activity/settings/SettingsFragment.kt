@@ -207,7 +207,6 @@ class SettingsFragment : Fragment() {
         return false
     }
 
-
     private fun setPermissionRequested(context: Context, value: Boolean) {
         val sharedPref = context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE) ?: return
         with (sharedPref.edit()) {
@@ -221,7 +220,6 @@ class SettingsFragment : Fragment() {
         return sharedPref.getBoolean("notification_permission_requested", false)
     }
 
-
     private suspend fun setReminderPreference(value: Boolean) {
         requireContext().dataStore.edit { settings ->
             settings[REMINDER_SET] = value
@@ -233,5 +231,4 @@ class SettingsFragment : Fragment() {
             settings[REMINDER_TIME_SET] = value
         }
     }
-
 }

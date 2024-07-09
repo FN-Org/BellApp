@@ -7,7 +7,12 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.memoryCacheSettings
+import com.google.firebase.firestore.persistentCacheSettings
 import com.google.firebase.firestore.toObject
 
 data class System(
@@ -44,12 +49,12 @@ class MainViewModel : ViewModel() {
         _system.value = System()
     }
 
-    fun fetchSysData() {
+    fun fetchSysHomeData() {
         if (uid != null) {
             db.collection("users")
                 .document(uid)
                 .collection("systems")
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener { result ->
                     val systemsList = mutableListOf<System>()
                     for (document in result) {
@@ -104,7 +109,7 @@ class MainViewModel : ViewModel() {
     fun fetchSysData(sysId: String, callback: (Boolean) -> Unit){
             db.collection("systems")
                 .document(sysId)
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener { result ->
                     result.toObject<System>().let { system ->
                         if (system != null) {

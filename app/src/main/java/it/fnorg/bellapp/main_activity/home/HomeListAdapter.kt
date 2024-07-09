@@ -68,7 +68,7 @@ class HomeListAdapter (var mContext: Context, var sysList: List<System>) : Recyc
                 Log.w("ChangeName", newName)
                 val viewModel = (mContext as MainActivity).viewModel
                 viewModel.changeSysName(sysId, newName)
-                viewModel.fetchSysData()
+                viewModel.fetchSysHomeData()
                 Toast.makeText(mContext, R.string.name_changed, Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(mContext, "Name cannot be empty", Toast.LENGTH_SHORT).show()

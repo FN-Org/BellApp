@@ -122,7 +122,6 @@ class MonthViewFragment : Fragment() {
         binding.calendarRv.adapter = eventsAdapter
     }
 
-
     private fun configureBinders(daysOfWeek: List<DayOfWeek>) {
         class DayViewContainer(view: View) : ViewContainer(view) {
             lateinit var day: CalendarDay
@@ -223,6 +222,5 @@ class MonthViewFragment : Fragment() {
 
         viewModel.fetchEventsData()
         viewModel.fetchMelodiesData()
-
     }
 }

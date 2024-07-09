@@ -16,7 +16,6 @@ class ReminderReceiver : BroadcastReceiver() {
 
     private val CHANNELID = "Daily_reminder"
 
-
     override fun onReceive(context: Context?, intent: Intent?) {
         context?.let {
 

@@ -1,20 +1,15 @@
 package it.fnorg.bellapp.main_activity.home
 
-import android.app.AlertDialog
 import androidx.lifecycle.Observer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
-import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.auth.FirebaseAuth
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainFragmentHomeBinding
 import it.fnorg.bellapp.main_activity.MainViewModel
@@ -60,7 +55,7 @@ class HomeFragment : Fragment() {
             binding.rvHome.adapter = homeListAdapter
         })
 
-        viewModel.fetchSysData()
+        viewModel.fetchSysHomeData()
     }
 
 }

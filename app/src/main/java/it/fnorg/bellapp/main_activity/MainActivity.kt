@@ -3,7 +3,10 @@ package it.fnorg.bellapp.main_activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -16,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.bumptech.glide.Glide
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import it.fnorg.bellapp.login_activity.LogInActivity
@@ -82,6 +86,11 @@ class MainActivity : AppCompatActivity() {
             binding.navView.getHeaderView(0).findViewById<TextView>(R.id.fullNameTextView).text = name
         }
 
+        viewModel.userImage.observe(this) { userImage ->
+            Glide.with(this)
+                .load(userImage)
+                .into(binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.imageView))
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

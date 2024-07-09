@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.icu.util.Calendar
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,8 +17,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.constraintlayout.widget.Group
@@ -27,6 +32,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.google.firebase.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
@@ -65,9 +74,24 @@ class SettingsFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
 
+    // Registers a photo picker activity launcher in single-select mode.
+    val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri != null) {
+            Log.d("PhotoPicker", "Selected URI: $uri")
+            uploadImageToFirebase(uri)
+        } else {
+            Log.d("PhotoPicker", "No media selected")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
+
+    // Creating a storage reference
+    private val storageRef = Firebase.storage.reference;
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,6 +103,13 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val imageView : ImageView = view.findViewById(R.id.profileIv)
+        viewModel.userImage.observe(viewLifecycleOwner) { userImage ->
+            Glide.with(this)
+                .load(userImage)
+                .into(imageView)
+        }
 
         val reminderSwitch: SwitchMaterial = view.findViewById(R.id.reminder_switch)
 
@@ -140,6 +171,36 @@ class SettingsFragment : Fragment() {
                     timeEditText.setText(reminderSetTime)
             }
         }
+
+        val imageButton : Button = view.findViewById(R.id.buttonProva)
+        // button Click listener
+        // invoke on user interaction
+        imageButton.setOnClickListener {
+            // Launch the photo picker and let the user choose only images.
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+    }
+
+    private fun uploadImageToFirebase(uri: Uri) {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val fileRef = storageRef.child("images/${viewModel.uid}.jpg")
+        fileRef.putFile(uri)
+            .addOnSuccessListener {
+                fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    updateImageView(downloadUri)
+                    viewModel.updateProfileImage(downloadUri)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firebase", "Image upload failed", e)
+            }
+    }
+
+    private fun updateImageView(uri: Uri) {
+        val imageView: ImageView = view?.findViewById(R.id.profileIv) ?: return
+        Glide.with(this)
+            .load(uri)
+            .into(imageView)
     }
 
     private fun setDailyAlarm(hour: Int, minute: Int) {

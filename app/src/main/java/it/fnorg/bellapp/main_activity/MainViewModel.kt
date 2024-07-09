@@ -1,5 +1,6 @@
 package it.fnorg.bellapp.main_activity
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -37,6 +38,9 @@ class MainViewModel : ViewModel() {
 
     private val _system = MutableLiveData<System>()
     val system : LiveData<System> get() = _system
+
+    private val _userImage = MutableLiveData<Uri>()
+    val userImage : LiveData<Uri> get() = _userImage
 
     // Initialize with an empty list
     init {
@@ -143,5 +147,9 @@ class MainViewModel : ViewModel() {
                 }
         }
         else Log.d("HomeViewModelAddSys", "uid was null")
+    }
+
+    fun updateProfileImage(newUrl: Uri) {
+        _userImage.value = newUrl
     }
 }

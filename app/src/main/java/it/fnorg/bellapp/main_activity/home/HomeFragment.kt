@@ -51,7 +51,7 @@ class HomeFragment : Fragment() {
         viewModel.systems.observe(viewLifecycleOwner, Observer
         { systems ->
             // Update the RecyclerView
-            val homeListAdapter = HomeListAdapter(requireContext(), systems)
+            val homeListAdapter = HomeListAdapter(requireContext(), systems, viewModel)
             binding.rvHome.adapter = homeListAdapter
         })
 

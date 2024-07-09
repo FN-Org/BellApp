@@ -12,10 +12,16 @@ import androidx.recyclerview.widget.RecyclerView
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarActivity
 import it.fnorg.bellapp.databinding.MainHomeListItemBinding
+import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.System
 import it.fnorg.bellapp.main_activity.MainActivity
+import it.fnorg.bellapp.main_activity.MainViewModel
 
-class HomeListAdapter (var mContext: Context, var sysList: List<System>) : RecyclerView.Adapter<HomeListAdapter.SysHolder>() {
+class HomeListAdapter (
+    private val mContext: Context,
+    private val sysList: List<System>,
+    private val viewModel: MainViewModel
+) : RecyclerView.Adapter<HomeListAdapter.SysHolder>() {
 
     inner class SysHolder(val binding: MainHomeListItemBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -47,8 +53,30 @@ class HomeListAdapter (var mContext: Context, var sysList: List<System>) : Recyc
             mContext.startActivity(intent)
         }
 
-        binding.changeNameButton.setOnClickListener{
+        binding.editIv.setOnClickListener {
             showChangeNameInputDialog(sys.id)
+        }
+
+        binding.closeIv.setOnClickListener {
+            if (!isInternetAvailable(mContext)) {
+                Toast.makeText(mContext, mContext.getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
+            } else {
+                val builder = AlertDialog.Builder(mContext)
+                builder.setTitle("Do you want to remove this system?")
+                // Set up the buttons
+                builder.setPositiveButton("Save") { dialog, which ->
+                    viewModel.removeSys(mContext, sys.id)
+                    viewModel.fetchSysHomeData()
+                }
+                builder.setNegativeButton("Cancel") { dialog, which ->
+                    dialog.cancel()
+                }
+                builder.show()
+            }
+        }
+
+        binding.playButton.setOnClickListener {
+            Toast.makeText(mContext, mContext.getString(R.string.coming_soon), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -77,7 +105,6 @@ class HomeListAdapter (var mContext: Context, var sysList: List<System>) : Recyc
         builder.setNegativeButton("Cancel") { dialog, which ->
             dialog.cancel()
         }
-
         builder.show()
     }
 }

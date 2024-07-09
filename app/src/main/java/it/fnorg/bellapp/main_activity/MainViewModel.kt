@@ -1,6 +1,8 @@
 package it.fnorg.bellapp.main_activity
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +16,7 @@ import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.memoryCacheSettings
 import com.google.firebase.firestore.persistentCacheSettings
 import com.google.firebase.firestore.toObject
+import it.fnorg.bellapp.R
 
 data class System(
     val id: String = "",
@@ -54,7 +57,7 @@ class MainViewModel : ViewModel() {
             db.collection("users")
                 .document(uid)
                 .collection("systems")
-                .get(Source.SERVER)
+                .get()
                 .addOnSuccessListener { result ->
                     val systemsList = mutableListOf<System>()
                     for (document in result) {
@@ -128,7 +131,7 @@ class MainViewModel : ViewModel() {
                 }
     }
 
-    fun addSys(sysId: String,location: String, name: String) {
+    fun addSys(sysId: String, location: String, name: String) {
         val selectedFields = mapOf(
             "id" to sysId,
             "name" to name,
@@ -148,5 +151,21 @@ class MainViewModel : ViewModel() {
                 }
         }
         else Log.d("HomeViewModelAddSys", "uid was null")
+    }
+
+    fun removeSys(context: Context, sysId: String) {
+        if (uid != null) {
+            db.collection("users")
+                .document(uid)
+                .collection("systems")
+                .document(sysId)
+                .delete()
+                .addOnSuccessListener {
+                    Toast.makeText(context, context.getString(R.string.sys_removed), Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 }

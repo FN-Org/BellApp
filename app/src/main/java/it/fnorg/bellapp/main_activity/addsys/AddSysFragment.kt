@@ -15,8 +15,10 @@ import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainFragmentAddSysBinding
 import it.fnorg.bellapp.main_activity.MainViewModel
 import androidx.lifecycle.Observer
+import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
 import it.fnorg.bellapp.isInternetAvailable
+import it.fnorg.bellapp.main_activity.System
 
 class AddSysFragment : Fragment() {
 
@@ -78,23 +80,38 @@ class AddSysFragment : Fragment() {
         })
 
         searchButton.setOnClickListener {
-            if (idEditTV.text.toString().trim().isNotBlank()) {
-                if (!isInternetAvailable(requireContext())) {
-                    Toast.makeText(requireContext(), requireContext().getString(R.string.connection_warning_2), Toast.LENGTH_SHORT).show()
+            val enteredId = idEditTV.text.toString().trim()
+            if (enteredId.isNotBlank()) {
+                if (viewModel.systems.value?.any { it.id == enteredId } == true) {
+                    sysDataGroup.visibility = View.INVISIBLE
+                    foundTV.visibility = View.VISIBLE
+                    foundTV.text = buildString {
+                        append(requireContext().getString(R.string.found))
+                        append("\n")
+                        append(requireContext().getString(R.string.already_linked))
+                    }
                 }
-                viewModel.fetchSysData(idEditTV.text.toString().trim()) { success ->
-                    if (success) {
-                        // Handle success
-                        foundTV.visibility = View.VISIBLE
-                        foundTV.text = requireContext().getString(R.string.found)
-                        sysDataGroup.visibility = View.VISIBLE
-                    } else {
-                        // Handle failure
-                        foundTV.visibility = View.VISIBLE
-                        foundTV.text = buildString {
-                            append(requireContext().getString(R.string.found))
-                            append("\n")
-                            append(requireContext().getString(R.string.none))
+                else if (!isInternetAvailable(requireContext())) {
+                    Toast.makeText(requireContext(), requireContext().getString(R.string.connection_warning_2), Toast.LENGTH_SHORT).show()
+                    foundTV.visibility = View.INVISIBLE
+                    sysDataGroup.visibility = View.INVISIBLE
+                }
+                else {
+                    viewModel.fetchSysData(enteredId) { success ->
+                        if (success) {
+                            // Handle success
+                            foundTV.visibility = View.VISIBLE
+                            foundTV.text = requireContext().getString(R.string.found)
+                            sysDataGroup.visibility = View.VISIBLE
+                        } else {
+                            // Handle failure
+                            sysDataGroup.visibility = View.INVISIBLE
+                            foundTV.visibility = View.VISIBLE
+                            foundTV.text = buildString {
+                                append(requireContext().getString(R.string.found))
+                                append("\n")
+                                append(requireContext().getString(R.string.none))
+                            }
                         }
                     }
                 }
@@ -105,7 +122,7 @@ class AddSysFragment : Fragment() {
             if ((pinEditTv.text.toString().isNotBlank()
                 && sysId.isNotBlank() && sysLocation.isNotBlank() && sysName.isNotBlank()
                 && pinEditTv.text.toString().toInt() == sysPin)
-                || !isInternetAvailable(requireContext()))
+                && isInternetAvailable(requireContext()))
             {
                 viewModel.addSys(sysId, sysLocation, sysName)
                 Toast.makeText(requireContext(),R.string.successfully_add_sys,Toast.LENGTH_SHORT).show()
@@ -113,8 +130,5 @@ class AddSysFragment : Fragment() {
             }
             else Toast.makeText(requireContext(),R.string.something_went_wrong,Toast.LENGTH_LONG).show()
         }
-
-
-
     }
 }

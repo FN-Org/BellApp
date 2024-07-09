@@ -15,3 +15,4 @@ fun isInternetAvailable(context: Context): Boolean {
         else -> false
     }
 }
+

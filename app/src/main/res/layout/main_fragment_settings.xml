@@ -7,12 +7,22 @@
     android:layout_height="match_parent"
     tools:context=".main_activity.settings.SettingsFragment">
 
+    <ImageView
+        android:id="@+id/github_nicco"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="80dp"
+        android:src="@drawable/ic_github"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView9" />
+
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="5dp"
         android:text="@string/action_settings"
         android:textColor="@color/lapis"
         android:textSize="30sp"
@@ -24,12 +34,11 @@
         android:id="@+id/reminder_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginEnd="28dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"
         android:text="@string/set_reminder"
-        android:textSize="20sp"
         android:textColor="@color/black"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
@@ -67,4 +76,61 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/reminder_switch" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="10dp"
+        android:text="- Contacts"
+        android:textColor="@color/lapis"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView8"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/mail_fede"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView9"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="80dp"
+        android:text="@string/mail_nicco"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/github_fede"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_github"
+        app:layout_constraintBottom_toTopOf="@+id/github_nicco"
+        app:layout_constraintStart_toEndOf="@+id/textView8" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:text="FN Org"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
 </androidx.constraintlayout.widget.ConstraintLayout>

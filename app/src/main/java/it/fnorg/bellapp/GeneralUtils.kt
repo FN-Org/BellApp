@@ -1,8 +1,11 @@
 package it.fnorg.bellapp
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
+import androidx.core.content.ContextCompat.startActivity
 
 fun isInternetAvailable(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -16,3 +19,14 @@ fun isInternetAvailable(context: Context): Boolean {
     }
 }
 
+fun openLink(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.data = Uri.parse(url)
+    // Controlla se c'è un'attività che può gestire l'intento
+    if (intent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(intent)
+    } else {
+    // Gestisci il caso in cui nessun browser è disponibile per aprire il link
+    // Ad esempio, mostra un messaggio all'utente
+    }
+}

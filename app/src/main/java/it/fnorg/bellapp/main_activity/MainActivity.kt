@@ -49,6 +49,8 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
+        viewModel.fetchUserData()
+
         binding = MainActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -104,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onDrawerOpened(drawerView: View) {
                 checkConnection(this@MainActivity, binding.root)
+                viewModel.fetchUserData()
             }
 
             override fun onDrawerClosed(drawerView: View) {
@@ -114,8 +117,6 @@ class MainActivity : AppCompatActivity() {
                 // Not needed
             }
         })
-
-        viewModel.fetchUserData()
     }
 
     override fun onSupportNavigateUp(): Boolean {

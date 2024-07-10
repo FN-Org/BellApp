@@ -99,13 +99,16 @@
 
     <TextView
         android:id="@+id/galleyText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginTop="320dp"
+        android:layout_marginEnd="200dp"
+        android:gravity="center"
         android:text="Choose an image from gallery"
         android:textColor="@color/black"
         android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/imagePicker"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -117,7 +120,6 @@
         android:layout_marginTop="208dp"
         android:layout_marginBottom="30dp"
         android:src="@drawable/ic_profile_default"
-        app:layout_constraintBottom_toTopOf="@+id/textView6"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -126,7 +128,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="307dp"
+        android:layout_marginTop="320dp"
         android:background="@drawable/custom_button"
         android:paddingStart="7dp"
         android:paddingEnd="7dp"

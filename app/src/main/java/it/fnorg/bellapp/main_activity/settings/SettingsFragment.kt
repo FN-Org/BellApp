@@ -81,7 +81,7 @@ class SettingsFragment : Fragment() {
             // Set up the buttons
             builder.setPositiveButton("Yes") { dialog, which ->
                 Log.d("PhotoPicker", "Selected URI: $uri")
-                Toast.makeText(requireContext(), requireContext().getString(R.string.image_update_toast), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), requireContext().getString(R.string.image_uploading), Toast.LENGTH_SHORT).show()
                 viewModel.uploadImageToFirebase(requireContext(), uri)
             }
             builder.setNegativeButton("Cancel") { dialog, which ->
@@ -113,6 +113,7 @@ class SettingsFragment : Fragment() {
 
         val imageView : ImageView = view.findViewById(R.id.profileIv)
         viewModel.userImage.observe(viewLifecycleOwner) { userImage ->
+            Log.w("Image", "Uri. " + userImage)
             Glide.with(this)
                 .load(userImage)
                 .apply(RequestOptions.circleCropTransform())

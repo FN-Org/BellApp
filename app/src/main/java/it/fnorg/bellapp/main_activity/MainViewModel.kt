@@ -97,6 +97,8 @@ class MainViewModel : ViewModel() {
                         }
                         .addOnFailureListener {
                             // Failed to fetch the user image
+                            _userImage.value = Uri.parse("android.resource://it.fnorg.bellapp/drawable/ic_profile_default")
+                            Log.w("Image", "Uri. " + _userImage.value)
                         }
                     }
                 }

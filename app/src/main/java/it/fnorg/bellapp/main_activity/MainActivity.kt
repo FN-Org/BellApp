@@ -20,6 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import it.fnorg.bellapp.login_activity.LogInActivity
@@ -89,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.userImage.observe(this) { userImage ->
             Glide.with(this)
                 .load(userImage)
+                .apply(RequestOptions.circleCropTransform())
                 .into(binding.navView.getHeaderView(0).findViewById(R.id.imageView))
         }
     }

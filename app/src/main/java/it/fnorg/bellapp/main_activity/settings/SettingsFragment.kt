@@ -1,15 +1,14 @@
 package it.fnorg.bellapp.main_activity.settings
 
-
 import android.Manifest
 import android.app.AlarmManager
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.icu.util.Calendar
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -17,11 +16,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -33,8 +31,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.main_activity.MainViewModel
@@ -46,7 +44,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SettingsFragment : Fragment() {
-
 
     val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -60,7 +57,6 @@ class SettingsFragment : Fragment() {
             Toast.makeText(context, "Please enable notifications in settings", Toast.LENGTH_LONG).show()
         }
     }
-
 
     private lateinit var alarmManager: AlarmManager
     private lateinit var pendingIntent: PendingIntent
@@ -79,8 +75,18 @@ class SettingsFragment : Fragment() {
         // Callback is invoked after the user selects a media item or closes the
         // photo picker.
         if (uri != null) {
-            Log.d("PhotoPicker", "Selected URI: $uri")
-            viewModel.uploadImageToFirebase(requireContext(), uri)
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Are you sure you want to change your profile image?")
+            // Set up the buttons
+            builder.setPositiveButton("Yes") { dialog, which ->
+                Log.d("PhotoPicker", "Selected URI: $uri")
+                Toast.makeText(requireContext(), requireContext().getString(R.string.image_update_toast), Toast.LENGTH_SHORT).show()
+                viewModel.uploadImageToFirebase(requireContext(), uri)
+            }
+            builder.setNegativeButton("Cancel") { dialog, which ->
+                dialog.cancel()
+            }
+            builder.show()
         } else {
             Log.d("PhotoPicker", "No media selected")
         }
@@ -91,7 +97,7 @@ class SettingsFragment : Fragment() {
     }
 
     // Creating a storage reference
-    private val storageRef = Firebase.storage.reference;
+    private val storageRef = Firebase.storage.reference
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -108,6 +114,7 @@ class SettingsFragment : Fragment() {
         viewModel.userImage.observe(viewLifecycleOwner) { userImage ->
             Glide.with(this)
                 .load(userImage)
+                .apply(RequestOptions.circleCropTransform())
                 .into(imageView)
         }
 
@@ -172,7 +179,7 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        val imageButton : Button = view.findViewById(R.id.buttonProva)
+        val imageButton : ImageButton = view.findViewById(R.id.imagePicker)
         // button Click listener
         // invoke on user interaction
         imageButton.setOnClickListener {

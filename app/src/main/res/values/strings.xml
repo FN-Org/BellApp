@@ -19,8 +19,6 @@
     <string name="calendar">Calendar</string>
     <string name="play">Play melody</string>
 
-    <string name="name_changed">Name successfully changed!</string>
-
     <string name="skip_button">SKIP</string>
     <string name="next_button">NEXT</string>
     <string name="previous_button">PREVIOUS</string>
@@ -78,4 +76,20 @@
     <string name="connection_warning">Please remember to activate your internet connection while using the application</string>
     <string name="connection_warning_1">Check your internet connection before creating or updating your events</string>
     <string name="connection_warning_2">Check your internet connection before trying to link a system</string>
+
+    <!-- Alert dialogs -->
+
+    <!-- Remove sys (HomeListAdapter) -->
+    <string name="remove_sys">Do you want to remove this system?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- Change sys name (HomeListAdapter) -->
+    <string name="change_name">Enter a name for your system</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Toast -->
+    <string name="name_changed">Name successfully changed!</string>
+    <string name="empty_name">Name cannot be empty, please try again</string>
 </resources>

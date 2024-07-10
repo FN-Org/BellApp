@@ -6,17 +6,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import it.fnorg.bellapp.R
-import it.fnorg.bellapp.checkConnection
 import it.fnorg.bellapp.databinding.MainFragmentHomeBinding
-import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.MainViewModel
 
+/**
+ * Fragment representing the home screen of the application.
+ */
 class HomeFragment : Fragment() {
 
     companion object {
@@ -25,12 +25,13 @@ class HomeFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
 
-    //binding connected to the specific layout of the fragment
+    // Binding connected to the specific layout of the fragment
     private lateinit var binding: MainFragmentHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Handle back press to show toast and confirm exit
         requireActivity().onBackPressedDispatcher.addCallback(this){
             Toast.makeText(requireContext(),getString(R.string.back_before_exit_toast),Toast.LENGTH_SHORT).show()
             requireActivity().onBackPressedDispatcher.addCallback(requireActivity()){
@@ -43,7 +44,6 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout using data binding
         binding = MainFragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -53,17 +53,18 @@ class HomeFragment : Fragment() {
         binding.rvHome.layoutManager = LinearLayoutManager(requireContext())
         viewModel.systems.observe(viewLifecycleOwner, Observer
         { systems ->
-            // Update the RecyclerView
             val homeListAdapter = HomeListAdapter(requireContext(), systems, viewModel)
             binding.rvHome.adapter = homeListAdapter
         })
 
+        // Fetch system data when view is created or resumed
         viewModel.fetchSysHomeData()
     }
 
     override fun onResume() {
         super.onResume()
 
+        // Refresh system data when fragment resumes
         viewModel.fetchSysHomeData()
     }
 }

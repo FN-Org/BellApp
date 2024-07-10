@@ -17,12 +17,25 @@ import it.fnorg.bellapp.main_activity.System
 import it.fnorg.bellapp.main_activity.MainActivity
 import it.fnorg.bellapp.main_activity.MainViewModel
 
+/**
+ * Adapter for the RecyclerView in the home screen, responsible for displaying
+ * a list of systems and handling user interactions with each system item.
+ *
+ * @property mContext Context of the adapter.
+ * @property sysList List of systems to display.
+ * @property viewModel ViewModel instance used for system operations.
+ */
 class HomeListAdapter (
     private val mContext: Context,
     private val sysList: List<System>,
     private val viewModel: MainViewModel
 ) : RecyclerView.Adapter<HomeListAdapter.SysHolder>() {
 
+    /**
+     * ViewHolder class for holding the views of each system item.
+     *
+     * @param binding View binding object for accessing views.
+     */
     inner class SysHolder(val binding: MainHomeListItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SysHolder {
@@ -46,6 +59,7 @@ class HomeListAdapter (
             binding.sysTitle.text = sys.id
         }
 
+        // Handle click on calendar button to navigate to CalendarActivity
         binding.calendarButton.setOnClickListener {
             val intent = Intent(mContext, CalendarActivity::class.java).apply {
                 putExtra("id", sys.id)
@@ -53,56 +67,62 @@ class HomeListAdapter (
             mContext.startActivity(intent)
         }
 
+        // Handle click on edit icon to change system name
         binding.editIv.setOnClickListener {
             showChangeNameInputDialog(sys.id)
         }
 
+        // Handle click on close icon to remove system
         binding.closeIv.setOnClickListener {
             if (!isInternetAvailable(mContext)) {
                 Toast.makeText(mContext, mContext.getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
             } else {
                 val builder = AlertDialog.Builder(mContext)
-                builder.setTitle("Do you want to remove this system?")
+                builder.setTitle(R.string.remove_sys)
                 // Set up the buttons
-                builder.setPositiveButton("Save") { dialog, which ->
+                builder.setPositiveButton(mContext.getString(R.string.yes).uppercase()) { dialog, which ->
                     viewModel.removeSys(mContext, sys.id)
                     viewModel.fetchSysHomeData()
                 }
-                builder.setNegativeButton("Cancel") { dialog, which ->
+                builder.setNegativeButton(mContext.getString(R.string.no).uppercase()) { dialog, which ->
                     dialog.cancel()
                 }
                 builder.show()
             }
         }
 
+        // Handle click on play button
         binding.playButton.setOnClickListener {
             Toast.makeText(mContext, mContext.getString(R.string.coming_soon), Toast.LENGTH_SHORT).show()
         }
     }
 
+    /**
+     * Method to display an input dialog for changing the system name.
+     *
+     * @param sysId ID of the system for which name is to be changed.
+     */
     private fun showChangeNameInputDialog(sysId: String) {
         val builder = AlertDialog.Builder(mContext)
-        builder.setTitle("Enter new name")
+        builder.setTitle(R.string.change_name)
 
         // Set up the input
         val input = EditText(mContext)
-        input.hint = "Enter name"
         builder.setView(input)
 
-        // Set up the buttons
-        builder.setPositiveButton("Save") { dialog, which ->
+        // Set up the save and cancel buttons
+        builder.setPositiveButton(mContext.getString(R.string.save).uppercase()) { dialog, which ->
             val newName = input.text.toString()
             if (newName.isNotBlank()) {
-                Log.w("ChangeName", newName)
                 val viewModel = (mContext as MainActivity).viewModel
                 viewModel.changeSysName(sysId, newName)
                 viewModel.fetchSysHomeData()
                 Toast.makeText(mContext, R.string.name_changed, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(mContext, "Name cannot be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(mContext, R.string.empty_name, Toast.LENGTH_SHORT).show()
             }
         }
-        builder.setNegativeButton("Cancel") { dialog, which ->
+        builder.setNegativeButton(mContext.getString(R.string.cancel).uppercase()) { dialog, which ->
             dialog.cancel()
         }
         builder.show()

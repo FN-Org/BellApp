@@ -10,6 +10,12 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 
+/**
+ * Check if the connection is available
+ *
+ * @param   context of the activity or specific application environment
+ * @return  true if it is connected, false otherwise
+ */
 fun isInternetAvailable(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val activeNetwork = connectivityManager.activeNetwork ?: return false
@@ -22,36 +28,45 @@ fun isInternetAvailable(context: Context): Boolean {
     }
 }
 
+/**
+ * Open the link with a browser
+ *
+ * @param   context of the activity or specific application environment
+ * @param   url string for the url opened
+ */
 fun openLink(context: Context, url: String) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.data = Uri.parse(url)
-    // Controlla se c'è un'attività che può gestire l'intento
     if (intent.resolveActivity(context.packageManager) != null) {
         context.startActivity(intent)
     } else {
-    // Gestisci il caso in cui nessun browser è disponibile per aprire il link
-    // Ad esempio, mostra un messaggio all'utente
+        Toast.makeText(context, context.getString(R.string.sww_try_again), Toast.LENGTH_SHORT).show()
     }
 }
 
+/**
+ * Used in MainActivity to show a warning message if you are
+ * not connected to the Internet
+ *
+ * @param   context of the activity or specific application environment
+ * @param   view    general user interface
+ */
 fun checkConnection(context: Context, view: View) {
     val warningMessage: LinearLayout? = view.findViewById(R.id.connection_warning)
     if (!isInternetAvailable(context)) {
         if (warningMessage != null) {
             warningMessage.visibility = View.VISIBLE
-            Log.w("Check Connection", "Belin ha funzionato")
         }
         else {
-            Log.w("Check Connection", "Non funziona un belino, linear layout nullo")
+            Log.w("Check Connection", "Warning message is null")
         }
     }
     else {
         if (warningMessage != null) {
             warningMessage.visibility = View.GONE
-            Log.w("Check Connection", "Belin ha funzionato")
         }
         else {
-            Log.w("Check Connection", "Non funziona un belino, linear layout nullo")
+            Log.w("Check Connection", "Warning message is null")
         }
     }
 }

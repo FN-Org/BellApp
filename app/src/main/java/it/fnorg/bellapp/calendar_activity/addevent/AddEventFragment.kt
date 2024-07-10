@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -29,16 +28,14 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 /**
- * A simple [Fragment] subclass.
- * Use the [AddEventFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * Manage events in the calendar (create, delete and update)
  */
 class AddEventFragment : Fragment() {
 
-    val viewModel: CalendarActivityViewModel by activityViewModels()
+    private val viewModel: CalendarActivityViewModel by activityViewModels()
 
-    // Safe args
-    val args: AddEventFragmentArgs by navArgs()
+    // Safe args passed from MonthView Fragment
+    private val args: AddEventFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,12 +84,11 @@ class AddEventFragment : Fragment() {
                 timeTextView.setText(args.eventTime)
                 dateTextView.setText(args.eventDate)
 
-                // Trova l'indice della melodia da selezionare
+                // Find the selected melody index
                 val selectedMelodyIndex = melodies.indexOfFirst { it.number == args.eventMelody }
                 if (selectedMelodyIndex != -1) {
                     spinnerMelodies.setSelection(selectedMelodyIndex)
                 }
-
                 spinnerColors.setSelection(args.eventColor - 1)
 
                 // defaultButton become visible and clickable in the Modify Event
@@ -111,35 +107,12 @@ class AddEventFragment : Fragment() {
             } else {
                 fragmentTitle.text = requireContext().getString(R.string.add_event)
             }
-
-            // Notifica all'adapter che i dati sono cambiati
-            adapter1.notifyDataSetChanged()
-        }
-
-        spinnerMelodies.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                // Esegui le azioni desiderate con l'opzione selezionata
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Non esegue alcuna azione quando non viene selezionata alcuna opzione
-            }
         }
 
         // Spinner for colors
         val adapter2 = ColorAdapter(requireContext(), viewModel.colorsList)
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerColors.adapter = adapter2
-
-        spinnerColors.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                // Esegui le azioni desiderate con l'opzione selezionata
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Non esegue alcuna azione quando non viene selezionata alcuna opzione
-            }
-        }
 
         // TimerPickerDialog
         timeTextView.setOnClickListener {
@@ -184,6 +157,7 @@ class AddEventFragment : Fragment() {
         }
 
         saveButton.setOnClickListener {
+            // Update or create the event only if you are connected
             if (!isInternetAvailable(requireContext())) {
                 Toast.makeText(requireContext(), requireContext().getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
                 view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
@@ -202,10 +176,10 @@ class AddEventFragment : Fragment() {
                 val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
                 val dateTime = LocalDateTime.parse(dateTimeString.trim(), formatter)
 
-                // Converte LocalDateTime in istante di tempo in millisecondi UNIX
+                // Convert LocalDateTime in UNIX milliseconds
                 val epochMillis = dateTime.toInstant(ZoneOffset.ofHours(2)).toEpochMilli()
 
-                // Creazione di un oggetto Timestamp per Firebase Firestore
+                // Timestamp creation for Firestore DB
                 val timestamp = Timestamp(epochMillis / 1000, (epochMillis % 1000).toInt())
 
                 val selectedMelody = spinnerMelodies.selectedItem as Melody
@@ -215,7 +189,7 @@ class AddEventFragment : Fragment() {
                 val color = spinnerColors.selectedItemPosition + 1
 
                 val event = Event(
-                    id = "", // L'ID verrà generato automaticamente da Firestore
+                    id = "", // Automatic ID will be created by Firestore
                     time = timestamp,
                     melodyName = melodyName,
                     melodyNumber = melodyNumber,

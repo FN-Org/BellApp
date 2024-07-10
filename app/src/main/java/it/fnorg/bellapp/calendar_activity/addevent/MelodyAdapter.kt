@@ -9,6 +9,12 @@ import android.widget.TextView
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.Melody
 
+/**
+ * Adapter for displaying a list of melodies in a spinner.
+ *
+ * @property context the context of the activity or specific application environment
+ * @property options the list of available melodies
+ */
 class MelodyAdapter (
     context: Context,
     private val options: List<Melody>

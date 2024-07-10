@@ -1,4 +1,5 @@
 package it.fnorg.bellapp.calendar_activity.addevent
+
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,13 @@ import androidx.core.content.ContextCompat
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.Color
 
+/**
+ * Adapter for displaying a list of colors in a spinner within the AddEventFragment.
+ * Each color is displayed with its name and a preview.
+ *
+ * @param context the context of the activity or specific application environment
+ * @param options the list of available colors to display in the spinner
+ */
 class ColorAdapter(
         context: Context,
         private val options: List<Color>

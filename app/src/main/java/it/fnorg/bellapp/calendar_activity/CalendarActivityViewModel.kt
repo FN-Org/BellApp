@@ -9,7 +9,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import it.fnorg.bellapp.R
@@ -46,30 +45,40 @@ fun Timestamp.toLocalDateTime(): LocalDateTime {
     return this.toDate().toInstant().atZone(ZoneOffset.ofHours(2)).toLocalDateTime()
 }
 
+/**
+ * ViewModel for managing calendar-related data and operations.
+ */
 class CalendarActivityViewModel : ViewModel() {
 
+    // LiveData for events list
     private val _events = MutableLiveData<List<Event>>()
     val events: LiveData<List<Event>> get() = _events
 
+    // LiveData for melodies list
     private val _melodies = MutableLiveData<List<Melody>>()
     val melodies: LiveData<List<Melody>> get() = _melodies
 
+    // Firebase Firestore instance
     private val db = Firebase.firestore
 
     var sysId:String = ""
 
-    // Initialize with an empty list
+    // Initialize LiveData lists with empty lists
     init {
         _events.value = emptyList()
         _melodies.value = emptyList()
     }
 
+    // List of colors available for events
     val colorsList = listOf(
         Color("Yellow", R.color.naples),
         Color("Red", R.color.lightred),
         Color("Green", R.color.jade)
     )
 
+    /**
+     * Fetches event data from Firestore database.
+     */
     fun fetchEventsData() {
         if (sysId.isEmpty()) {
             Log.w("BellAppDB", "sysId is empty, cannot fetch events.")
@@ -94,6 +103,9 @@ class CalendarActivityViewModel : ViewModel() {
             }
     }
 
+    /**
+     * Fetches melody data from Firestore database.
+     */
     fun fetchMelodiesData() {
         if (sysId.isEmpty()) {
             Log.w("BellAppDB", "sysId is empty, cannot fetch melodies.")
@@ -118,8 +130,16 @@ class CalendarActivityViewModel : ViewModel() {
             }
     }
 
+    /**
+     * Saves or updates an event in the Firestore database.
+     *
+     * @param context The context used to display Toast messages.
+     * @param event The event object to be saved or updated.
+     * @param identifier The identifier of the event. If "default", a new event is created; otherwise, the existing event is updated.
+     */
     fun saveEvent(context: Context, event: Event, identifier: String) {
         if (identifier == "default") {
+            // Create a new event document
             val newEvent = db.collection("systems")
                 .document(sysId)
                 .collection("events")
@@ -138,27 +158,32 @@ class CalendarActivityViewModel : ViewModel() {
                 }
         }
         else {
+            // Update an existing event document
             val modifiedEvent = db.collection("systems")
                 .document(sysId)
                 .collection("events")
                 .document(identifier)
 
-            // Update ref
             modifiedEvent.update("color", event.color,
                 "melodyName", event.melodyName,
                                     "melodyNumber", event.melodyNumber,
                                     "time", event.time)
                 .addOnSuccessListener {
-                    // Toast.makeText(context, context.getString(R.string.event_updated), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.event_updated), Toast.LENGTH_SHORT).show()
                     Log.d("BellAppDB", "Event successfully updated!")
                 }
                 .addOnFailureListener { e ->
-                    // Toast.makeText(context, context.getString(R.string.event_not_updated), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.sww_try_again), Toast.LENGTH_SHORT).show()
                     Log.w("BellAppDB", "Error updating document", e)
                 }
         }
     }
 
+    /**
+     * Deletes an event from the Firestore database.
+     *
+     * @param eventId The ID of the event to be deleted.
+     */
     fun deleteEvent(eventId: String) {
         db.collection("systems")
             .document(sysId)

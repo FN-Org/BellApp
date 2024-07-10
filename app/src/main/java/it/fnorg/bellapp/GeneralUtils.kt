@@ -11,10 +11,10 @@ import android.widget.LinearLayout
 import android.widget.Toast
 
 /**
- * Check if the connection is available
+ * Checks if the internet connection is available.
  *
- * @param   context of the activity or specific application environment
- * @return  true if it is connected, false otherwise
+ * @param context the context of the activity or specific application environment
+ * @return true if the device is connected to the internet, false otherwise
  */
 fun isInternetAvailable(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -29,10 +29,10 @@ fun isInternetAvailable(context: Context): Boolean {
 }
 
 /**
- * Open the link with a browser
+ * Opens a URL link in a browser.
  *
- * @param   context of the activity or specific application environment
- * @param   url string for the url opened
+ * @param context the context of the activity or specific application environment
+ * @param url the URL to be opened in the browser
  */
 fun openLink(context: Context, url: String) {
     val intent = Intent(Intent.ACTION_VIEW)
@@ -45,11 +45,11 @@ fun openLink(context: Context, url: String) {
 }
 
 /**
- * Used in MainActivity to show a warning message if you are
- * not connected to the Internet
+ * Checks the internet connection and shows a warning message if not connected.
+ * Used in MainActivity to display a warning message when there is no internet connection.
  *
- * @param   context of the activity or specific application environment
- * @param   view    general user interface
+ * @param context the context of the activity or specific application environment
+ * @param view the root view containing the user interface elements
  */
 fun checkConnection(context: Context, view: View) {
     val warningMessage: LinearLayout? = view.findViewById(R.id.connection_warning)

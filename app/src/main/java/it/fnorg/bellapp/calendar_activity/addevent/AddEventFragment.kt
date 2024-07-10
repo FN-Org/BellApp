@@ -28,7 +28,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 /**
- * Manage events in the calendar (create, delete and update)
+ * Fragment for managing events in the calendar, including creation, deletion, and updates.
  */
 class AddEventFragment : Fragment() {
 

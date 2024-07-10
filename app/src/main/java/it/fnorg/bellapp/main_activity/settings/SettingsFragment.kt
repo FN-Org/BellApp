@@ -16,49 +16,54 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.google.firebase.Firebase
-import com.google.firebase.storage.storage
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.databinding.MainFragmentSettingsBinding
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
-import it.fnorg.bellapp.main_activity.dataStore
 import it.fnorg.bellapp.openLink
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+/**
+ * Fragment that allows users to manage application settings, including reminders, profile images,
+ * and external links for contacts.
+ */
 class SettingsFragment : Fragment() {
 
+    // Launcher for requesting notification permissions.
     val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         val context = requireContext()
         if (isGranted) {
-            // Il permesso è stato concesso
+            // Permission granted
             setPermissionRequested(context, true)
         } else {
-            // Il permesso è stato negato, mostra un messaggio per andare nelle impostazioni
-            Toast.makeText(context, "Please enable notifications in settings", Toast.LENGTH_LONG).show()
+            // Permission denied, show a message to enable notifications in settings
+            Toast.makeText(context, R.string.notification_denied, Toast.LENGTH_LONG).show()
         }
     }
 
+    // AlarmManager instance for setting and cancelling alarms.
     private lateinit var alarmManager: AlarmManager
     private lateinit var pendingIntent: PendingIntent
 
@@ -71,20 +76,21 @@ class SettingsFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
 
+    // ViewBinding instance
+    private lateinit var binding: MainFragmentSettingsBinding
+
     // Registers a photo picker activity launcher in single-select mode.
     val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        // Callback is invoked after the user selects a media item or closes the
-        // photo picker.
         if (uri != null) {
             val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("Are you sure you want to change your profile image?")
+            builder.setTitle(R.string.change_image)
             // Set up the buttons
-            builder.setPositiveButton("Yes") { dialog, which ->
+            builder.setPositiveButton(requireContext().getString(R.string.yes).uppercase()) { dialog, which ->
                 Log.d("PhotoPicker", "Selected URI: $uri")
                 Toast.makeText(requireContext(), requireContext().getString(R.string.image_uploading), Toast.LENGTH_SHORT).show()
                 viewModel.uploadImageToFirebase(requireContext(), uri)
             }
-            builder.setNegativeButton("Cancel") { dialog, which ->
+            builder.setNegativeButton(requireContext().getString(R.string.no).uppercase()) { dialog, which ->
                 dialog.cancel()
             }
             builder.show()
@@ -93,59 +99,49 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    // Creating a storage reference
-    private val storageRef = Firebase.storage.reference
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        return inflater.inflate(R.layout.main_fragment_settings, container, false)
+        // Inflate the layout using ViewBinding
+        binding = MainFragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val imageView : ImageView = view.findViewById(R.id.profileIv)
+        // Initialize AlarmManager
+        alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        // Observes userImage changes and updates ImageView using Glide
         viewModel.userImage.observe(viewLifecycleOwner) { userImage ->
             Log.w("Image", "Uri. " + userImage)
             Glide.with(this)
                 .load(userImage)
                 .apply(RequestOptions.circleCropTransform())
-                .into(imageView)
+                .into(binding.profileIv)
         }
 
-        val reminderSwitch: SwitchMaterial = view.findViewById(R.id.reminder_switch)
-        val first_github: ImageView = view.findViewById(R.id.github_fede)
-        val second_github: ImageView = view.findViewById(R.id.github_nicco)
-        val third_github: ImageView = view.findViewById(R.id.github_fnorg)
-
-        alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        reminderSwitch.setOnCheckedChangeListener { _, isChecked ->
-            val timeGroup: Group = view.findViewById(R.id.time_group)
+        // Handle reminder switch state changes
+        binding.reminderSwitch.setOnCheckedChangeListener { _, isChecked ->
+            val timeGroup: Group = binding.timeGroup
             if (isChecked) {
-                if (checkNotifyPermission(view)) {
+                if (checkNotifyPermission(binding.root)) {
                     timeGroup.visibility = View.VISIBLE
                 } else {
-                    reminderSwitch.isChecked = false // Disabilita lo switch se i permessi non sono concessi
+                    binding.reminderSwitch.isChecked = false // Disabilita lo switch se i permessi non sono concessi
                 }
             } else {
                 cancelAlarm(true)
                 timeGroup.visibility = View.GONE
             }
 
-            viewLifecycleOwner.lifecycleScope.launch {setReminderPreference(reminderSwitch.isChecked)}
+            viewLifecycleOwner.lifecycleScope.launch { setReminderPreference(isChecked) }
         }
 
-        val timeEditText: EditText = view.findViewById(R.id.reminderEditTextTime)
-
-        timeEditText.setOnClickListener {
+        // Handle click on time EditText to set reminder time
+        binding.reminderEditTextTime.setOnClickListener {
             cancelAlarm(false)
             val c = Calendar.getInstance()
 
@@ -155,8 +151,8 @@ class SettingsFragment : Fragment() {
                 requireContext(),
                 { view, hourOfDay, minute ->
                     val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
-                    timeEditText.setText(formattedTime)
-                    viewLifecycleOwner.lifecycleScope.launch {setReminderTimePreference(formattedTime)}
+                    binding.reminderEditTextTime.setText(formattedTime)
+                    viewLifecycleOwner.lifecycleScope.launch { setReminderTimePreference(formattedTime) }
                     setDailyAlarm(hourOfDay, minute)
                 },
                 hour,
@@ -171,45 +167,50 @@ class SettingsFragment : Fragment() {
             settings[REMINDER_SET] == true
         }
 
-        var reminderSetTimeFlow : Flow<String?> = requireContext().dataStore.data.map { settings ->
+        var reminderSetTimeFlow: Flow<String?> = requireContext().dataStore.data.map { settings ->
             settings[REMINDER_TIME_SET]
         }
 
-        viewLifecycleOwner.lifecycleScope.launch{
+        viewLifecycleOwner.lifecycleScope.launch {
             if (reminderSetFlow.first()) {
-                reminderSwitch.isChecked = true
+                binding.reminderSwitch.isChecked = true
                 val reminderSetTime = reminderSetTimeFlow.first()
                 if (reminderSetTime != null)
-                    timeEditText.setText(reminderSetTime)
+                    binding.reminderEditTextTime.setText(reminderSetTime)
             }
         }
 
-        val imageButton : ImageButton = view.findViewById(R.id.imagePicker)
-        // button Click listener
-        // invoke on user interaction
-        imageButton.setOnClickListener {
+        // Set click listener for image picker button
+        binding.imagePicker.setOnClickListener {
             // Launch the photo picker and let the user choose only images.
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
-        
-        first_github.setOnClickListener {
+
+        // Set click listeners for external links (GitHub profiles)
+        binding.githubFede.setOnClickListener {
             openLink(requireContext(), "https://github.com/fedeg202")
         }
-        second_github.setOnClickListener {
+        binding.githubNicco.setOnClickListener {
             openLink(requireContext(), "https://github.com/nicolotrebino")
         }
-        third_github.setOnClickListener {
+        binding.githubFnorg.setOnClickListener {
             openLink(requireContext(), "https://github.com/FN-Org")
         }
     }
 
+    /**
+     * Sets a daily repeating alarm at the specified hour and minute.
+     *
+     * @param hour Hour of the day to set the alarm.
+     * @param minute Minute of the hour to set the alarm.
+     */
     private fun setDailyAlarm(hour: Int, minute: Int) {
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
             set(Calendar.SECOND, 0)
 
-            // Se l'orario prefissato è già passato per oggi, allora imposta per domani
+            // If the specified time has already passed for today, set it for tomorrow
             if (before(Calendar.getInstance())) {
                 add(Calendar.DAY_OF_MONTH, 1)
             }
@@ -228,6 +229,11 @@ class SettingsFragment : Fragment() {
         Toast.makeText(requireContext(), "Daily Alarm Set", Toast.LENGTH_SHORT).show()
     }
 
+    /**
+     * Cancels the currently set alarm.
+     *
+     * @param showToast Flag to indicate whether to show a toast message for cancellation.
+     */
     private fun cancelAlarm(show: Boolean) {
         if (::pendingIntent.isInitialized) {
             alarmManager.cancel(pendingIntent)
@@ -237,6 +243,12 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    /**
+     * Checks if the notification permission is granted.
+     *
+     * @param view View instance to handle permission rationale.
+     * @return True if notification permission is granted, false otherwise.
+     */
     private fun checkNotifyPermission(view: View): Boolean {
         val context = requireContext()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -248,16 +260,15 @@ class SettingsFragment : Fragment() {
                     return true
                 }
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
-                    // Mostra un messaggio che spiega perché il permesso è necessario e chiede di andare nelle impostazioni
                     Toast.makeText(context, "Please enable notifications in settings", Toast.LENGTH_LONG).show()
                     return false
                 }
                 else -> {
                     if (!wasPermissionRequested(context)) {
-                        // Chiede il permesso per la prima volta
+                        // If the permission has not been requested before, request it
                         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     } else {
-                        // Se il permesso è stato richiesto e negato, mostra un messaggio per andare nelle impostazioni
+                        // If the permission has been requested and denied before, display a message to go to settings
                         Toast.makeText(context, "Please enable notifications in settings", Toast.LENGTH_LONG).show()
                     }
                     return false
@@ -267,6 +278,12 @@ class SettingsFragment : Fragment() {
         return false
     }
 
+    /**
+     * Stores the state of whether the notification permission has been requested.
+     *
+     * @param context Context to access shared preferences.
+     * @param value Boolean value indicating if the permission has been requested.
+     */
     private fun setPermissionRequested(context: Context, value: Boolean) {
         val sharedPref = context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE) ?: return
         with (sharedPref.edit()) {
@@ -275,17 +292,33 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    /**
+     * Checks if the notification permission has been requested before.
+     *
+     * @param context Context to access shared preferences.
+     * @return Boolean value indicating if the permission has been requested before.
+     */
     private fun wasPermissionRequested(context: Context): Boolean {
         val sharedPref = context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE) ?: return false
         return sharedPref.getBoolean("notification_permission_requested", false)
     }
 
+    /**
+     * Stores the reminder switch state in the DataStore.
+     *
+     * @param value Boolean value indicating if the reminder is set.
+     */
     private suspend fun setReminderPreference(value: Boolean) {
         requireContext().dataStore.edit { settings ->
             settings[REMINDER_SET] = value
         }
     }
 
+    /**
+     * Stores the reminder time in the DataStore.
+     *
+     * @param value String value representing the reminder time.
+     */
     private suspend fun setReminderTimePreference(value: String) {
         requireContext().dataStore.edit { settings ->
             settings[REMINDER_TIME_SET] = value

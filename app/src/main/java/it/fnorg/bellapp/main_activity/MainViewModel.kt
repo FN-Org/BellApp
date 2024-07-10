@@ -10,16 +10,23 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.firestoreSettings
-import com.google.firebase.firestore.memoryCacheSettings
-import com.google.firebase.firestore.persistentCacheSettings
 import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import it.fnorg.bellapp.R
 
+/**
+ * Data class representing a system.
+ *
+ * @property id Unique identifier for the system.
+ * @property name Name of the system.
+ * @property location Location of the system.
+ * @property nBells Number of bells in the system.
+ * @property nMelodies Number of melodies in the system.
+ * @property pin Pin code for the system.
+ * @property timestamp Timestamp of the system creation.
+ */
 data class System(
     val id: String = "",
     val name: String = "",
@@ -30,6 +37,9 @@ data class System(
     val timestamp: Timestamp = Timestamp.now()
 )
 
+/**
+ * ViewModel class for the MainActivity.
+ */
 class MainViewModel : ViewModel() {
 
     private val db = Firebase.firestore
@@ -51,12 +61,15 @@ class MainViewModel : ViewModel() {
     private val _userImage = MutableLiveData<Uri>()
     val userImage : LiveData<Uri> get() = _userImage
 
-    // Initialize with an empty list
     init {
+        // Initialize with an empty list
         _systems.value = emptyList()
         _system.value = System()
     }
 
+    /**
+     * Fetches system data for the home screen.
+     */
     fun fetchSysHomeData() {
         if (uid != null) {
             db.collection("users")
@@ -79,6 +92,9 @@ class MainViewModel : ViewModel() {
         else Log.d("HomeViewModelFetchSysdata", "uid was null")
     }
 
+    /**
+     * Fetches user data including email, name, and profile image.
+     */
     fun fetchUserData() {
         if (uid != null) {
             db.collection("users")
@@ -109,6 +125,12 @@ class MainViewModel : ViewModel() {
         else Log.d("HomeViewModelFetchUserData", "uid was null")
     }
 
+    /**
+     * Changes the name of a system.
+     *
+     * @param sysId ID of the system.
+     * @param name New name of the system.
+     */
     fun changeSysName(sysId : String,name : String){
         if (uid != null && name.isNotBlank()) {
             db.collection("users")
@@ -117,7 +139,7 @@ class MainViewModel : ViewModel() {
                 .document(sysId)
                 .update("name", name)
                 .addOnSuccessListener {
-
+                    // Successfully changed the name
                 }
                 .addOnFailureListener { exception ->
                     Log.d("HomeViewModel", "change name failed with ", exception)
@@ -126,6 +148,12 @@ class MainViewModel : ViewModel() {
         else Log.d("HomeViewModelChangeSysName", "uid was null or name was blank")
     }
 
+    /**
+     * Fetches data for a specific system.
+     *
+     * @param sysId ID of the system.
+     * @param callback Callback function to handle the success status.
+     */
     fun fetchSysData(sysId: String, callback: (Boolean) -> Unit){
             db.collection("systems")
                 .document(sysId)
@@ -148,6 +176,13 @@ class MainViewModel : ViewModel() {
                 }
     }
 
+    /**
+     * Adds a new system to the user's collection.
+     *
+     * @param sysId ID of the system.
+     * @param location Location of the system.
+     * @param name Name of the system.
+     */
     fun addSys(sysId: String, location: String, name: String) {
         val selectedFields = mapOf(
             "id" to sysId,
@@ -170,6 +205,12 @@ class MainViewModel : ViewModel() {
         else Log.d("HomeViewModelAddSys", "uid was null")
     }
 
+    /**
+     * Uploads an image to Firebase Storage.
+     *
+     * @param context Application context.
+     * @param uri URI of the image to upload.
+     */
     fun uploadImageToFirebase(context: Context, uri: Uri) {
         val storageRef = FirebaseStorage.getInstance().reference
         val fileRef = storageRef.child("profile_images/${uid}.jpg")
@@ -185,6 +226,12 @@ class MainViewModel : ViewModel() {
             }
     }
 
+    /**
+     * Removes a system from the user's collection.
+     *
+     * @param context Application context.
+     * @param sysId ID of the system to remove.
+     */
     fun removeSys(context: Context, sysId: String) {
         if (uid != null) {
             db.collection("users")

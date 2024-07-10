@@ -89,7 +89,11 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
 
+    <!-- Change profile image -->
+    <string name="change_image">Are you sure you want to change your profile image?</string>
+
     <!-- Toast -->
     <string name="name_changed">Name successfully changed!</string>
     <string name="empty_name">Name cannot be empty, please try again</string>
+    <string name="notification_denied">Please enable notifications in settings</string>
 </resources>

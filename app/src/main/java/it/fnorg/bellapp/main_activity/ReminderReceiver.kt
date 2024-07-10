@@ -12,10 +12,19 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import it.fnorg.bellapp.R
 
+/**
+ * BroadcastReceiver class to handle daily reminder notifications.
+ */
 class ReminderReceiver : BroadcastReceiver() {
 
     private val CHANNELID = "Daily_reminder"
 
+    /**
+     * Called when the BroadcastReceiver receives an Intent broadcast.
+     *
+     * @param context The Context in which the receiver is running.
+     * @param intent The Intent being received.
+     */
     override fun onReceive(context: Context?, intent: Intent?) {
         context?.let {
 
@@ -29,6 +38,11 @@ class ReminderReceiver : BroadcastReceiver() {
         }
     }
 
+    /**
+     * Creates a notification channel for devices running Android O or higher.
+     *
+     * @param context The Context in which the receiver is running.
+     */
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "Daily Reminder Channel"
@@ -48,8 +62,12 @@ class ReminderReceiver : BroadcastReceiver() {
         }
     }
 
+    /**
+     * Shows a notification to remind the user of a task.
+     *
+     * @param context The Context in which the receiver is running.
+     */
     private fun showNotification(context: Context) {
-        //createNotificationChannel(context)
 
         val notificationId = 1
 

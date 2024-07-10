@@ -1,14 +1,9 @@
 package it.fnorg.bellapp.main_activity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.ImageView
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -18,9 +13,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
@@ -29,10 +21,11 @@ import it.fnorg.bellapp.login_activity.LogInActivity
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.checkConnection
 import it.fnorg.bellapp.databinding.MainActivityMainBinding
-import it.fnorg.bellapp.isInternetAvailable
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
+/**
+ * MainActivity is the main entry point of the application. It handles user authentication,
+ * navigation, and updating the UI based on user data.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -43,24 +36,27 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Redirect to login if user is not authenticated
         if (FirebaseAuth.getInstance().currentUser == null) {
             val intent = Intent(this, LogInActivity::class.java)
             startActivity(intent)
             finish()
         }
 
+        // Fetch user data from ViewModel
         viewModel.fetchUserData()
 
         binding = MainActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Set up toolbar
         setSupportActionBar(binding.mainToolbar.toolbar)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
+        // Configure the AppBarConfiguration with top level destinations
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_add_sys, R.id.nav_settings
@@ -69,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        // OnClickListener for signing-out
+        // OnClickListener for signing out
         navView.menu.findItem(R.id.nav_sign_out).setOnMenuItemClickListener {
             AuthUI.getInstance()
                 .signOut(this)
@@ -78,8 +74,6 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 }
-            // Per chiudere il drawer dopo il sign-out ma probabilmente non serve
-            // drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
 
@@ -119,6 +113,11 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * Handles the action bar's Up button navigation.
+     *
+     * @return True if the navigation was successful, false otherwise.
+     */
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()

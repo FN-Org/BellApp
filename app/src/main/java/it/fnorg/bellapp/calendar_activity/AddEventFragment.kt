@@ -51,11 +51,6 @@ class AddEventFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (!isInternetAvailable(requireContext())) {
-            val warning : TextView = view.findViewById(R.id.warningTv)
-            warning.visibility = View.VISIBLE
-        }
-
         val spinnerMelodies: Spinner = view.findViewById(R.id.spinner_options_melodies)
         val spinnerColors: Spinner = view.findViewById(R.id.spinner_options_colors)
         val timeTextView: EditText = view.findViewById(R.id.editTextTime)
@@ -102,7 +97,7 @@ class AddEventFragment : Fragment() {
                 deleteButton.isEnabled = true
                 deleteButton.setOnClickListener {
                     if (!isInternetAvailable(requireContext())) {
-                        Toast.makeText(requireContext(), requireContext().getString(R.string.connection_warning), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), requireContext().getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
                         view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
                     } else {
                         viewModel.deleteEvent(args.eventId)
@@ -187,7 +182,7 @@ class AddEventFragment : Fragment() {
 
         saveButton.setOnClickListener {
             if (!isInternetAvailable(requireContext())) {
-                Toast.makeText(requireContext(), requireContext().getString(R.string.connection_warning), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), requireContext().getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
                 view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
             }
             else {

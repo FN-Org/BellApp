@@ -69,12 +69,9 @@
     <string name="event_created">Event successfully created!</string>
     <string name="sys_removed">System successfully removed!</string>
 
-    <string name="something_went_wrong">Something went wrong, please try again</string>
-    <string name="connection_warning">Check your internet connection before creating or updating your events</string>
-    <string name="connection_warning_2">Check your internet connection before trying to link a system</string>
+    <string name="sww_try_again">Something went wrong, please try again</string>
     <string name="sww_connection">Something went wrong. Please check your connection</string>
-
-    <string name="github_fede"></string>
-    <string name="github_nicco"></string>
-    <string name="github_fnorg">https://github.com/FN-Org</string>
+    <string name="connection_warning">Please remember to activate your internet connection while using the application</string>
+    <string name="connection_warning_1">Check your internet connection before creating or updating your events</string>
+    <string name="connection_warning_2">Check your internet connection before trying to link a system</string>
 </resources>

@@ -78,7 +78,7 @@ class CalendarActivityViewModel : ViewModel() {
         db.collection("systems")
             .document(sysId)
             .collection("events")
-            .get(Source.SERVER)
+            .get()
             .addOnSuccessListener { result ->
                 val eventList = mutableListOf<Event>()
                 for (document in result) {
@@ -102,7 +102,7 @@ class CalendarActivityViewModel : ViewModel() {
         db.collection("systems")
             .document(sysId)
             .collection("melodies")
-            .get(Source.SERVER)
+            .get()
             .addOnSuccessListener { result ->
                 val melodyList = mutableListOf<Melody>()
                 for (document in result) {
@@ -133,7 +133,7 @@ class CalendarActivityViewModel : ViewModel() {
                     Log.d("BellAppDB", "Event successfully created!")
                 }
                 .addOnFailureListener{
-                    Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.sww_try_again), Toast.LENGTH_SHORT).show()
                     Log.d("BellAppDB", "Error creating event")
                 }
         }

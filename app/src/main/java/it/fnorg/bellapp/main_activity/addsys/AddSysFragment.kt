@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.Group
@@ -17,6 +18,7 @@ import it.fnorg.bellapp.main_activity.MainViewModel
 import androidx.lifecycle.Observer
 import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
+import it.fnorg.bellapp.checkConnection
 import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.System
 
@@ -128,7 +130,7 @@ class AddSysFragment : Fragment() {
                 Toast.makeText(requireContext(),R.string.successfully_add_sys,Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_nav_add_sys_to_nav_home2)
             }
-            else Toast.makeText(requireContext(),R.string.something_went_wrong,Toast.LENGTH_LONG).show()
+            else Toast.makeText(requireContext(),R.string.sww_try_again,Toast.LENGTH_LONG).show()
         }
     }
 }

@@ -3,6 +3,8 @@ package it.fnorg.bellapp.main_activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import com.google.android.material.navigation.NavigationView
@@ -20,7 +22,9 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import it.fnorg.bellapp.login_activity.LogInActivity
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.checkConnection
 import it.fnorg.bellapp.databinding.MainActivityMainBinding
+import it.fnorg.bellapp.isInternetAvailable
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -72,8 +76,6 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        viewModel.fetchUserData()
-
         viewModel.email.observe(this) { email ->
             binding.navView.getHeaderView(0).findViewById<TextView>(R.id.emailTextView).text = email
         }
@@ -82,6 +84,26 @@ class MainActivity : AppCompatActivity() {
             binding.navView.getHeaderView(0).findViewById<TextView>(R.id.fullNameTextView).text = name
         }
 
+        // Add DrawerListener to call checkConnection() when drawer is opened
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                // Not needed
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                checkConnection(this@MainActivity, binding.root)
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                // Not needed
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                // Not needed
+            }
+        })
+
+        viewModel.fetchUserData()
     }
 
     override fun onSupportNavigateUp(): Boolean {

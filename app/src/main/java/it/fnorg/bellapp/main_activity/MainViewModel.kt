@@ -164,7 +164,7 @@ class MainViewModel : ViewModel() {
                     Toast.makeText(context, context.getString(R.string.sys_removed), Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.sww_try_again), Toast.LENGTH_SHORT).show()
                 }
         }
     }

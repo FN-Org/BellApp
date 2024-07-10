@@ -5,7 +5,10 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import androidx.core.content.ContextCompat.startActivity
+import android.util.Log
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.Toast
 
 fun isInternetAvailable(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -28,5 +31,27 @@ fun openLink(context: Context, url: String) {
     } else {
     // Gestisci il caso in cui nessun browser è disponibile per aprire il link
     // Ad esempio, mostra un messaggio all'utente
+    }
+}
+
+fun checkConnection(context: Context, view: View) {
+    val warningMessage: LinearLayout? = view.findViewById(R.id.connection_warning)
+    if (!isInternetAvailable(context)) {
+        if (warningMessage != null) {
+            warningMessage.visibility = View.VISIBLE
+            Log.w("Check Connection", "Belin ha funzionato")
+        }
+        else {
+            Log.w("Check Connection", "Non funziona un belino, linear layout nullo")
+        }
+    }
+    else {
+        if (warningMessage != null) {
+            warningMessage.visibility = View.GONE
+            Log.w("Check Connection", "Belin ha funzionato")
+        }
+        else {
+            Log.w("Check Connection", "Non funziona un belino, linear layout nullo")
+        }
     }
 }

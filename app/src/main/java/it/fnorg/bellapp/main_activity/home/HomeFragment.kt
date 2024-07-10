@@ -6,12 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.checkConnection
 import it.fnorg.bellapp.databinding.MainFragmentHomeBinding
+import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.MainViewModel
 
 class HomeFragment : Fragment() {
@@ -58,4 +61,9 @@ class HomeFragment : Fragment() {
         viewModel.fetchSysHomeData()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.fetchSysHomeData()
+    }
 }

@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.navigation.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kizitonwose.calendar.core.CalendarDay
@@ -30,6 +31,7 @@ import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.CalendarDayBinding
 import it.fnorg.bellapp.databinding.CalendarFragmentMonthViewBinding
 import it.fnorg.bellapp.databinding.CalendarHeaderBinding
+import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.MainActivity
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -111,9 +113,13 @@ class MonthViewFragment : Fragment() {
 
         val addEventButton: FloatingActionButton = binding.root.findViewById(R.id.calendarAddEventButton)
         addEventButton.setOnClickListener {
-            view.findNavController().navigate(R.id.action_monthViewFragment_to_addEventFragment)
+            if (!isInternetAvailable(requireContext())) {
+                Toast.makeText(requireContext(), requireContext().getString(R.string.connection_warning_1), Toast.LENGTH_SHORT).show()
+            }
+            else {
+                view.findNavController().navigate(R.id.action_monthViewFragment_to_addEventFragment)
+            }
         }
-
     }
 
     private fun updateAdapterForDate(date: LocalDate?) {

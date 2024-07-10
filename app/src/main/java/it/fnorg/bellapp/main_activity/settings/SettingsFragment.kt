@@ -18,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -30,6 +31,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.checkConnection
+import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
 import it.fnorg.bellapp.main_activity.dataStore
@@ -148,10 +151,10 @@ class SettingsFragment : Fragment() {
         }
 
         first_github.setOnClickListener {
-            openLink(requireContext(), "https://github.com/FN-Org")
+            openLink(requireContext(), "https://github.com/fedeg202")
         }
         second_github.setOnClickListener {
-            openLink(requireContext(), "https://github.com/FN-Org")
+            openLink(requireContext(), "https://github.com/nicolotrebino")
         }
         third_github.setOnClickListener {
             openLink(requireContext(), "https://github.com/FN-Org")

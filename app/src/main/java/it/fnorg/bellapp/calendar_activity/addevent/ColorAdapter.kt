@@ -1,4 +1,4 @@
-package it.fnorg.bellapp.calendar_activity
+package it.fnorg.bellapp.calendar_activity.addevent
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.calendar_activity.Color
 
 class ColorAdapter(
         context: Context,

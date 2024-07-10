@@ -1,4 +1,4 @@
-package it.fnorg.bellapp.calendar_activity
+package it.fnorg.bellapp.calendar_activity.addevent
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.calendar_activity.Melody
 
 class MelodyAdapter (
     context: Context,

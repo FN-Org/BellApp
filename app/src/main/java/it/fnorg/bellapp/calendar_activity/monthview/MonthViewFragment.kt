@@ -1,4 +1,4 @@
-package it.fnorg.bellapp.calendar_activity
+package it.fnorg.bellapp.calendar_activity.monthview
 
 import android.content.Intent
 import android.graphics.Typeface
@@ -28,6 +28,10 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.calendar_activity.CalendarActivityViewModel
+import it.fnorg.bellapp.calendar_activity.Event
+import it.fnorg.bellapp.calendar_activity.displayText
+import it.fnorg.bellapp.calendar_activity.toLocalDateTime
 import it.fnorg.bellapp.databinding.CalendarDayBinding
 import it.fnorg.bellapp.databinding.CalendarFragmentMonthViewBinding
 import it.fnorg.bellapp.databinding.CalendarHeaderBinding

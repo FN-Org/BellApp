@@ -1,4 +1,4 @@
-package it.fnorg.bellapp.calendar_activity
+package it.fnorg.bellapp.calendar_activity.addevent
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -20,6 +20,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.firebase.Timestamp
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.calendar_activity.CalendarActivityViewModel
+import it.fnorg.bellapp.calendar_activity.Event
+import it.fnorg.bellapp.calendar_activity.Melody
 import it.fnorg.bellapp.isInternetAvailable
 import java.time.LocalDateTime
 import java.time.ZoneOffset

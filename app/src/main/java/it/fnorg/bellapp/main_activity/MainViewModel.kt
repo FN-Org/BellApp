@@ -1,7 +1,9 @@
 package it.fnorg.bellapp.main_activity
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +12,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
+import com.google.firebase.storage.FirebaseStorage
 
 data class System(
     val id: String = "",
@@ -79,10 +82,20 @@ class MainViewModel : ViewModel() {
                     if (document != null && document.exists()) {
                         _email.value = document.getString("email").toString()
                         _name.value = document.getString("fullName").toString()
+
+                        // Fetch the user image from Firebase Storage
+                        val storageRef = FirebaseStorage.getInstance().reference
+                        val fileRef = storageRef.child("profile_images/${uid}.jpg")
+                        fileRef.downloadUrl.addOnSuccessListener { uri ->
+                            _userImage.value = uri
+                        }
+                        .addOnFailureListener {
+                            // Failed to fetch the user image
+                        }
                     }
                 }
                 .addOnFailureListener {
-
+                    // Failed to fetch the user data
                 }
         }
         else Log.d("HomeViewModelFetchUserData", "uid was null")
@@ -149,7 +162,18 @@ class MainViewModel : ViewModel() {
         else Log.d("HomeViewModelAddSys", "uid was null")
     }
 
-    fun updateProfileImage(newUrl: Uri) {
-        _userImage.value = newUrl
+    fun uploadImageToFirebase(context: Context, uri: Uri) {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val fileRef = storageRef.child("profile_images/${uid}.jpg")
+        fileRef.putFile(uri)
+            .addOnSuccessListener {
+                fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    _userImage.value = downloadUri
+                    Toast.makeText(context, "Image updated successfully", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firebase", "Image upload failed", e)
+            }
     }
 }

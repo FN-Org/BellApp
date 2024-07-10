@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.userImage.observe(this) { userImage ->
             Glide.with(this)
                 .load(userImage)
-                .into(binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.imageView))
+                .into(binding.navView.getHeaderView(0).findViewById(R.id.imageView))
         }
     }
 

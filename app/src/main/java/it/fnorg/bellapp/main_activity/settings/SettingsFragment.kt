@@ -80,7 +80,7 @@ class SettingsFragment : Fragment() {
         // photo picker.
         if (uri != null) {
             Log.d("PhotoPicker", "Selected URI: $uri")
-            uploadImageToFirebase(uri)
+            viewModel.uploadImageToFirebase(requireContext(), uri)
         } else {
             Log.d("PhotoPicker", "No media selected")
         }
@@ -181,28 +181,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun uploadImageToFirebase(uri: Uri) {
-        val storageRef = FirebaseStorage.getInstance().reference
-        val fileRef = storageRef.child("images/${viewModel.uid}.jpg")
-        fileRef.putFile(uri)
-            .addOnSuccessListener {
-                fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    updateImageView(downloadUri)
-                    viewModel.updateProfileImage(downloadUri)
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("Firebase", "Image upload failed", e)
-            }
-    }
-
-    private fun updateImageView(uri: Uri) {
-        val imageView: ImageView = view?.findViewById(R.id.profileIv) ?: return
-        Glide.with(this)
-            .load(uri)
-            .into(imageView)
-    }
-
     private fun setDailyAlarm(hour: Int, minute: Int) {
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, hour)
@@ -268,7 +246,6 @@ class SettingsFragment : Fragment() {
         return false
     }
 
-
     private fun setPermissionRequested(context: Context, value: Boolean) {
         val sharedPref = context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE) ?: return
         with (sharedPref.edit()) {
@@ -281,7 +258,6 @@ class SettingsFragment : Fragment() {
         val sharedPref = context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE) ?: return false
         return sharedPref.getBoolean("notification_permission_requested", false)
     }
-
 
     private suspend fun setReminderPreference(value: Boolean) {
         requireContext().dataStore.edit { settings ->

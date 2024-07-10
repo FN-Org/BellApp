@@ -38,6 +38,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="30dp"
         android:text="@string/set_reminder"
+        android:textSize="18sp"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -84,6 +85,60 @@
         app:layout_constraintTop_toBottomOf="@+id/reminder_switch" />
 
     <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginBottom="30dp"
+        android:text="- Profile image"
+        android:textColor="@color/lapis"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="357dp"
+        android:text="Choose an image from gallery"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/profileIv"
+        android:layout_width="77dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginBottom="30dp"
+        android:src="@drawable/ic_profile_default"
+        app:layout_constraintBottom_toTopOf="@+id/textView6"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imagePicker"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="342dp"
+        android:background="@drawable/custom_button"
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_gallery"
+        app:layout_constraintStart_toEndOf="@+id/textView6"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/seasalt" />
+
+  <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -163,4 +218,5 @@
         android:src="@drawable/ic_github"
         app:layout_constraintStart_toEndOf="@+id/textView6"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />
+  
 </androidx.constraintlayout.widget.ConstraintLayout>

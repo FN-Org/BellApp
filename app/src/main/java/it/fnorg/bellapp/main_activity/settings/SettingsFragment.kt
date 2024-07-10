@@ -1,8 +1,8 @@
 package it.fnorg.bellapp.main_activity.settings
 
-
 import android.Manifest
 import android.app.AlarmManager
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
@@ -17,9 +17,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.constraintlayout.widget.Group
@@ -29,6 +32,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.Firebase
+import com.google.firebase.storage.storage
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.checkConnection
@@ -44,7 +51,6 @@ import kotlinx.coroutines.launch
 
 class SettingsFragment : Fragment() {
 
-
     val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -58,7 +64,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-
     private lateinit var alarmManager: AlarmManager
     private lateinit var pendingIntent: PendingIntent
 
@@ -71,9 +76,34 @@ class SettingsFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
 
+    // Registers a photo picker activity launcher in single-select mode.
+    val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri != null) {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Are you sure you want to change your profile image?")
+            // Set up the buttons
+            builder.setPositiveButton("Yes") { dialog, which ->
+                Log.d("PhotoPicker", "Selected URI: $uri")
+                Toast.makeText(requireContext(), requireContext().getString(R.string.image_update_toast), Toast.LENGTH_SHORT).show()
+                viewModel.uploadImageToFirebase(requireContext(), uri)
+            }
+            builder.setNegativeButton("Cancel") { dialog, which ->
+                dialog.cancel()
+            }
+            builder.show()
+        } else {
+            Log.d("PhotoPicker", "No media selected")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
+
+    // Creating a storage reference
+    private val storageRef = Firebase.storage.reference
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,6 +115,14 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val imageView : ImageView = view.findViewById(R.id.profileIv)
+        viewModel.userImage.observe(viewLifecycleOwner) { userImage ->
+            Glide.with(this)
+                .load(userImage)
+                .apply(RequestOptions.circleCropTransform())
+                .into(imageView)
+        }
 
         val reminderSwitch: SwitchMaterial = view.findViewById(R.id.reminder_switch)
         val first_github: ImageView = view.findViewById(R.id.github_fede)
@@ -150,6 +188,14 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        val imageButton : ImageButton = view.findViewById(R.id.imagePicker)
+        // button Click listener
+        // invoke on user interaction
+        imageButton.setOnClickListener {
+            // Launch the photo picker and let the user choose only images.
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+        
         first_github.setOnClickListener {
             openLink(requireContext(), "https://github.com/fedeg202")
         }

@@ -20,6 +20,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.firebase.Timestamp
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.isInternetAvailable
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -94,10 +95,15 @@ class AddEventFragment : Fragment() {
                 // defaultButton become visible and clickable in the Modify Event
                 deleteButton.visibility = View.VISIBLE
                 deleteButton.isEnabled = true
-                deleteButton.setOnClickListener{
-                    viewModel.deleteEvent(args.eventId)
-                    Toast.makeText(requireActivity(), R.string.deleted, Toast.LENGTH_SHORT).show()
-                    view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
+                deleteButton.setOnClickListener {
+                    if (!isInternetAvailable(requireContext())) {
+                        Toast.makeText(requireContext(), requireContext().getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
+                        view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
+                    } else {
+                        viewModel.deleteEvent(args.eventId)
+                        Toast.makeText(requireActivity(), R.string.deleted, Toast.LENGTH_SHORT).show()
+                        view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
+                    }
                 }
             } else {
                 fragmentTitle.text = requireContext().getString(R.string.add_event)
@@ -175,44 +181,48 @@ class AddEventFragment : Fragment() {
         }
 
         saveButton.setOnClickListener {
-            val time = timeTextView.text.toString()
-            val date = dateTextView.text.toString()
-
-            if (time.isBlank()||date.isBlank()){
-                Toast.makeText(requireActivity(), R.string.incorrect_saved, Toast.LENGTH_LONG).show()
-                return@setOnClickListener
+            if (!isInternetAvailable(requireContext())) {
+                Toast.makeText(requireContext(), requireContext().getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
+                view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
             }
+            else {
+                val time = timeTextView.text.toString()
+                val date = dateTextView.text.toString()
 
-            // LocalDateTime
-            val dateTimeString = "$date $time"
-            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
-            val dateTime = LocalDateTime.parse(dateTimeString.trim(), formatter)
+                if (time.isBlank()||date.isBlank()){
+                    Toast.makeText(requireActivity(), R.string.incorrect_saved, Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
 
-            // Converte LocalDateTime in istante di tempo in millisecondi UNIX
-            val epochMillis = dateTime.toInstant(ZoneOffset.ofHours(2)).toEpochMilli()
+                // LocalDateTime
+                val dateTimeString = "$date $time"
+                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
+                val dateTime = LocalDateTime.parse(dateTimeString.trim(), formatter)
 
-            // Creazione di un oggetto Timestamp per Firebase Firestore
-            val timestamp = Timestamp(epochMillis / 1000, (epochMillis % 1000).toInt())
+                // Converte LocalDateTime in istante di tempo in millisecondi UNIX
+                val epochMillis = dateTime.toInstant(ZoneOffset.ofHours(2)).toEpochMilli()
 
-            val selectedMelody = spinnerMelodies.selectedItem as Melody
-            val melodyNumber = selectedMelody.number
-            val melodyName = selectedMelody.name
+                // Creazione di un oggetto Timestamp per Firebase Firestore
+                val timestamp = Timestamp(epochMillis / 1000, (epochMillis % 1000).toInt())
 
-            val color = spinnerColors.selectedItemPosition + 1
+                val selectedMelody = spinnerMelodies.selectedItem as Melody
+                val melodyNumber = selectedMelody.number
+                val melodyName = selectedMelody.name
 
-            val event = Event(
-                id = "", // L'ID verrà generato automaticamente da Firestore
-                time = timestamp,
-                melodyName = melodyName,
-                melodyNumber = melodyNumber,
-                color = color
-            )
+                val color = spinnerColors.selectedItemPosition + 1
 
-            viewModel.saveEvent(event, args.eventId)
+                val event = Event(
+                    id = "", // L'ID verrà generato automaticamente da Firestore
+                    time = timestamp,
+                    melodyName = melodyName,
+                    melodyNumber = melodyNumber,
+                    color = color
+                )
 
+                viewModel.saveEvent(requireContext(), event, args.eventId)
 
-            view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
-
+                view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
+            }
         }
     }
 }

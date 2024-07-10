@@ -16,7 +16,6 @@ class ReminderReceiver : BroadcastReceiver() {
 
     private val CHANNELID = "Daily_reminder"
 
-
     override fun onReceive(context: Context?, intent: Intent?) {
         context?.let {
 
@@ -65,6 +64,7 @@ class ReminderReceiver : BroadcastReceiver() {
             .setContentText(context.getString(R.string.reminder_text))
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
 
         with(NotificationManagerCompat.from(context)) {
             notify(notificationId, builder.build())

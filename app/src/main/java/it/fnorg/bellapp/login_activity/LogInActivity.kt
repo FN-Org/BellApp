@@ -3,6 +3,8 @@ package it.fnorg.bellapp.login_activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
@@ -15,6 +17,7 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.main_activity.MainActivity
+import it.fnorg.bellapp.welcome_activity.WelcomeActivity
 
 class LogInActivity : AppCompatActivity() {
 
@@ -34,6 +37,10 @@ class LogInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity_log_in)
+
+        this.onBackPressedDispatcher.addCallback(this){
+            navigateToWelcomeActivity()
+        }
 
         // Choose authentication providers
         val providers = arrayListOf(
@@ -59,9 +66,6 @@ class LogInActivity : AppCompatActivity() {
             // Successfully signed in
             val user = FirebaseAuth.getInstance().currentUser
 
-            // TODO: Fare in modo che se l'utente si è appena registrato venga creato il documento e la raccolta
-            //       relativi all'utente per sapere a che sistemi è collegato
-
             // Controlla se l'utente è autenticato
             if (user != null) {
                 val uid = user.uid
@@ -80,10 +84,9 @@ class LogInActivity : AppCompatActivity() {
                             Log.d("LogInActivity", "Failed to create user document: ", exception)
                         }
                     } else {
-                        userData = document.toObject<UserInfo>()!!
                         Log.d("LogInActivity", "User document already exists")
                     }
-                    navigateToMainActivity(userData)
+                    navigateToMainActivity()
                 }.addOnFailureListener { exception ->
                     Log.d("LogInActivity", "Failed to check user document: ", exception)
                 }
@@ -95,15 +98,24 @@ class LogInActivity : AppCompatActivity() {
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
             // ...
+            if (response != null) {
+                Log.d("LogInActivity", "Error code: "+ response.getError())
+            }
+            else {
+                navigateToWelcomeActivity()
+            }
         }
     }
 
-    private fun navigateToMainActivity(user: UserInfo) {
+    private fun navigateToMainActivity() {
         // Start the MainActivity
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("UserId", user.uid)
-        intent.putExtra("FullName", user.fullName)
-        intent.putExtra("Email", user.email)
+        startActivity(intent)
+    }
+
+    private fun navigateToWelcomeActivity() {
+        // Start the MainActivity
+        val intent = Intent(this, WelcomeActivity::class.java)
         startActivity(intent)
     }
 }

@@ -19,6 +19,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,10 +36,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
+import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.checkConnection
+import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
 import it.fnorg.bellapp.main_activity.dataStore
+import it.fnorg.bellapp.openLink
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -119,6 +125,9 @@ class SettingsFragment : Fragment() {
         }
 
         val reminderSwitch: SwitchMaterial = view.findViewById(R.id.reminder_switch)
+        val first_github: ImageView = view.findViewById(R.id.github_fede)
+        val second_github: ImageView = view.findViewById(R.id.github_nicco)
+        val third_github: ImageView = view.findViewById(R.id.github_fnorg)
 
         alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -185,6 +194,16 @@ class SettingsFragment : Fragment() {
         imageButton.setOnClickListener {
             // Launch the photo picker and let the user choose only images.
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+        
+        first_github.setOnClickListener {
+            openLink(requireContext(), "https://github.com/fedeg202")
+        }
+        second_github.setOnClickListener {
+            openLink(requireContext(), "https://github.com/nicolotrebino")
+        }
+        third_github.setOnClickListener {
+            openLink(requireContext(), "https://github.com/FN-Org")
         }
     }
 
@@ -277,5 +296,4 @@ class SettingsFragment : Fragment() {
             settings[REMINDER_TIME_SET] = value
         }
     }
-
 }

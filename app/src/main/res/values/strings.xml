@@ -17,7 +17,7 @@
     <string name="mail_nicco">nicolotrebino@gmail.com</string>
 
     <string name="calendar">Calendar</string>
-    <string name="change_name">Change name</string>
+    <string name="play">Play melody</string>
 
     <string name="name_changed">Name successfully changed!</string>
 
@@ -59,9 +59,20 @@
     <string name="add_sys">Add system</string>
 
     <string name="none">none</string>
-    <string name="something_went_wrong">Something went wrong, please try again</string>
+    <string name="already_linked">System already linked</string>
     <string name="successfully_add_sys">System added successfully</string>
 
     <string name="image_update_toast">Profile image updated successfully</string>
     <string name="back_before_exit_toast">Press back again to exit from the application</string>
+
+    <string name="coming_soon">COMING SOON!</string>
+
+    <string name="event_created">Event successfully created!</string>
+    <string name="sys_removed">System successfully removed!</string>
+
+    <string name="sww_try_again">Something went wrong, please try again</string>
+    <string name="sww_connection">Something went wrong. Please check your connection</string>
+    <string name="connection_warning">Please remember to activate your internet connection while using the application</string>
+    <string name="connection_warning_1">Check your internet connection before creating or updating your events</string>
+    <string name="connection_warning_2">Check your internet connection before trying to link a system</string>
 </resources>

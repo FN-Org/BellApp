@@ -6,35 +6,15 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/contacts"
+        android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/black"
-        android:text="Contacts"
-        app:layout_constraintBottom_toTopOf="@+id/mail1"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:gravity="center"
+        android:text="@string/connection_warning"
+        android:textColor="@color/warning"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/mail1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/black"
-        android:text="@string/mail_fede"
-        app:layout_constraintBottom_toTopOf="@+id/mail2"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/mail2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/black"
-        android:text="@string/mail_nicco"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

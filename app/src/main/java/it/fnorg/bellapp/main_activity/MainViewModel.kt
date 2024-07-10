@@ -10,9 +10,15 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.memoryCacheSettings
+import com.google.firebase.firestore.persistentCacheSettings
 import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
+import it.fnorg.bellapp.R
 
 data class System(
     val id: String = "",
@@ -51,7 +57,7 @@ class MainViewModel : ViewModel() {
         _system.value = System()
     }
 
-    fun fetchSysData() {
+    fun fetchSysHomeData() {
         if (uid != null) {
             db.collection("users")
                 .document(uid)
@@ -121,7 +127,7 @@ class MainViewModel : ViewModel() {
     fun fetchSysData(sysId: String, callback: (Boolean) -> Unit){
             db.collection("systems")
                 .document(sysId)
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener { result ->
                     result.toObject<System>().let { system ->
                         if (system != null) {
@@ -140,7 +146,7 @@ class MainViewModel : ViewModel() {
                 }
     }
 
-    fun addSys(sysId: String,location: String, name: String) {
+    fun addSys(sysId: String, location: String, name: String) {
         val selectedFields = mapOf(
             "id" to sysId,
             "name" to name,
@@ -175,5 +181,20 @@ class MainViewModel : ViewModel() {
             .addOnFailureListener { e ->
                 Log.e("Firebase", "Image upload failed", e)
             }
+
+    fun removeSys(context: Context, sysId: String) {
+        if (uid != null) {
+            db.collection("users")
+                .document(uid)
+                .collection("systems")
+                .document(sysId)
+                .delete()
+                .addOnSuccessListener {
+                    Toast.makeText(context, context.getString(R.string.sys_removed), Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, context.getString(R.string.sww_try_again), Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 }

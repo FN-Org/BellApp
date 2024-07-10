@@ -181,6 +181,7 @@ class MainViewModel : ViewModel() {
             .addOnFailureListener { e ->
                 Log.e("Firebase", "Image upload failed", e)
             }
+    }
 
     fun removeSys(context: Context, sysId: String) {
         if (uid != null) {

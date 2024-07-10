@@ -40,7 +40,6 @@
         android:text="@string/set_reminder"
         android:textSize="18sp"
         android:textColor="@color/black"
-        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,12 +49,13 @@
         android:id="@+id/time_group"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:visibility="visible"
         android:visibility="gone"
         app:constraint_referenced_ids="textView5,reminderEditTextTime"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/textView5"
@@ -89,22 +89,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="250dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginTop="230dp"
         android:text="- Profile image"
         android:textColor="@color/lapis"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textView6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/galleyText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="357dp"
+        android:layout_marginTop="320dp"
         android:text="Choose an image from gallery"
         android:textColor="@color/black"
         android:textSize="18sp"
@@ -116,7 +114,7 @@
         android:layout_width="77dp"
         android:layout_height="72dp"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="208dp"
         android:layout_marginBottom="30dp"
         android:src="@drawable/ic_profile_default"
         app:layout_constraintBottom_toTopOf="@+id/textView6"
@@ -128,13 +126,13 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="342dp"
+        android:layout_marginTop="307dp"
         android:background="@drawable/custom_button"
         android:paddingStart="7dp"
         android:paddingEnd="7dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_gallery"
-        app:layout_constraintStart_toEndOf="@+id/textView6"
+        app:layout_constraintStart_toEndOf="@+id/galleyText"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/seasalt" />
 
@@ -187,7 +185,7 @@
         app:layout_constraintStart_toEndOf="@+id/textView8" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/github_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -216,7 +214,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="20dp"
         android:src="@drawable/ic_github"
-        app:layout_constraintStart_toEndOf="@+id/textView6"
+        app:layout_constraintStart_toEndOf="@+id/github_3"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />
   
 </androidx.constraintlayout.widget.ConstraintLayout>

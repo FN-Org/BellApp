@@ -19,8 +19,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,10 +34,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
-import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import it.fnorg.bellapp.R
-import it.fnorg.bellapp.checkConnection
-import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
 import it.fnorg.bellapp.main_activity.dataStore
@@ -260,7 +255,6 @@ class SettingsFragment : Fragment() {
                     if (!wasPermissionRequested(context)) {
                         // Chiede il permesso per la prima volta
                         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        setPermissionRequested(context, true)
                     } else {
                         // Se il permesso è stato richiesto e negato, mostra un messaggio per andare nelle impostazioni
                         Toast.makeText(context, "Please enable notifications in settings", Toast.LENGTH_LONG).show()

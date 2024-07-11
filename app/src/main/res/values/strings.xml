@@ -1,51 +1,39 @@
 <resources>
     <string name="app_name">BellApp</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <!-- Drawer default strings -->
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_add_sys">Add System</string>
-    <string name="menu_settings">Settings</string>
-    <string name="menu_sign_out">Sign Out</string>
-
-    <string name="mail_fede">fedegarau02@gmail.com</string>
-    <string name="mail_nicco">nicolotrebino@gmail.com</string>
-
-    <string name="calendar">Calendar</string>
-    <string name="play">Play melody</string>
+    <!-- WELCOME ACTIVITY -->
 
     <string name="skip_button">SKIP</string>
     <string name="next_button">NEXT</string>
     <string name="previous_button">PREVIOUS</string>
 
-    <string name="login_email_button">Sign in with email</string>
-    <string name="login_google_button">Sign in with Google</string>
+    <!-- MAIN ACTIVITY -->
 
-    <string name="add_time">Time</string>
-    <string name="add_date">Date</string>
-    <string name="select_melody">Select a melody</string>
-    <string name="select_color">Select a color</string>
-    <string name="save_event">SAVE</string>
-    <string name="delete_event">DELETE</string>
+    <!-- Navigation drawer -->
+    <string name="menu_home">Home</string>
+    <string name="menu_add_sys">Add System</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_sign_out">Sign Out</string>
 
-    <string name="add_event">Add Event</string>
-    <string name="modify_event">Modify Event</string>
+    <!-- Home fragment -->
+    <string name="first_message_home">
+        Don\'t panic, to start controlling your bell systems just
+        click in the top menu and add one from the \"Add Sys\" page. \n
+        You just need to know the system ID and its PIN.
+    </string>
+    <string name="calendar">Calendar</string>
+    <string name="play">Play melody</string>
+    <string name="name_changed">Name successfully changed!</string>
+    <string name="empty_name">Name cannot be empty, please try again</string>
+    <string name="sys_removed">System successfully removed!</string>
 
-    <string name="saved">Successfully  saved</string>
-    <string name="incorrect_saved">Please provide all the informations</string>
-    <string name="deleted">Successfully  deleted</string>
-
-    <string name="set_reminder">Set a reminder</string>
-    <string name="reminder_title">Daily reminder</string>
-    <string name="reminder_text">Remember to set some events</string>
-
+    <!-- Add Sys fragment -->
     <string name="insert_sys_id">Insert system id:</string>
-
     <string name="search">Search</string>
     <string name="found">Found:</string>
     <string name="location">Location:</string>
@@ -55,29 +43,38 @@
     <string name="name">Name:</string>
     <string name="insert_pin">Insert pin:</string>
     <string name="add_sys">Add system</string>
-
-    <string name="none">none</string>
+    <string name="none">None</string>
     <string name="already_linked">System already linked</string>
     <string name="successfully_add_sys">System added successfully</string>
 
+    <!-- Settings fragment -->
+    <string name="mail_fede">fedegarau02@gmail.com</string>
+    <string name="mail_nicco">nicolotrebino@gmail.com</string>
+    <string name="set_reminder">Set a reminder</string>
+    <string name="reminder_title">Daily reminder</string>
+    <string name="reminder_text">Remember to set some events</string>
     <string name="image_update_toast">Profile image updated successfully</string>
     <string name="image_uploading">Profile image uploading</string>
-    <string name="back_before_exit_toast">Press back again to exit from the application</string>
+    <string name="notification_denied">Please enable notifications in settings</string>
 
-    <string name="coming_soon">COMING SOON!</string>
+    <!-- CALENDAR ACTIVITY -->
 
+    <!-- Add Event fragment -->
+    <string name="add_time">Time</string>
+    <string name="add_date">Date</string>
+    <string name="select_melody">Select a melody</string>
+    <string name="select_color">Select a color</string>
+    <string name="save_event">SAVE</string>
+    <string name="delete_event">DELETE</string>
+    <string name="add_event">Add Event</string>
+    <string name="modify_event">Modify Event</string>
+    <string name="saved">Successfully  saved</string>
+    <string name="incorrect_saved">Please provide all the information</string>
+    <string name="deleted">Successfully  deleted</string>
     <string name="event_created">Event successfully created!</string>
     <string name="event_updated">Event successfully updated!</string>
 
-    <string name="sys_removed">System successfully removed!</string>
-
-    <string name="sww_try_again">Something went wrong, please try again</string>
-    <string name="sww_connection">Something went wrong. Please check your connection</string>
-    <string name="connection_warning">Please remember to activate your internet connection while using the application</string>
-    <string name="connection_warning_1">Check your internet connection before creating or updating your events</string>
-    <string name="connection_warning_2">Check your internet connection before trying to link a system</string>
-
-    <!-- Alert dialogs -->
+    <!-- ALERT DIALOGS -->
 
     <!-- Remove sys (HomeListAdapter) -->
     <string name="remove_sys">Do you want to remove this system?</string>
@@ -89,11 +86,20 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
 
-    <!-- Change profile image -->
+    <!-- Change profile image (Home fragment)-->
     <string name="change_image">Are you sure you want to change your profile image?</string>
 
-    <!-- Toast -->
-    <string name="name_changed">Name successfully changed!</string>
-    <string name="empty_name">Name cannot be empty, please try again</string>
-    <string name="notification_denied">Please enable notifications in settings</string>
+    <!-- GENERAL MESSAGES -->
+
+    <!-- Warning and Error messages -->
+    <string name="sww_try_again">Something went wrong, please try again</string>
+    <string name="sww_connection">Something went wrong. Please check your connection</string>
+    <string name="connection_warning">Please remember to activate your internet connection while using the application</string>
+    <string name="connection_warning_1">Check your internet connection before creating or updating your events</string>
+    <string name="connection_warning_2">Check your internet connection before trying to link a system</string>
+
+    <!-- General Toast -->
+    <string name="back_before_exit_toast">Press back again to exit from the application</string>
+    <string name="coming_soon">COMING SOON!</string>
+
 </resources>

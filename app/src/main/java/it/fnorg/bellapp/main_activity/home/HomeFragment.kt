@@ -51,10 +51,16 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.rvHome.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.systems.observe(viewLifecycleOwner, Observer
-        { systems ->
-            val homeListAdapter = HomeListAdapter(requireContext(), systems, viewModel)
-            binding.rvHome.adapter = homeListAdapter
+        viewModel.systems.observe(viewLifecycleOwner, Observer { systems ->
+            if (systems.isNullOrEmpty()) {
+                binding.homeMessage.visibility = View.VISIBLE
+                binding.rvHome.visibility = View.GONE
+            } else {
+                binding.homeMessage.visibility = View.GONE
+                binding.rvHome.visibility = View.VISIBLE
+                val homeListAdapter = HomeListAdapter(requireContext(), systems, viewModel)
+                binding.rvHome.adapter = homeListAdapter
+            }
         })
 
         // Fetch system data when view is created or resumed
@@ -66,5 +72,16 @@ class HomeFragment : Fragment() {
 
         // Refresh system data when fragment resumes
         viewModel.fetchSysHomeData()
+        viewModel.systems.observe(viewLifecycleOwner, Observer { systems ->
+            if (systems.isNullOrEmpty()) {
+                binding.homeMessage.visibility = View.VISIBLE
+                binding.rvHome.visibility = View.GONE
+            } else {
+                binding.homeMessage.visibility = View.GONE
+                binding.rvHome.visibility = View.VISIBLE
+                val homeListAdapter = HomeListAdapter(requireContext(), systems, viewModel)
+                binding.rvHome.adapter = homeListAdapter
+            }
+        })
     }
 }

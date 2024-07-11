@@ -172,6 +172,7 @@ class MainViewModel : ViewModel() {
                 }
                 .addOnFailureListener { exception ->
                     Log.d("MainViewModel", "get failed with ", exception)
+                    _system.value = System()
                     callback(false)
                 }
     }

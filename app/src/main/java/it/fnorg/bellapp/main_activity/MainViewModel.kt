@@ -107,11 +107,12 @@ class MainViewModel : ViewModel() {
 
                         // Fetch the user image from Firebase Storage
                         val storageRef = FirebaseStorage.getInstance().reference
-                        val fileRef = storageRef.child("profile_images/${uid}.jpg")
+                        val fileRef = storageRef.child("profile_images/${uid}")
                         fileRef.downloadUrl.addOnSuccessListener { uri ->
                             _userImage.value = uri
                         }
-                        .addOnFailureListener {
+                        .addOnFailureListener {e ->
+                            Log.e("Download image", "ERROR", e)
                             // Failed to fetch the user image
                             _userImage.value = Uri.parse("android.resource://it.fnorg.bellapp/drawable/ic_profile_default")
                             Log.w("Image", "Uri. " + _userImage.value)
@@ -214,7 +215,7 @@ class MainViewModel : ViewModel() {
      */
     fun uploadImageToFirebase(context: Context, uri: Uri) {
         val storageRef = FirebaseStorage.getInstance().reference
-        val fileRef = storageRef.child("profile_images/${uid}.jpg")
+        val fileRef = storageRef.child("profile_images/${uid}")
         fileRef.putFile(uri)
             .addOnSuccessListener {
                 fileRef.downloadUrl.addOnSuccessListener { downloadUri ->

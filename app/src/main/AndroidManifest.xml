@@ -10,6 +10,18 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
+    <queries>
+        <!-- Permission to open a browser -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"

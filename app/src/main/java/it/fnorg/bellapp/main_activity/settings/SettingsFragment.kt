@@ -50,7 +50,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 class SettingsFragment : Fragment() {
 
     // Launcher for requesting notification permissions.
-    val requestPermissionLauncher = registerForActivityResult(
+    private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         val context = requireContext()
@@ -130,14 +130,14 @@ class SettingsFragment : Fragment() {
                 if (checkNotifyPermission(binding.root)) {
                     timeGroup.visibility = View.VISIBLE
                 } else {
-                    binding.reminderSwitch.isChecked = false // Disabilita lo switch se i permessi non sono concessi
+                    binding.reminderSwitch.isChecked = false
                 }
             } else {
                 cancelAlarm(true)
                 timeGroup.visibility = View.GONE
             }
 
-            viewLifecycleOwner.lifecycleScope.launch { setReminderPreference(isChecked) }
+            viewLifecycleOwner.lifecycleScope.launch { setReminderPreference(binding.reminderSwitch.isChecked) }
         }
 
         // Handle click on time EditText to set reminder time
@@ -163,11 +163,11 @@ class SettingsFragment : Fragment() {
             timePickerDialog.show()
         }
 
-        var reminderSetFlow: Flow<Boolean> = requireContext().dataStore.data.map { settings ->
+        val reminderSetFlow: Flow<Boolean> = requireContext().dataStore.data.map { settings ->
             settings[REMINDER_SET] == true
         }
 
-        var reminderSetTimeFlow: Flow<String?> = requireContext().dataStore.data.map { settings ->
+        val reminderSetTimeFlow: Flow<String?> = requireContext().dataStore.data.map { settings ->
             settings[REMINDER_TIME_SET]
         }
 

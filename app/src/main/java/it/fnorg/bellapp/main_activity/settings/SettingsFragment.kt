@@ -144,9 +144,16 @@ class SettingsFragment : Fragment() {
         binding.reminderEditTextTime.setOnClickListener {
             cancelAlarm(false)
             val c = Calendar.getInstance()
+            var hour = c.get(Calendar.HOUR_OF_DAY)
+            var minute = c.get(Calendar.MINUTE)
 
-            val hour = c.get(Calendar.HOUR_OF_DAY)
-            val minute = c.get(Calendar.MINUTE)
+            if (binding.reminderEditTextTime.text.isNotBlank()) {
+                val parts = binding.reminderEditTextTime.text.toString().split(":")
+                hour = parts[0].toInt()
+                minute = parts[1].toInt()
+            }
+
+
             val timePickerDialog = TimePickerDialog(
                 requireContext(),
                 { view, hourOfDay, minute ->

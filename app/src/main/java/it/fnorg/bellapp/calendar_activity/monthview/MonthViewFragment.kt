@@ -30,6 +30,7 @@ import com.kizitonwose.calendar.view.ViewContainer
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarActivityViewModel
 import it.fnorg.bellapp.calendar_activity.Event
+import it.fnorg.bellapp.calendar_activity.dateFormatter
 import it.fnorg.bellapp.calendar_activity.displayText
 import it.fnorg.bellapp.calendar_activity.toLocalDateTime
 import it.fnorg.bellapp.databinding.CalendarDayBinding
@@ -40,6 +41,7 @@ import it.fnorg.bellapp.main_activity.MainActivity
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 class MonthViewFragment : Fragment() {
 
@@ -121,7 +123,20 @@ class MonthViewFragment : Fragment() {
                 Toast.makeText(requireContext(), requireContext().getString(R.string.connection_warning_1), Toast.LENGTH_SHORT).show()
             }
             else {
-                view.findNavController().navigate(R.id.action_monthViewFragment_to_addEventFragment)
+                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+
+                var formattedDate = selectedDate?.format(formatter)
+
+                if (formattedDate == null) formattedDate = "default"
+
+                val action = MonthViewFragmentDirections.actionMonthViewFragmentToAddEventFragment(
+                eventId = "default",
+                eventTime = "default",
+                eventDate = formattedDate,
+                eventMelody = 0,
+                eventColor = 0    
+                )
+                view.findNavController().navigate(action)
             }
         }
     }

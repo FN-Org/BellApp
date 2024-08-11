@@ -105,6 +105,8 @@ class AddEventFragment : Fragment() {
                     }
                 }
             } else {
+                if (args.eventDate != "default")
+                    dateTextView.setText(args.eventDate)
                 fragmentTitle.text = requireContext().getString(R.string.add_event)
             }
         }
@@ -118,8 +120,15 @@ class AddEventFragment : Fragment() {
         timeTextView.setOnClickListener {
             val c = Calendar.getInstance()
 
-            val hour = c.get(Calendar.HOUR_OF_DAY)
-            val minute = c.get(Calendar.MINUTE)
+            var hour = c.get(Calendar.HOUR_OF_DAY)
+            var minute = c.get(Calendar.MINUTE)
+
+            if (timeTextView.text.isNotBlank()) {
+                val parts = dateTextView.text.toString().split(":")
+                hour = parts[0].toInt()
+                minute = parts[1].toInt()
+            }
+
             val timePickerDialog = TimePickerDialog(
                 requireContext(),
                 { view, hourOfDay, minute ->
@@ -138,9 +147,16 @@ class AddEventFragment : Fragment() {
         dateTextView.setOnClickListener {
             val c = Calendar.getInstance()
 
-            val year = c.get(Calendar.YEAR)
-            val month = c.get(Calendar.MONTH)
-            val day = c.get(Calendar.DAY_OF_MONTH)
+            var year = c.get(Calendar.YEAR)
+            var month = c.get(Calendar.MONTH)
+            var day = c.get(Calendar.DAY_OF_MONTH)
+
+            if (dateTextView.text.isNotBlank()) {
+                val parts = dateTextView.text.toString().split("-")
+                day = parts[0].toInt()
+                month = parts[1].toInt() - 1
+                year = parts[2].toInt()
+            }
 
             val datePickerDialog = DatePickerDialog(
                 requireContext(),

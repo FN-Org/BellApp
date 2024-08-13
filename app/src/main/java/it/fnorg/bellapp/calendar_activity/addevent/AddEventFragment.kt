@@ -124,7 +124,7 @@ class AddEventFragment : Fragment() {
             var minute = c.get(Calendar.MINUTE)
 
             if (timeTextView.text.isNotBlank()) {
-                val parts = dateTextView.text.toString().split(":")
+                val parts = timeTextView.text.toString().split(":")
                 hour = parts[0].toInt()
                 minute = parts[1].toInt()
             }

@@ -55,6 +55,7 @@
     <string name="reminder_text">Remember to set some events</string>
     <string name="image_update_toast">Profile image updated successfully</string>
     <string name="image_uploading">Profile image uploading</string>
+    <string name="image_remove_toast">Image removed successfully</string>
     <string name="notification_denied">Please enable notifications in settings</string>
 
     <!-- CALENDAR ACTIVITY -->

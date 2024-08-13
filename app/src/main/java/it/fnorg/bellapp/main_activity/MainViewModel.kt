@@ -249,4 +249,23 @@ class MainViewModel : ViewModel() {
                 }
         }
     }
+
+    /**
+     * Remove the image of the current user from Firestore
+     *
+     * @param context Application context
+     */
+    fun removeImageFromFirebase(context: Context){
+        if (uid != null){
+            val storageRef = FirebaseStorage.getInstance().reference
+            val fileRef = storageRef.child("profile_images/${uid}")
+            fileRef.delete()
+                .addOnSuccessListener {
+                    Toast.makeText(context, R.string.image_remove_toast, Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener{
+                    Toast.makeText(context, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
 }

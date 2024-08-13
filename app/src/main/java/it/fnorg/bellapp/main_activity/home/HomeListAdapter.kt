@@ -3,10 +3,12 @@ package it.fnorg.bellapp.main_activity.home
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import it.fnorg.bellapp.R
@@ -73,7 +75,7 @@ class HomeListAdapter (
         }
 
         // Handle click on close icon to remove system
-        binding.closeIv.setOnClickListener {
+        binding.removeIv.setOnClickListener {
             if (!isInternetAvailable(mContext)) {
                 Toast.makeText(mContext, mContext.getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
             } else {
@@ -88,6 +90,18 @@ class HomeListAdapter (
                     dialog.cancel()
                 }
                 builder.show()
+            }
+        }
+
+
+        // Handle click on info button
+        binding.infoIv.setOnClickListener{
+            viewModel.fetchSysData(sys.id) { success ->
+                if (success) {
+                    showInfoDialog(viewModel.system.value!!)
+                } else {
+                   Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -125,6 +139,34 @@ class HomeListAdapter (
         builder.setNegativeButton(mContext.getString(R.string.cancel).uppercase()) { dialog, which ->
             dialog.cancel()
         }
+        builder.show()
+    }
+
+    private fun showInfoDialog(sys : System){
+
+        val inflater = LayoutInflater.from(mContext)
+        val dialogView = inflater.inflate(R.layout.main_home_info_dialog,null)
+        val builder = AlertDialog.Builder(mContext)
+            .setView(dialogView)
+            .create()
+
+        val closeButton = dialogView.findViewById<ImageView>(R.id.closeIv)
+        val nameTv = dialogView.findViewById<TextView>(R.id.name_TV)
+        val locationTv = dialogView.findViewById<TextView>(R.id.location_TV)
+        val idTv = dialogView.findViewById<TextView>(R.id.id_TV)
+        val numBellsTv = dialogView.findViewById<TextView>(R.id.num_bell_TV)
+        val numMelTv = dialogView.findViewById<TextView>(R.id.num_melodies_TV)
+
+        closeButton.setOnClickListener{
+            builder.dismiss()
+        }
+
+        nameTv.text = sys.name
+        locationTv.text = sys.location
+        idTv.text = sys.id
+        numBellsTv.text = sys.nBells.toString()
+        numMelTv.text = sys.nMelodies.toString()
+
         builder.show()
     }
 }

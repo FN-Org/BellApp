@@ -89,6 +89,9 @@
     <!-- Change profile image (Home fragment)-->
     <string name="change_image">Are you sure you want to change your profile image?</string>
 
+    <!-- Main information dialog -->
+    <string name="informations">Informations</string>
+
     <!-- GENERAL MESSAGES -->
 
     <!-- Warning and Error messages -->

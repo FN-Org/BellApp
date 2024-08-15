@@ -70,6 +70,7 @@ class SettingsFragment : Fragment() {
 
     private val REMINDER_SET = booleanPreferencesKey("reminder_set")
     private val REMINDER_TIME_SET = stringPreferencesKey("reminder_time_set")
+    private val EVENT_NOTIFICATION = booleanPreferencesKey("event_notification")
 
     companion object {
         fun newInstance() = SettingsFragment()
@@ -129,7 +130,7 @@ class SettingsFragment : Fragment() {
         binding.reminderSwitch.setOnCheckedChangeListener { _, isChecked ->
             val timeGroup: Group = binding.timeGroup
             if (isChecked) {
-                if (checkNotifyPermission(binding.root)) {
+                if (checkNotifyPermission()) {
                     timeGroup.visibility = View.VISIBLE
                 } else {
                     binding.reminderSwitch.isChecked = false
@@ -180,12 +181,20 @@ class SettingsFragment : Fragment() {
             settings[REMINDER_TIME_SET]
         }
 
+        val eventNotificationFlow: Flow<Boolean> = requireContext().dataStore.data.map { settings ->
+            settings[EVENT_NOTIFICATION] == true
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             if (reminderSetFlow.first()) {
                 binding.reminderSwitch.isChecked = true
                 val reminderSetTime = reminderSetTimeFlow.first()
                 if (reminderSetTime != null)
                     binding.reminderEditTextTime.setText(reminderSetTime)
+            }
+
+            if (reminderSetFlow.first()) {
+                binding.eventsNotificationSwitch.isChecked = true
             }
         }
 
@@ -206,6 +215,21 @@ class SettingsFragment : Fragment() {
             binding.binIv.visibility = View.VISIBLE
         } else {
             binding.binIv.visibility = View.GONE
+        }
+
+        binding.eventsNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                if (checkNotifyPermission()) {
+                    Toast.makeText(requireContext(), R.string.event_notification_toast, Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    Toast.makeText(requireContext(), R.string.notification_denied, Toast.LENGTH_SHORT)
+                        .show()
+                    binding.reminderSwitch.isChecked = false
+                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch { setEventNotificationPreference(binding.reminderSwitch.isChecked) }
         }
 
         // Set click listeners for external links (GitHub profiles)
@@ -280,7 +304,7 @@ class SettingsFragment : Fragment() {
      * @param view View instance to handle permission rationale.
      * @return True if notification permission is granted, false otherwise.
      */
-    private fun checkNotifyPermission(view: View): Boolean {
+    private fun checkNotifyPermission(): Boolean {
         val context = requireContext()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             when {
@@ -353,6 +377,17 @@ class SettingsFragment : Fragment() {
     private suspend fun setReminderTimePreference(value: String) {
         requireContext().dataStore.edit { settings ->
             settings[REMINDER_TIME_SET] = value
+        }
+    }
+
+    /**
+     * Stores the event notification switch state in the DataStore.
+     *
+     * @param value Boolean value indicating if the reminder is set.
+     */
+    private suspend fun setEventNotificationPreference(value: Boolean) {
+        requireContext().dataStore.edit { settings ->
+            settings[EVENT_NOTIFICATION] = value
         }
     }
 }

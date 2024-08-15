@@ -87,12 +87,12 @@ class ReminderReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
 
             // Check for permission before showing the notification
-            if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                with(NotificationManagerCompat.from(context)) {
-                    notify(notificationId, builder.build())
-                }
-            } else {
-                Log.w("ReminderReceiver", "Notification permission not granted")
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            with(NotificationManagerCompat.from(context)) {
+                notify(notificationId, builder.build())
             }
+        } else {
+                Log.w("ReminderReceiver", "Notification permission not granted")
+        }
     }
 }

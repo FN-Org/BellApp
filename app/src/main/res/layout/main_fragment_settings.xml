@@ -55,7 +55,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        tools:visibility="visible" >
+    </androidx.constraintlayout.widget.Group>
 
     <TextView
         android:id="@+id/textView5"
@@ -137,6 +138,18 @@
         app:layout_constraintStart_toEndOf="@+id/galleyText"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/seasalt" />
+
+    <ImageView
+        android:id="@+id/binIv"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="325dp"
+        android:src="@drawable/ic_bin"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/imagePicker"
+        app:layout_constraintTop_toTopOf="parent" />
 
   <TextView
         android:layout_width="wrap_content"

@@ -255,7 +255,7 @@ class MainViewModel : ViewModel() {
      *
      * @param context Application context
      */
-    fun removeImageFromFirebase(context: Context){
+    fun deleteImageFromFirebase(context: Context){
         if (uid != null){
             val storageRef = FirebaseStorage.getInstance().reference
             val fileRef = storageRef.child("profile_images/${uid}")

@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.icu.util.Calendar
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -89,6 +90,7 @@ class SettingsFragment : Fragment() {
                 Log.d("PhotoPicker", "Selected URI: $uri")
                 Toast.makeText(requireContext(), requireContext().getString(R.string.image_uploading), Toast.LENGTH_SHORT).show()
                 viewModel.uploadImageToFirebase(requireContext(), uri)
+                binding.binIv.visibility = View.VISIBLE
             }
             builder.setNegativeButton(requireContext().getString(R.string.no).uppercase()) { dialog, which ->
                 dialog.cancel()
@@ -193,6 +195,19 @@ class SettingsFragment : Fragment() {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
+        // Set click listener for delete image button
+        binding.binIv.setOnClickListener {
+            viewModel.deleteImageFromFirebase(requireContext())
+            viewModel.fetchUserData()
+            binding.binIv.visibility = View.GONE
+        }
+
+        if (viewModel.userImage.value != Uri.parse("android.resource://${requireContext().packageName}/drawable/ic_profile_default")) {
+            binding.binIv.visibility = View.VISIBLE
+        } else {
+            binding.binIv.visibility = View.GONE
+        }
+
         // Set click listeners for external links (GitHub profiles)
         binding.githubFede.setOnClickListener {
             openLink(requireContext(), "https://github.com/fedeg202")
@@ -202,6 +217,15 @@ class SettingsFragment : Fragment() {
         }
         binding.githubFnorg.setOnClickListener {
             openLink(requireContext(), "https://github.com/FN-Org")
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.userImage.value != Uri.parse("android.resource://${requireContext().packageName}/drawable/ic_profile_default")) {
+            binding.binIv.visibility = View.VISIBLE
+        } else {
+            binding.binIv.visibility = View.GONE
         }
     }
 

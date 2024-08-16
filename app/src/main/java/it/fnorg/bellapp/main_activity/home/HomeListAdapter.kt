@@ -33,6 +33,8 @@ class HomeListAdapter (
     private val viewModel: MainViewModel
 ) : RecyclerView.Adapter<HomeListAdapter.SysHolder>() {
 
+    private var filteredSysList: List<System> = sysList
+
     /**
      * ViewHolder class for holding the views of each system item.
      *
@@ -47,12 +49,12 @@ class HomeListAdapter (
     }
 
     override fun getItemCount(): Int {
-        return sysList.size
+        return filteredSysList.size
     }
 
     override fun onBindViewHolder(holder: SysHolder, position: Int)
     {
-        val sys = sysList[position]
+        val sys = filteredSysList[position]
         val binding = holder.binding
 
         if (sys.name.isNotBlank()) {
@@ -168,5 +170,17 @@ class HomeListAdapter (
         numMelTv.text = sys.nMelodies.toString()
 
         builder.show()
+    }
+
+    fun filter(query: String) {
+        val lowerCaseQuery = query.lowercase()
+
+        filteredSysList = if (lowerCaseQuery.isEmpty()) {
+            sysList
+        } else {
+            sysList.filter { it.name.lowercase().contains(lowerCaseQuery) }
+        }
+
+        notifyDataSetChanged()
     }
 }

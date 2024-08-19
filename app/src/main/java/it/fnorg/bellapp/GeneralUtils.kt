@@ -9,6 +9,9 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
 
 /**
  * Checks if the internet connection is available.
@@ -68,5 +71,22 @@ fun checkConnection(context: Context, view: View) {
         else {
             Log.w("Check Connection", "Warning message is null")
         }
+    }
+}
+
+
+fun addFCMTokenToUser(token: String){
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    val db = Firebase.firestore
+    if (uid != null){
+        db.collection("users")
+            .document(uid)
+            .update("fcmToken",token)
+            .addOnSuccessListener {
+                Log.w("addFCMTokenToUser", "Refreshed token: $token added to firebase")
+            }
+            .addOnFailureListener{
+                Log.w("addFCMTokenToUser", "Something went wrong with token $token")
+            }
     }
 }

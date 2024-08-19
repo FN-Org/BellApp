@@ -32,7 +32,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.messaging.FirebaseMessaging
+import it.fnorg.bellapp.BellAppFirebaseMessagingService
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.addFCMTokenToUser
 import it.fnorg.bellapp.databinding.MainFragmentSettingsBinding
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
@@ -184,7 +187,7 @@ class SettingsFragment : Fragment() {
         val eventNotificationFlow: Flow<Boolean> = requireContext().dataStore.data.map { settings ->
             settings[EVENT_NOTIFICATION] == true
         }
-
+        var eventNotificationBool = false
         viewLifecycleOwner.lifecycleScope.launch {
             if (reminderSetFlow.first()) {
                 binding.reminderSwitch.isChecked = true
@@ -192,10 +195,8 @@ class SettingsFragment : Fragment() {
                 if (reminderSetTime != null)
                     binding.reminderEditTextTime.setText(reminderSetTime)
             }
-
-            if (reminderSetFlow.first()) {
-                binding.eventsNotificationSwitch.isChecked = true
-            }
+            eventNotificationBool = eventNotificationFlow.first()
+            binding.eventsNotificationSwitch.isChecked = eventNotificationBool
         }
 
         // Set click listener for image picker button
@@ -217,20 +218,30 @@ class SettingsFragment : Fragment() {
             binding.binIv.visibility = View.GONE
         }
 
-        binding.eventsNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
+        binding.eventsNotificationSwitch.setOnClickListener {
+            if (binding.eventsNotificationSwitch.isChecked) {
                 if (checkNotifyPermission()) {
+                    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val token = task.result
+
+                            addFCMTokenToUser(token)
+                        }
+                    }
                     Toast.makeText(requireContext(), R.string.event_notification_toast, Toast.LENGTH_SHORT)
                         .show()
                 } else {
                     Toast.makeText(requireContext(), R.string.notification_denied, Toast.LENGTH_SHORT)
                         .show()
-                    binding.reminderSwitch.isChecked = false
+                    binding.eventsNotificationSwitch.isChecked = false
                 }
             }
-
-            viewLifecycleOwner.lifecycleScope.launch { setEventNotificationPreference(binding.reminderSwitch.isChecked) }
         }
+
+        binding.eventsNotificationSwitch.setOnCheckedChangeListener { _, _ ->
+            viewLifecycleOwner.lifecycleScope.launch { setEventNotificationPreference(binding.eventsNotificationSwitch.isChecked) }
+        }
+
 
         // Set click listeners for external links (GitHub profiles)
         binding.githubFede.setOnClickListener {

@@ -1,6 +1,5 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.melody_activity
 
-import android.content.Intent
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -10,6 +9,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -17,13 +18,19 @@ import android.view.animation.ScaleAnimation
 import android.widget.Button
 import android.widget.Space
 import android.widget.TableRow
-import androidx.appcompat.app.AppCompatActivity
-import it.fnorg.bellapp.databinding.ActivityCreateMelodyBinding
-import it.fnorg.bellapp.main_activity.MainActivity
+import androidx.navigation.fragment.findNavController
+import it.fnorg.bellapp.R
+import it.fnorg.bellapp.databinding.MainFragmentHomeBinding
+import it.fnorg.bellapp.databinding.MelodyFragmentRecordMelodyBinding
 
-class CreateMelodyActivity : AppCompatActivity() {
+/**
+ * A simple [Fragment] subclass.
+ * Use the [RecordMelodyFragment.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class RecordMelodyFragment : Fragment() {
 
-    private lateinit var binding: ActivityCreateMelodyBinding
+    private lateinit var binding: MelodyFragmentRecordMelodyBinding
     private lateinit var soundPool: SoundPool
     private val soundMap = mutableMapOf<String, Int>()
     private val handler = Handler(Looper.getMainLooper())
@@ -31,14 +38,23 @@ class CreateMelodyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+    }
 
-        // Inizializza il binding
-        binding = ActivityCreateMelodyBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = MelodyFragmentRecordMelodyBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val navController = findNavController()
 
         binding.backArrow.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
         }
 
         // Inizializzazione di SoundPool
@@ -56,13 +72,13 @@ class CreateMelodyActivity : AppCompatActivity() {
             SoundPool(6, AudioManager.STREAM_MUSIC, 0)
         }
 
-        soundMap["C"] = soundPool.load(this, R.raw.c4, 1)
-        soundMap["D"] = soundPool.load(this, R.raw.d4, 1)
-        soundMap["E"] = soundPool.load(this, R.raw.e4, 1)
-        soundMap["F"] = soundPool.load(this, R.raw.f4, 1)
-        soundMap["G"] = soundPool.load(this, R.raw.g4, 1)
+        soundMap["C"] = soundPool.load(activity, R.raw.c4, 1)
+        soundMap["D"] = soundPool.load(activity, R.raw.d4, 1)
+        soundMap["E"] = soundPool.load(activity, R.raw.e4, 1)
+        soundMap["F"] = soundPool.load(activity, R.raw.f4, 1)
+        soundMap["G"] = soundPool.load(activity, R.raw.g4, 1)
 
-        numBells = intent.getIntExtra("NUM_BELLS", 0)
+        numBells = activity?.intent?.getIntExtra("NUM_BELLS", 0) ?: 0
         generateBellButtons(numBells)
     }
 
@@ -74,55 +90,50 @@ class CreateMelodyActivity : AppCompatActivity() {
         val minColumns = 2
         val maxColumns = 4
 
-        // Calcola il numero di colonne in base al numero di campane
         val numColumns = when {
             numBells <= 4 -> minColumns
             numBells <= 9 -> 3
             else -> maxColumns
         }
 
-        // Calcola il numero di righe necessarie
         val numRows = (numBells + numColumns - 1) / numColumns
 
-        // Calcola la dimensione dei pulsanti
         val displayMetrics = resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
-        val buttonSize = (screenWidth / numColumns) - 2 * 8 // Larghezza dello schermo divisa per il numero di colonne, meno i margini
+        val buttonSize = (screenWidth / numColumns) - 2 * 8
 
-        // Limita la dimensione massima dei pulsanti per evitare che diventino troppo grandi
         val maxButtonSize = (screenWidth / minColumns) - 2 * 8
         val finalButtonSize = minOf(buttonSize, maxButtonSize)
 
         var bellsAdded = 0
 
         while (bellsAdded < numBells) {
-            val tableRow = TableRow(this)
+            val tableRow = TableRow(activity)
             tableRow.layoutParams = TableRow.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            tableRow.gravity = Gravity.CENTER // Centra i pulsanti verticalmente
+            tableRow.gravity = Gravity.CENTER
 
             val remainingBells = numBells - bellsAdded
             val columnsInRow = if (remainingBells < numColumns) remainingBells else numColumns
 
             for (col in 0 until columnsInRow) {
-                val bellButton = Button(this).apply {
-                    text = notes[bellsAdded % notes.size] // Usa la nota corrispondente
-                    tag = notes[bellsAdded % notes.size] // Usa la nota come tag
+                val bellButton = Button(activity).apply {
+                    text = notes[bellsAdded % notes.size]
+                    tag = notes[bellsAdded % notes.size]
                     setBackgroundResource(R.drawable.ic_bell)
                     setTextColor(Color.WHITE)
                     textSize = 18f
-                    setPadding(8, 8, 8, 8) // Aggiungi padding ai bottoni
+                    setPadding(8, 8, 8, 8)
                     setOnClickListener { onBellClick(it as Button) }
                 }
 
-                // Imposta i parametri del layout per garantire che i bottoni siano quadrati
                 val params = TableRow.LayoutParams(
-                    finalButtonSize, // Larghezza quadrata
-                    finalButtonSize // Altezza quadrata
+                    finalButtonSize,
+                    finalButtonSize
                 ).apply {
-                    setMargins(8, 8, 8, 8) // Aggiungi margini intorno ai bottoni
+                    setMargins(8, 8, 8, 8)
                 }
                 bellButton.layoutParams = params
 
@@ -130,9 +141,8 @@ class CreateMelodyActivity : AppCompatActivity() {
                 bellsAdded++
             }
 
-            // Aggiungi spazi vuoti per riempire e centrare i pulsanti in caso di riga incompleta
             for (col in columnsInRow until numColumns) {
-                val emptySpace = Space(this)
+                val emptySpace = Space(activity)
                 val params = TableRow.LayoutParams(
                     finalButtonSize,
                     finalButtonSize
@@ -148,14 +158,11 @@ class CreateMelodyActivity : AppCompatActivity() {
     private fun onBellClick(button: Button) {
         val note = button.tag as String
 
-        // Suona la nota per 500ms
         val soundId = soundMap[note] ?: return
         soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
 
-        // Avvia l'animazione
         startBellAnimation(button)
 
-        // Ferma il suono dopo 500ms
         handler.postDelayed({
             soundPool.stop(soundId)
         }, 500)
@@ -163,11 +170,11 @@ class CreateMelodyActivity : AppCompatActivity() {
 
     private fun startBellAnimation(button: Button) {
         val scaleAnimation = ScaleAnimation(
-            1f, 1.1f, 1f, 1.1f, // Scala da 1x a 1.1x
+            1f, 1.1f, 1f, 1.1f,
             Animation.RELATIVE_TO_SELF, 0.5f,
             Animation.RELATIVE_TO_SELF, 0.5f
         ).apply {
-            duration = 500 // Durata dell'animazione in millisecondi
+            duration = 500
             repeatMode = ScaleAnimation.REVERSE
             repeatCount = 1
         }
@@ -175,8 +182,8 @@ class CreateMelodyActivity : AppCompatActivity() {
         button.startAnimation(scaleAnimation)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         soundPool.release()
     }
 }

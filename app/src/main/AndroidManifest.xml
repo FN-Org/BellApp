@@ -35,7 +35,7 @@
         android:theme="@style/Theme.BellApp"
         tools:targetApi="31">
         <activity
-            android:name=".CreateMelodyActivity"
+            android:name=".melody_activity.MelodyActivity"
             android:exported="false" />
         <activity
             android:name=".welcome_activity.WelcomeActivity"
@@ -48,13 +48,19 @@
         </activity>
         <activity
             android:name=".login_activity.LogInActivity"
-            android:exported="true"></activity>
+            android:exported="true">
+
+        </activity>
         <activity
             android:name=".main_activity.MainActivity"
-            android:exported="false"></activity>
+            android:exported="false">
+
+        </activity>
         <activity
             android:name=".calendar_activity.CalendarActivity"
-            android:exported="false"></activity>
+            android:exported="false">
+
+        </activity>
 
         <receiver android:name=".main_activity.ReminderReceiver" />
     </application>

@@ -106,4 +106,10 @@
     <string name="back_before_exit_toast">Press back again to exit from the application</string>
     <string name="coming_soon">COMING SOON!</string>
 
+    <!-- NUOVI MESSAGGI -->
+    <string name="noMelodies">
+        You don\'t have any personal melodies yet.
+        Press the button below and try to create one from scratch
+    </string>
+
 </resources>

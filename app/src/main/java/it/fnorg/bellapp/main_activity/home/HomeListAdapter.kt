@@ -4,14 +4,13 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import it.fnorg.bellapp.CreateMelodyActivity
+import it.fnorg.bellapp.melody_activity.MelodyActivity
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarActivity
 import it.fnorg.bellapp.databinding.MainHomeListItemBinding
@@ -110,7 +109,7 @@ class HomeListAdapter (
 
         // Handle click on play button
         binding.createMelodyButton.setOnClickListener {
-            val intent = Intent(mContext, CreateMelodyActivity::class.java)
+            val intent = Intent(mContext, MelodyActivity::class.java)
 
             viewModel.fetchSysData(sys.id) { success ->
                 if (success) {

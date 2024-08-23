@@ -30,7 +30,6 @@ import com.kizitonwose.calendar.view.ViewContainer
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarActivityViewModel
 import it.fnorg.bellapp.calendar_activity.Event
-import it.fnorg.bellapp.calendar_activity.dateFormatter
 import it.fnorg.bellapp.calendar_activity.displayText
 import it.fnorg.bellapp.calendar_activity.toLocalDateTime
 import it.fnorg.bellapp.databinding.CalendarDayBinding

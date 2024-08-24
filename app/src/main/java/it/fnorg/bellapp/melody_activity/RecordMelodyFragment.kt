@@ -113,6 +113,11 @@ class RecordMelodyFragment : Fragment() {
         binding.melodyBin.setOnClickListener {
             recordList.clear()
             binding.newMelodyLayout.visibility = View.GONE
+            binding.saveMelodyButton.visibility = View.GONE
+            val buttons = listOf(binding.micStop, binding.pause, binding.play, binding.stop)
+            buttons.forEach { button ->
+                disableButton(button)
+            }
         }
 
         // Disable unusable control panel buttons

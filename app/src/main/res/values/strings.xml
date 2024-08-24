@@ -27,7 +27,7 @@
         You just need to know the system ID and its PIN.
     </string>
     <string name="calendar">Calendar</string>
-    <string name="play">Play melody</string>
+    <string name="play">My melodies</string>
     <string name="name_changed">Name successfully changed!</string>
     <string name="empty_name">Name cannot be empty, please try again</string>
     <string name="sys_removed">System successfully removed!</string>

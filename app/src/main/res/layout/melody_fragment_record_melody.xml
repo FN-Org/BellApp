@@ -20,9 +20,9 @@
             android:background="@color/blue"
             android:padding="14dp"
             android:theme="@style/Theme.NavigationDrawer.AppBarOverlay"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/linearLayout2"
@@ -39,18 +39,37 @@
                     app:srcCompat="@drawable/ic_arrow_back" />
 
                 <ImageView
-                    android:id="@+id/imageView10"
+                    android:id="@+id/saveMelodyButton"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="10dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_save" />
+
+                <TextView
+                    android:id="@+id/countdownTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginEnd="50dp"
+                    android:text="REC"
+                    android:textStyle="bold"
+                    android:textColor="#FF0000"
+                    android:textSize="24sp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/saveMelodyButton"
+                    app:layout_constraintStart_toEndOf="@+id/backArrow"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
-
 
         <TableLayout
             android:id="@+id/bellsTable"
@@ -65,11 +84,40 @@
             android:layout_marginBottom="8dp"/>
 
         <LinearLayout
+            android:id="@+id/newMelodyLayout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/controlPanel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="91dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="New Melody" />
+
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/ic_sound_wave" />
+        </LinearLayout>
+
+
+        <LinearLayout
             android:id="@+id/controlPanel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
             android:orientation="vertical"
+            android:background="@color/persianorange"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -77,27 +125,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/micPlay"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:background="@drawable/melody_icon_border"
                     app:srcCompat="@drawable/ic_mic_play" />
 
                 <ImageView
                     android:id="@+id/micStop"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:background="@drawable/melody_icon_border"
                     app:srcCompat="@drawable/ic_mic_stop" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -105,6 +160,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:background="@drawable/melody_icon_border"
                     app:srcCompat="@drawable/ic_pause" />
 
                 <ImageView
@@ -112,6 +170,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:background="@drawable/melody_icon_border"
                     app:srcCompat="@drawable/ic_play" />
 
                 <ImageView
@@ -119,6 +180,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:background="@drawable/melody_icon_border"
                     app:srcCompat="@drawable/ic_stop" />
             </LinearLayout>
         </LinearLayout>

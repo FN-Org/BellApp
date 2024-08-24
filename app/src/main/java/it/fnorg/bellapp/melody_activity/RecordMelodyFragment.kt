@@ -1,5 +1,6 @@
 package it.fnorg.bellapp.melody_activity
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -16,12 +17,16 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Space
 import android.widget.TableRow
+import android.widget.Toast
+import androidx.core.view.children
 import androidx.navigation.fragment.findNavController
 import it.fnorg.bellapp.R
-import it.fnorg.bellapp.databinding.MainFragmentHomeBinding
 import it.fnorg.bellapp.databinding.MelodyFragmentRecordMelodyBinding
+import java.io.File
 
 /**
  * A simple [Fragment] subclass.
@@ -32,9 +37,21 @@ class RecordMelodyFragment : Fragment() {
 
     private lateinit var binding: MelodyFragmentRecordMelodyBinding
     private lateinit var soundPool: SoundPool
+    private val notes = listOf("C", "D", "E", "F", "G", "A", "B")
     private val soundMap = mutableMapOf<String, Int>()
     private val handler = Handler(Looper.getMainLooper())
     private var numBells: Int = 0
+    private var isRecording = false
+    private var startTime: Long = 0L
+    private val recordList = mutableListOf<String>()
+    private var recordTitle: String = ""
+    private var lastBell: String? = null
+    private var lastClickTime: Long? = null
+    private var playbackHandler: Handler? = null
+    private var playbackRunnable: Runnable? = null
+    private var isPlaying = false
+    private var isPaused = false
+    private var pauseTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +74,46 @@ class RecordMelodyFragment : Fragment() {
             navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
         }
 
-        // Inizializzazione di SoundPool
+        binding.micPlay.setOnClickListener {
+            if (!isRecording) {
+                startCountdownAndRecording()
+            }
+        }
+
+        binding.micStop.setOnClickListener {
+            if (isRecording) {
+                stopRecording()
+            }
+        }
+
+        binding.saveMelodyButton.setOnClickListener {
+            showSaveMelodyDialog()
+        }
+
+        binding.play.setOnClickListener {
+            if (recordList.isNotEmpty() && !isPlaying) {
+                if (isPaused) resumePlayback()
+                else startPlayback()
+            }
+        }
+
+        binding.pause.setOnClickListener {
+            if (isPlaying) {
+                pausePlayback()
+            }
+        }
+
+        binding.stop.setOnClickListener {
+            stopPlayback()
+        }
+
+        // Disable unusable control panel buttons
+        val buttons = listOf(binding.micStop, binding.pause, binding.play, binding.stop)
+        buttons.forEach { button ->
+            disableButton(button)
+        }
+
+        // SoundPool initialization
         soundPool = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val audioAttributes = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -86,7 +142,6 @@ class RecordMelodyFragment : Fragment() {
         val bellTable = binding.bellsTable
         bellTable.removeAllViews()
 
-        val notes = listOf("C", "D", "E", "F", "G", "A", "B")
         val minColumns = 2
         val maxColumns = 4
 
@@ -119,9 +174,10 @@ class RecordMelodyFragment : Fragment() {
             val columnsInRow = if (remainingBells < numColumns) remainingBells else numColumns
 
             for (col in 0 until columnsInRow) {
+                val bellNumber = bellsAdded + 1
                 val bellButton = Button(activity).apply {
                     text = notes[bellsAdded % notes.size]
-                    tag = notes[bellsAdded % notes.size]
+                    tag = bellNumber
                     setBackgroundResource(R.drawable.ic_bell)
                     setTextColor(Color.WHITE)
                     textSize = 18f
@@ -156,16 +212,19 @@ class RecordMelodyFragment : Fragment() {
     }
 
     private fun onBellClick(button: Button) {
-        val note = button.tag as String
+        if (isRecording) {
+            val bellNumber = button.tag as Int
+            recordBellClick(bellNumber.toString())
 
-        val soundId = soundMap[note] ?: return
-        soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            val note = notes[(bellNumber - 1) % notes.size]
+            val soundId = soundMap[note] ?: return
+            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            startBellAnimation(button)
 
-        startBellAnimation(button)
-
-        handler.postDelayed({
-            soundPool.stop(soundId)
-        }, 500)
+            handler.postDelayed({
+                soundPool.stop(soundId)
+            }, 500)
+        }
     }
 
     private fun startBellAnimation(button: Button) {
@@ -182,8 +241,226 @@ class RecordMelodyFragment : Fragment() {
         button.startAnimation(scaleAnimation)
     }
 
+    private fun startCountdownAndRecording() {
+        binding.countdownTv.visibility = View.VISIBLE
+        val countdownTime = 3
+        val countdownHandler = Handler(Looper.getMainLooper())
+
+        binding.saveMelodyButton.visibility = View.GONE
+        binding.newMelodyLayout.visibility = View.GONE
+
+        // Disable all the control panel buttons
+        val buttons = listOf(binding.micPlay, binding.micStop, binding.pause, binding.play, binding.stop)
+        buttons.forEach { button ->
+            disableButton(button)
+        }
+
+        fun updateCountdown(timeLeft: Int) {
+            if (timeLeft > 0) {
+                binding.countdownTv.text = timeLeft.toString()
+                countdownHandler.postDelayed({ updateCountdown(timeLeft - 1) }, 1000)
+            } else {
+                binding.countdownTv.text = "REC"
+                startTime = System.currentTimeMillis()
+                isRecording = true
+                enableBellButtons(true)
+                enableButton(binding.micStop)
+                // updateControlPanelButtonsState(true)
+            }
+        }
+
+        updateCountdown(countdownTime)
+        // updateControlPanelButtonsState(false)
+    }
+
+    private fun disableButton(button: ImageView) {
+        button.isEnabled = false
+        button.setColorFilter(resources.getColor(R.color.gray, null))
+    }
+
+    private fun enableButton(button: ImageView) {
+        button.isEnabled = true
+        button.setColorFilter(resources.getColor(R.color.black, null))
+    }
+
+    private fun recordBellClick(bellNumber: String) {
+        val currentTime = System.currentTimeMillis()
+
+        if (lastClickTime != null && lastBell != null) {
+            val elapsedTime = (currentTime - lastClickTime!!) / 1000
+            val recordEntry = "$lastBell $elapsedTime\n"
+            recordList.add(recordEntry)
+        }
+
+        lastBell = bellNumber
+        lastClickTime = currentTime
+    }
+
+    private fun stopRecording() {
+        binding.countdownTv.visibility = View.GONE
+        binding.saveMelodyButton.visibility = View.VISIBLE
+        binding.newMelodyLayout.visibility = View.VISIBLE
+        isRecording = false
+        enableBellButtons(false)
+
+        // Se c'è una campana registrata, aggiungila alla lista senza tempo intercorso
+        if (lastBell != null && lastClickTime != null) {
+            val recordEntry = "$lastBell\n"
+            recordList.add(recordEntry)
+        }
+
+        val buttons = listOf(binding.micPlay, binding.pause, binding.play, binding.stop)
+        buttons.forEach { button ->
+            enableButton(button)
+        }
+        disableButton(binding.micStop)
+
+        // Resetta lastBell e lastClickTime
+        lastBell = null
+        lastClickTime = null
+    }
+
+    private fun saveRecordToFile() {
+        val fileName = "bell_record_${System.currentTimeMillis()}.txt"
+        val file = File(requireContext().filesDir, fileName)
+
+        val content = buildString {
+            appendLine(recordTitle)
+            append(recordList.joinToString(""))
+        }
+
+        file.writeText(content)
+        recordList.clear()
+        recordTitle = ""
+    }
+
+
+    private fun enableBellButtons(enabled: Boolean) {
+        val bellButtons = binding.bellsTable.children
+        for (button in bellButtons) {
+            if (button is Button) {
+                button.isEnabled = enabled
+            }
+        }
+    }
+
+    private fun showSaveMelodyDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Enter the title of the melody and click SAVE to save it")
+
+        val input = EditText(requireContext())
+        input.hint = "Insert the title"
+        builder.setView(input)
+
+        builder.setPositiveButton("SAVE") { dialog, _ ->
+            val title = input.text.toString().trim()
+
+            if (title.isNotEmpty()) {
+                recordTitle = title
+
+                saveRecordToFile()
+
+                dialog.dismiss()
+
+                val navController = findNavController()
+                navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
+                Toast.makeText(requireContext(),getString(R.string.melody_created),Toast.LENGTH_SHORT).show()
+
+            } else {
+                input.error = "The title can't be empty"
+            }
+        }
+
+        builder.setNegativeButton("CANCEL") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
+    private fun startPlayback() {
+        isPlaying = true
+        isPaused = false
+        playbackHandler = Handler(Looper.getMainLooper())
+        playbackRunnable = object : Runnable {
+            private var index = 0
+
+            override fun run() {
+                if (index < recordList.size) {
+                    val entry = recordList[index].trim().split(" ")
+                    if (entry.size == 2) {
+                        val note = entry[0]
+                        val durationStr = entry[1]
+                        val duration = try {
+                            durationStr.toLong() * 1000 // Convert seconds to milliseconds
+                        } catch (e: NumberFormatException) {
+                            e.printStackTrace()
+                            0
+                        }
+
+                        if (duration > 0) {
+                            playNote(note)
+                            playbackHandler?.postDelayed({
+                                stopNote()
+                                index++
+                                playbackHandler?.postDelayed(this, duration)
+                            }, duration)
+                        } else {
+                            index++
+                            playbackHandler?.post(this)
+                        }
+                    } else {
+                        index++
+                        playbackHandler?.post(this)
+                    }
+                } else {
+                    stopPlayback()
+                }
+            }
+        }
+        playbackHandler?.post(playbackRunnable!!)
+    }
+
+    private fun playNote(note: String) {
+        val soundId = soundMap[note] ?: return
+        soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+    }
+
+    private fun stopNote() {
+        soundPool.autoPause() // Pause all sounds if needed
+    }
+
+    private fun pausePlayback() {
+        if (isPlaying) {
+            isPaused = true
+            isPlaying = false
+            pauseTime = System.currentTimeMillis()
+            playbackHandler?.removeCallbacks(playbackRunnable!!)
+            stopNote()
+        }
+    }
+
+    private fun resumePlayback() {
+        if (isPaused) {
+            isPlaying = true
+            isPaused = false
+            val resumeDelay = System.currentTimeMillis() - pauseTime
+            playbackHandler?.postDelayed(playbackRunnable!!, resumeDelay)
+        }
+    }
+
+    private fun stopPlayback() {
+        isPlaying = false
+        isPaused = false
+        playbackHandler?.removeCallbacks(playbackRunnable!!)
+        stopNote() // Ensure that playback stops
+        playbackHandler = null
+        playbackRunnable = null
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         soundPool.release()
+        playbackHandler?.removeCallbacks(playbackRunnable!!)
     }
 }

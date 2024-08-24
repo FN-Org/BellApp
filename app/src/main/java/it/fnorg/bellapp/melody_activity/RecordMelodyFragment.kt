@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -42,16 +43,17 @@ class RecordMelodyFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private var numBells: Int = 0
     private var isRecording = false
-    private var startTime: Long = 0L
+    private var startTime: Double = 0.0
     private val recordList = mutableListOf<String>()
     private var recordTitle: String = ""
     private var lastBell: String? = null
-    private var lastClickTime: Long? = null
+    private var lastClickTime: Double? = null
     private var playbackHandler: Handler? = null
     private var playbackRunnable: Runnable? = null
     private var isPlaying = false
     private var isPaused = false
-    private var pauseTime: Long = 0
+    private var pauseTime: Double = 0.0
+    private var bipSoundId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +78,7 @@ class RecordMelodyFragment : Fragment() {
 
         binding.micPlay.setOnClickListener {
             if (!isRecording) {
+                recordList.clear()
                 startCountdownAndRecording()
             }
         }
@@ -107,11 +110,20 @@ class RecordMelodyFragment : Fragment() {
             stopPlayback()
         }
 
+        binding.melodyBin.setOnClickListener {
+            recordList.clear()
+            binding.newMelodyLayout.visibility = View.GONE
+        }
+
         // Disable unusable control panel buttons
         val buttons = listOf(binding.micStop, binding.pause, binding.play, binding.stop)
         buttons.forEach { button ->
             disableButton(button)
         }
+
+        // Bells generation
+        numBells = activity?.intent?.getIntExtra("NUM_BELLS", 0) ?: 0
+        generateBellButtons(numBells)
 
         // SoundPool initialization
         soundPool = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -134,8 +146,8 @@ class RecordMelodyFragment : Fragment() {
         soundMap["F"] = soundPool.load(activity, R.raw.f4, 1)
         soundMap["G"] = soundPool.load(activity, R.raw.g4, 1)
 
-        numBells = activity?.intent?.getIntExtra("NUM_BELLS", 0) ?: 0
-        generateBellButtons(numBells)
+        // Countdown sound
+        bipSoundId = soundPool.load(activity, R.raw.countdown, 1)
     }
 
     private fun generateBellButtons(numBells: Int) {
@@ -213,17 +225,22 @@ class RecordMelodyFragment : Fragment() {
 
     private fun onBellClick(button: Button) {
         if (isRecording) {
+
+            // Save the clicked bell (note)
             val bellNumber = button.tag as Int
             recordBellClick(bellNumber.toString())
 
-            val note = notes[(bellNumber - 1) % notes.size]
+            // Play the note
+            val note = notes[bellNumber - 1]
             val soundId = soundMap[note] ?: return
             soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
             startBellAnimation(button)
 
+            // Play the animation
             handler.postDelayed({
                 soundPool.stop(soundId)
             }, 500)
+
         }
     }
 
@@ -255,13 +272,16 @@ class RecordMelodyFragment : Fragment() {
             disableButton(button)
         }
 
+        // Start the countdown effect
+        soundPool.play(bipSoundId, 1f, 1f, 1, 0, 1f)
+
         fun updateCountdown(timeLeft: Int) {
             if (timeLeft > 0) {
                 binding.countdownTv.text = timeLeft.toString()
                 countdownHandler.postDelayed({ updateCountdown(timeLeft - 1) }, 1000)
             } else {
                 binding.countdownTv.text = "REC"
-                startTime = System.currentTimeMillis()
+                startTime = System.currentTimeMillis() / 1000.0
                 isRecording = true
                 enableBellButtons(true)
                 enableButton(binding.micStop)
@@ -284,10 +304,10 @@ class RecordMelodyFragment : Fragment() {
     }
 
     private fun recordBellClick(bellNumber: String) {
-        val currentTime = System.currentTimeMillis()
+        val currentTime: Double = System.currentTimeMillis() / 1000.0
 
         if (lastClickTime != null && lastBell != null) {
-            val elapsedTime = (currentTime - lastClickTime!!) / 1000
+            val elapsedTime = (currentTime - lastClickTime!!)
             val recordEntry = "$lastBell $elapsedTime\n"
             recordList.add(recordEntry)
         }
@@ -305,7 +325,7 @@ class RecordMelodyFragment : Fragment() {
 
         // Se c'è una campana registrata, aggiungila alla lista senza tempo intercorso
         if (lastBell != null && lastClickTime != null) {
-            val recordEntry = "$lastBell\n"
+            val recordEntry = "$lastBell 1\n"
             recordList.add(recordEntry)
         }
 
@@ -315,7 +335,7 @@ class RecordMelodyFragment : Fragment() {
         }
         disableButton(binding.micStop)
 
-        // Resetta lastBell e lastClickTime
+        // Reset variables
         lastBell = null
         lastClickTime = null
     }
@@ -390,21 +410,25 @@ class RecordMelodyFragment : Fragment() {
                     val entry = recordList[index].trim().split(" ")
                     if (entry.size == 2) {
                         val note = entry[0]
-                        val durationStr = entry[1]
-                        val duration = try {
-                            durationStr.toLong() * 1000 // Convert seconds to milliseconds
+                        val pauseDurationStr = entry[1]
+                        val pauseDuration = try {
+                            pauseDurationStr.toLong() * 1000 // Converts seconds in milliseconds
                         } catch (e: NumberFormatException) {
                             e.printStackTrace()
                             0
                         }
 
-                        if (duration > 0) {
+                        if (pauseDuration >= 0) {
                             playNote(note)
+
+                            // Stops the note after 500ms
                             playbackHandler?.postDelayed({
                                 stopNote()
                                 index++
-                                playbackHandler?.postDelayed(this, duration)
-                            }, duration)
+
+                                // Wait for the write duration
+                                playbackHandler?.postDelayed(this, pauseDuration)
+                            }, 500) // La durata della nota è sempre 500ms
                         } else {
                             index++
                             playbackHandler?.post(this)
@@ -417,36 +441,44 @@ class RecordMelodyFragment : Fragment() {
                     stopPlayback()
                 }
             }
+
         }
+
+        // Activate the runnable
         playbackHandler?.post(playbackRunnable!!)
     }
 
     private fun playNote(note: String) {
-        val soundId = soundMap[note] ?: return
-        soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+        val noteIndex = note.toIntOrNull()
+
+        // Convert from bell number to bell note
+        if (noteIndex != null && noteIndex in 1..notes.size) {
+            val musicalNote = notes[noteIndex - 1]
+            val soundId = soundMap[musicalNote] ?: return
+            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+        } else {
+            Log.e("Playback", "Nota non valida: $note")
+        }
     }
+
 
     private fun stopNote() {
         soundPool.autoPause() // Pause all sounds if needed
     }
 
     private fun pausePlayback() {
-        if (isPlaying) {
-            isPaused = true
-            isPlaying = false
-            pauseTime = System.currentTimeMillis()
-            playbackHandler?.removeCallbacks(playbackRunnable!!)
-            stopNote()
-        }
+        isPaused = true
+        isPlaying = false
+        pauseTime = System.currentTimeMillis() / 1000.0
+        playbackHandler?.removeCallbacks(playbackRunnable!!)
+        stopNote()
     }
 
     private fun resumePlayback() {
-        if (isPaused) {
-            isPlaying = true
-            isPaused = false
-            val resumeDelay = System.currentTimeMillis() - pauseTime
-            playbackHandler?.postDelayed(playbackRunnable!!, resumeDelay)
-        }
+        isPlaying = true
+        isPaused = false
+        val resumeDelay = System.currentTimeMillis() / 1000.0 - pauseTime
+        playbackHandler?.postDelayed(playbackRunnable!!, resumeDelay.toLong())
     }
 
     private fun stopPlayback() {

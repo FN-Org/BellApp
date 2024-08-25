@@ -105,5 +105,4 @@
             android:background="@color/black" />
     </LinearLayout>
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>

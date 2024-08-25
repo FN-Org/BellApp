@@ -312,14 +312,18 @@ class RecordMelodyFragment : Fragment() {
         val currentTime: Double = System.currentTimeMillis() / 1000.0
 
         if (lastClickTime != null && lastBell != null) {
-            val elapsedTime = (currentTime - lastClickTime!!)
-            val recordEntry = "$lastBell $elapsedTime\n"
+            // Calcola il tempo trascorso in secondi con una cifra decimale
+            val elapsedTimeSeconds = currentTime - lastClickTime!!
+            val elapsedTimeRounded = String.format("%.1f", elapsedTimeSeconds)
+
+            val recordEntry = "$lastBell $elapsedTimeRounded\n"
             recordList.add(recordEntry)
         }
 
         lastBell = bellNumber
         lastClickTime = currentTime
     }
+
 
     private fun stopRecording() {
         binding.countdownTv.visibility = View.GONE
@@ -351,7 +355,10 @@ class RecordMelodyFragment : Fragment() {
 
         val content = buildString {
             appendLine(recordTitle)
-            append(recordList.joinToString(""))
+            recordList.forEach {
+                val formattedLine = it.replace(',', '.') // Assicura che il separatore decimale sia un punto
+                append(formattedLine)
+            }
         }
 
         file.writeText(content)
@@ -411,29 +418,31 @@ class RecordMelodyFragment : Fragment() {
             private var index = 0
 
             override fun run() {
+                if (!isPlaying) {
+                    return
+                }
                 if (index < recordList.size) {
                     val entry = recordList[index].trim().split(" ")
                     if (entry.size == 2) {
                         val note = entry[0]
-                        val pauseDurationStr = entry[1]
+                        val pauseDurationStr = entry[1].replace(',', '.') // Converti la virgola in punto
                         val pauseDuration = try {
-                            pauseDurationStr.toLong() * 1000 // Converts seconds in milliseconds
+                            (pauseDurationStr.toDouble() * 1000).toLong() // Converti in millisecondi
                         } catch (e: NumberFormatException) {
                             e.printStackTrace()
-                            0
+                            0L
                         }
 
                         if (pauseDuration >= 0) {
                             playNote(note)
 
-                            // Stops the note after 500ms
                             playbackHandler?.postDelayed({
                                 stopNote()
                                 index++
 
-                                // Wait for the write duration
-                                playbackHandler?.postDelayed(this, pauseDuration)
-                            }, 500) // La durata della nota è sempre 500ms
+                                // Wait for the time between two notes
+                                playbackHandler?.postDelayed(this, pauseDuration - 800)
+                            }, 800) // Note duration always 800ms (it is a bell)
                         } else {
                             index++
                             playbackHandler?.post(this)
@@ -446,7 +455,6 @@ class RecordMelodyFragment : Fragment() {
                     stopPlayback()
                 }
             }
-
         }
 
         // Activate the runnable
@@ -466,24 +474,27 @@ class RecordMelodyFragment : Fragment() {
         }
     }
 
-
     private fun stopNote() {
         soundPool.autoPause() // Pause all sounds if needed
     }
 
     private fun pausePlayback() {
-        isPaused = true
-        isPlaying = false
-        pauseTime = System.currentTimeMillis() / 1000.0
-        playbackHandler?.removeCallbacks(playbackRunnable!!)
-        stopNote()
+        if (isPlaying && !isPaused) {
+            isPaused = true
+            isPlaying = false
+            pauseTime = System.currentTimeMillis() / 1000.0
+            playbackHandler?.removeCallbacks(playbackRunnable!!)
+            stopNote()
+        }
     }
 
     private fun resumePlayback() {
-        isPlaying = true
-        isPaused = false
-        val resumeDelay = System.currentTimeMillis() / 1000.0 - pauseTime
-        playbackHandler?.postDelayed(playbackRunnable!!, resumeDelay.toLong())
+        if (isPaused && !isPlaying) {
+            isPlaying = true
+            isPaused = false
+            val resumeDelay = System.currentTimeMillis() / 1000.0 - pauseTime
+            playbackHandler?.postDelayed(playbackRunnable!!, resumeDelay.toLong())
+        }
     }
 
     private fun stopPlayback() {

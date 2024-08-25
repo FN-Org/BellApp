@@ -19,7 +19,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.firebase.Timestamp
 import it.fnorg.bellapp.R
-import it.fnorg.bellapp.calendar_activity.CalendarActivityViewModel
+import it.fnorg.bellapp.calendar_activity.CalendarViewModel
 import it.fnorg.bellapp.calendar_activity.Event
 import it.fnorg.bellapp.calendar_activity.Melody
 import it.fnorg.bellapp.isInternetAvailable
@@ -32,7 +32,7 @@ import java.time.format.DateTimeFormatter
  */
 class AddEventFragment : Fragment() {
 
-    private val viewModel: CalendarActivityViewModel by activityViewModels()
+    private val viewModel: CalendarViewModel by activityViewModels()
 
     // Safe args passed from MonthView Fragment
     private val args: AddEventFragmentArgs by navArgs()

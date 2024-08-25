@@ -28,7 +28,7 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import it.fnorg.bellapp.R
-import it.fnorg.bellapp.calendar_activity.CalendarActivityViewModel
+import it.fnorg.bellapp.calendar_activity.CalendarViewModel
 import it.fnorg.bellapp.calendar_activity.Event
 import it.fnorg.bellapp.calendar_activity.displayText
 import it.fnorg.bellapp.calendar_activity.toLocalDateTime
@@ -44,7 +44,7 @@ import java.time.format.DateTimeFormatter
 
 class MonthViewFragment : Fragment() {
 
-    val viewModel: CalendarActivityViewModel by activityViewModels()
+    val viewModel: CalendarViewModel by activityViewModels()
 
     private var selectedDate: LocalDate? = null
 

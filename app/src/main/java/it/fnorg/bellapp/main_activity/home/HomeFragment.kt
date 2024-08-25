@@ -23,10 +23,6 @@ import it.fnorg.bellapp.main_activity.MainViewModel
  */
 class HomeFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = HomeFragment()
-    }
-
     private val viewModel: MainViewModel by activityViewModels()
 
     // Binding connected to the specific layout of the fragment

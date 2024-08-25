@@ -6,7 +6,7 @@
     app:startDestination="@id/personalMelodiesFragment">
     <fragment
         android:id="@+id/personalMelodiesFragment"
-        android:name="it.fnorg.bellapp.melody_activity.PersonalMelodiesFragment"
+        android:name="it.fnorg.bellapp.melody_activity.personalmelodies.PersonalMelodiesFragment"
         android:label="melody_fragment_personal_melodies"
         tools:layout="@layout/melody_fragment_personal_melodies" >
         <action
@@ -15,7 +15,7 @@
     </fragment>
     <fragment
         android:id="@+id/recordMelodyFragment"
-        android:name="it.fnorg.bellapp.melody_activity.RecordMelodyFragment"
+        android:name="it.fnorg.bellapp.melody_activity.recordmelody.RecordMelodyFragment"
         android:label="RecordMelodyFragment" >
         <action
             android:id="@+id/action_recordMelodyFragment_to_personalMelodiesFragment"

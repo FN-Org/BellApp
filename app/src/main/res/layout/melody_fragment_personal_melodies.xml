@@ -5,7 +5,7 @@
     android:id="@+id/coordinatorLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".melody_activity.PersonalMelodiesFragment">
+    tools:context=".melody_activity.personalmelodies.PersonalMelodiesFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/calendarAppBarLayout"
@@ -44,6 +44,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_melody"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -1,10 +1,11 @@
-package it.fnorg.bellapp.melody_activity
+package it.fnorg.bellapp.melody_activity.recordmelody
 
 import android.app.AlertDialog
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.SoundPool
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -24,9 +25,12 @@ import android.widget.Space
 import android.widget.TableRow
 import android.widget.Toast
 import androidx.core.view.children
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.storage.FirebaseStorage
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MelodyFragmentRecordMelodyBinding
+import it.fnorg.bellapp.melody_activity.MelodyViewModel
 import java.io.File
 
 /**
@@ -41,7 +45,6 @@ class RecordMelodyFragment : Fragment() {
     private val notes = listOf("C", "D", "E", "F", "G", "A", "B")
     private val soundMap = mutableMapOf<String, Int>()
     private val handler = Handler(Looper.getMainLooper())
-    private var numBells: Int = 0
     private var isRecording = false
     private var startTime: Double = 0.0
     private val recordList = mutableListOf<String>()
@@ -54,6 +57,8 @@ class RecordMelodyFragment : Fragment() {
     private var isPaused = false
     private var pauseTime: Double = 0.0
     private var bipSoundId: Int = 0
+
+    private val viewModel: MelodyViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,8 +132,7 @@ class RecordMelodyFragment : Fragment() {
         }
 
         // Bells generation
-        numBells = activity?.intent?.getIntExtra("NUM_BELLS", 0) ?: 0
-        generateBellButtons(numBells)
+        generateBellButtons(viewModel.nBells)
 
         // SoundPool initialization
         soundPool = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -316,7 +320,7 @@ class RecordMelodyFragment : Fragment() {
             val elapsedTimeSeconds = currentTime - lastClickTime!!
             val elapsedTimeRounded = String.format("%.1f", elapsedTimeSeconds)
 
-            val recordEntry = "$lastBell $elapsedTimeRounded\n"
+            val recordEntry = "$lastBell $elapsedTimeRounded"
             recordList.add(recordEntry)
         }
 
@@ -334,7 +338,7 @@ class RecordMelodyFragment : Fragment() {
 
         // Se c'è una campana registrata, aggiungila alla lista senza tempo intercorso
         if (lastBell != null && lastClickTime != null) {
-            val recordEntry = "$lastBell 1\n"
+            val recordEntry = "$lastBell 1"
             recordList.add(recordEntry)
         }
 
@@ -349,7 +353,7 @@ class RecordMelodyFragment : Fragment() {
         lastClickTime = null
     }
 
-    private fun saveRecordToFile() {
+    private fun saveRecordToFile(): File? {
         val fileName = "bell_record_${System.currentTimeMillis()}.txt"
         val file = File(requireContext().filesDir, fileName)
 
@@ -357,15 +361,20 @@ class RecordMelodyFragment : Fragment() {
             appendLine(recordTitle)
             recordList.forEach {
                 val formattedLine = it.replace(',', '.') // Assicura che il separatore decimale sia un punto
-                append(formattedLine)
+                appendLine(formattedLine)
             }
         }
 
-        file.writeText(content)
-        recordList.clear()
-        recordTitle = ""
+        return try {
+            file.writeText(content)
+            recordList.clear()
+            recordTitle = ""
+            file // Return the file
+        } catch (e: Exception) {
+            Log.e("SaveRecordToFile", "Failed to save record to file", e)
+            null // Return null in case of error
+        }
     }
-
 
     private fun enableBellButtons(enabled: Boolean) {
         val bellButtons = binding.bellsTable.children
@@ -390,14 +399,32 @@ class RecordMelodyFragment : Fragment() {
             if (title.isNotEmpty()) {
                 recordTitle = title
 
-                saveRecordToFile()
+                val newMelodyFile  = saveRecordToFile()
+                if (newMelodyFile != null) {
+                    val storageReference = FirebaseStorage.getInstance().reference
+                    val fileRef = storageReference.child("melodies/${viewModel.sysId}/${newMelodyFile.name}")
 
-                dialog.dismiss()
+                    fileRef.putFile(Uri.fromFile(newMelodyFile))
+                        .addOnSuccessListener {
+                            Log.d("FirebaseUpload", "Upload successful")
+                            newMelodyFile.delete() // Delete the local file
 
-                val navController = findNavController()
-                navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
-                Toast.makeText(requireContext(),getString(R.string.melody_created),Toast.LENGTH_SHORT).show()
+                            // If the file is uploaded correctly
+                            dialog.dismiss()
+                            val navController = findNavController()
+                            navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
+                            Toast.makeText(requireContext(),getString(R.string.melody_created),Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FirebaseUpload", "Upload failed", e)
 
+                            // If the file is NOT uploaded correctly
+                            dialog.dismiss()
+                            val navController = findNavController()
+                            navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
+                            Toast.makeText(requireContext(),getString(R.string.sww_try_again),Toast.LENGTH_SHORT).show()
+                        }
+                }
             } else {
                 input.error = "The title can't be empty"
             }

@@ -114,4 +114,6 @@
 
     <string name="melody_created">Melody created and saved successfully</string>
 
+    <string name="melody_deleted">Melody deleted successfully</string>
+
 </resources>

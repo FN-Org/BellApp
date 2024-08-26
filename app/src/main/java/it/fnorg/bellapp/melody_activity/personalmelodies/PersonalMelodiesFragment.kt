@@ -7,12 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MelodyFragmentPersonalMelodiesBinding
 import it.fnorg.bellapp.main_activity.MainActivity
-import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.home.HomeListAdapter
 import it.fnorg.bellapp.melody_activity.MelodyViewModel
 
@@ -52,20 +52,36 @@ class PersonalMelodiesFragment : Fragment() {
         }
 
         binding.rvMelody.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.melodyList.observe(viewLifecycleOwner) { melodies ->
+        viewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
             if (melodies.isEmpty()) {
                 binding.noMelodiesTV.visibility = View.VISIBLE
                 binding.rvMelody.visibility = View.GONE
             } else {
                 binding.noMelodiesTV.visibility = View.GONE
                 binding.rvMelody.visibility = View.VISIBLE
-                binding.rvMelody.adapter = MelodyAdapter(melodies)
+                binding.rvMelody.adapter = MelodyAdapter(requireContext(), melodies)
             }
-        }
+        })
 
         binding.createMelodyButton.setOnClickListener {
             navController.navigate(R.id.action_personalMelodiesFragment_to_recordMelodyFragment)
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
+
+        // Refresh system data when fragment resumes
+        viewModel.fetchMelodies()
+        viewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
+            if (melodies.isEmpty()) {
+                binding.noMelodiesTV.visibility = View.VISIBLE
+                binding.rvMelody.visibility = View.GONE
+            } else {
+                binding.noMelodiesTV.visibility = View.GONE
+                binding.rvMelody.visibility = View.VISIBLE
+                binding.rvMelody.adapter = MelodyAdapter(requireContext(), melodies)
+            }
+        })
     }
 }

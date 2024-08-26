@@ -9,7 +9,7 @@ import com.google.firebase.storage.FirebaseStorage
 data class MelodyFile(
     val number: Int = 0,
     val title: String = "",
-    val recordList: MutableList<String> = mutableListOf()
+    val recordList: MutableList<String> = mutableListOf() // "Note Time"
 )
 
 class MelodyViewModel : ViewModel() {
@@ -53,6 +53,7 @@ class MelodyViewModel : ViewModel() {
 
                         // Update the LiveData
                         _melodyList.value = melodies
+
                     }.addOnFailureListener { e ->
                         Log.e("Download melody", "Failed to download file", e)
                     }

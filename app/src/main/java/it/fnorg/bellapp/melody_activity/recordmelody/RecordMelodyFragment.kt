@@ -48,7 +48,6 @@ class RecordMelodyFragment : Fragment() {
     private var isRecording = false
     private var startTime: Double = 0.0
     private val recordList = mutableListOf<String>()
-    private var recordTitle: String = ""
     private var lastBell: String? = null
     private var lastClickTime: Double? = null
     private var playbackHandler: Handler? = null
@@ -77,10 +76,16 @@ class RecordMelodyFragment : Fragment() {
 
         val navController = findNavController()
 
+        // Navbar buttons
         binding.backArrow.setOnClickListener {
             navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
         }
 
+        binding.saveMelodyButton.setOnClickListener {
+            showSaveMelodyDialog()
+        }
+
+        // Control panel buttons
         binding.micPlay.setOnClickListener {
             if (!isRecording) {
                 recordList.clear()
@@ -94,12 +99,16 @@ class RecordMelodyFragment : Fragment() {
             }
         }
 
-        binding.saveMelodyButton.setOnClickListener {
-            showSaveMelodyDialog()
-        }
-
         binding.play.setOnClickListener {
             if (recordList.isNotEmpty() && !isPlaying) {
+                val dButtons = listOf(binding.micStop, binding.play, binding.micPlay)
+                dButtons.forEach { button ->
+                    disableButton(button)
+                }
+                val eButtons = listOf(binding.pause, binding.stop)
+                eButtons.forEach { button ->
+                    enableButton(button)
+                }
                 if (isPaused) resumePlayback()
                 else startPlayback()
             }
@@ -107,14 +116,31 @@ class RecordMelodyFragment : Fragment() {
 
         binding.pause.setOnClickListener {
             if (isPlaying) {
+                val dButtons = listOf(binding.micStop, binding.pause, binding.micPlay)
+                dButtons.forEach { button ->
+                    disableButton(button)
+                }
+                val eButtons = listOf(binding.play, binding.stop)
+                eButtons.forEach { button ->
+                    enableButton(button)
+                }
                 pausePlayback()
             }
         }
 
         binding.stop.setOnClickListener {
+            val dButtons = listOf(binding.micStop, binding.pause, binding.stop)
+            dButtons.forEach { button ->
+                disableButton(button)
+            }
+            val eButtons = listOf(binding.play, binding.micPlay)
+            eButtons.forEach { button ->
+                enableButton(button)
+            }
             stopPlayback()
         }
 
+        // New melody button
         binding.melodyBin.setOnClickListener {
             recordList.clear()
             binding.newMelodyLayout.visibility = View.GONE
@@ -149,11 +175,13 @@ class RecordMelodyFragment : Fragment() {
             SoundPool(6, AudioManager.STREAM_MUSIC, 0)
         }
 
+        // Notes sound
         soundMap["C"] = soundPool.load(activity, R.raw.c4, 1)
         soundMap["D"] = soundPool.load(activity, R.raw.d4, 1)
         soundMap["E"] = soundPool.load(activity, R.raw.e4, 1)
         soundMap["F"] = soundPool.load(activity, R.raw.f4, 1)
         soundMap["G"] = soundPool.load(activity, R.raw.g4, 1)
+        // TODO: Mettere note A4 e B4
 
         // Countdown sound
         bipSoundId = soundPool.load(activity, R.raw.countdown, 1)
@@ -171,8 +199,6 @@ class RecordMelodyFragment : Fragment() {
             numBells <= 9 -> 3
             else -> maxColumns
         }
-
-        val numRows = (numBells + numColumns - 1) / numColumns
 
         val displayMetrics = resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
@@ -234,7 +260,6 @@ class RecordMelodyFragment : Fragment() {
 
     private fun onBellClick(button: Button) {
         if (isRecording) {
-
             // Save the clicked bell (note)
             val bellNumber = button.tag as Int
             recordBellClick(bellNumber.toString())
@@ -242,14 +267,14 @@ class RecordMelodyFragment : Fragment() {
             // Play the note
             val note = notes[bellNumber - 1]
             val soundId = soundMap[note] ?: return
-            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
-            startBellAnimation(button)
-
-            // Play the animation
+            val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            // 500ms duration of the note sound
             handler.postDelayed({
-                soundPool.stop(soundId)
+                soundPool.stop(streamId)
             }, 500)
 
+            // Play the animation
+            startBellAnimation(button)
         }
     }
 
@@ -294,12 +319,10 @@ class RecordMelodyFragment : Fragment() {
                 isRecording = true
                 enableBellButtons(true)
                 enableButton(binding.micStop)
-                // updateControlPanelButtonsState(true)
             }
         }
 
         updateCountdown(countdownTime)
-        // updateControlPanelButtonsState(false)
     }
 
     private fun disableButton(button: ImageView) {
@@ -316,7 +339,7 @@ class RecordMelodyFragment : Fragment() {
         val currentTime: Double = System.currentTimeMillis() / 1000.0
 
         if (lastClickTime != null && lastBell != null) {
-            // Calcola il tempo trascorso in secondi con una cifra decimale
+
             val elapsedTimeSeconds = currentTime - lastClickTime!!
             val elapsedTimeRounded = String.format("%.1f", elapsedTimeSeconds)
 
@@ -328,7 +351,6 @@ class RecordMelodyFragment : Fragment() {
         lastClickTime = currentTime
     }
 
-
     private fun stopRecording() {
         binding.countdownTv.visibility = View.GONE
         binding.saveMelodyButton.visibility = View.VISIBLE
@@ -336,7 +358,6 @@ class RecordMelodyFragment : Fragment() {
         isRecording = false
         enableBellButtons(false)
 
-        // Se c'è una campana registrata, aggiungila alla lista senza tempo intercorso
         if (lastBell != null && lastClickTime != null) {
             val recordEntry = "$lastBell 1"
             recordList.add(recordEntry)
@@ -353,8 +374,14 @@ class RecordMelodyFragment : Fragment() {
         lastClickTime = null
     }
 
-    private fun saveRecordToFile(): File? {
-        val fileName = "bell_record_${System.currentTimeMillis()}.txt"
+    private fun saveRecordToFile(recordTitle: String): File? {
+        // Create the file
+        val personalMelodiesNum = if (viewModel.melodyList.value.isNullOrEmpty()) {
+            1
+        } else {
+            viewModel.melodyList.value?.size!! + 1
+        }
+        val fileName = "${personalMelodiesNum}.txt"
         val file = File(requireContext().filesDir, fileName)
 
         val content = buildString {
@@ -368,7 +395,6 @@ class RecordMelodyFragment : Fragment() {
         return try {
             file.writeText(content)
             recordList.clear()
-            recordTitle = ""
             file // Return the file
         } catch (e: Exception) {
             Log.e("SaveRecordToFile", "Failed to save record to file", e)
@@ -397,9 +423,7 @@ class RecordMelodyFragment : Fragment() {
             val title = input.text.toString().trim()
 
             if (title.isNotEmpty()) {
-                recordTitle = title
-
-                val newMelodyFile  = saveRecordToFile()
+                val newMelodyFile  = saveRecordToFile(title)
                 if (newMelodyFile != null) {
                     val storageReference = FirebaseStorage.getInstance().reference
                     val fileRef = storageReference.child("melodies/${viewModel.sysId}/${newMelodyFile.name}")
@@ -453,27 +477,27 @@ class RecordMelodyFragment : Fragment() {
                     if (entry.size == 2) {
                         val note = entry[0]
                         val pauseDurationStr = entry[1].replace(',', '.') // Converti la virgola in punto
-                        val pauseDuration = try {
-                            (pauseDurationStr.toDouble() * 1000).toLong() // Converti in millisecondi
+                        var pauseDuration = try {
+                            (pauseDurationStr.toDouble() * 1000).toLong() - 500// Converti in millisecondi
                         } catch (e: NumberFormatException) {
                             e.printStackTrace()
                             0L
                         }
 
-                        if (pauseDuration >= 0) {
-                            playNote(note)
-
-                            playbackHandler?.postDelayed({
-                                stopNote()
-                                index++
-
-                                // Wait for the time between two notes
-                                playbackHandler?.postDelayed(this, pauseDuration - 800)
-                            }, 800) // Note duration always 800ms (it is a bell)
-                        } else {
-                            index++
-                            playbackHandler?.post(this)
+                        if (pauseDuration <= 0) {
+                            pauseDuration = 1
                         }
+
+                        val streamId = playNote(note)
+
+                        playbackHandler?.postDelayed({
+                            soundPool.stop(streamId)
+                            index++
+
+                            // Wait for the time between two notes
+                            playbackHandler?.postDelayed(this, pauseDuration)
+                        }, 500) // Note duration always 800ms (it is a bell)
+
                     } else {
                         index++
                         playbackHandler?.post(this)
@@ -488,21 +512,19 @@ class RecordMelodyFragment : Fragment() {
         playbackHandler?.post(playbackRunnable!!)
     }
 
-    private fun playNote(note: String) {
+    private fun playNote(note: String): Int {
         val noteIndex = note.toIntOrNull()
 
         // Convert from bell number to bell note
         if (noteIndex != null && noteIndex in 1..notes.size) {
             val musicalNote = notes[noteIndex - 1]
-            val soundId = soundMap[musicalNote] ?: return
-            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            val soundId = soundMap[musicalNote] ?: return 0
+            val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            return streamId
         } else {
             Log.e("Playback", "Nota non valida: $note")
+            return 0
         }
-    }
-
-    private fun stopNote() {
-        soundPool.autoPause() // Pause all sounds if needed
     }
 
     private fun pausePlayback() {
@@ -511,7 +533,7 @@ class RecordMelodyFragment : Fragment() {
             isPlaying = false
             pauseTime = System.currentTimeMillis() / 1000.0
             playbackHandler?.removeCallbacks(playbackRunnable!!)
-            stopNote()
+            soundPool.autoPause()
         }
     }
 
@@ -528,9 +550,19 @@ class RecordMelodyFragment : Fragment() {
         isPlaying = false
         isPaused = false
         playbackHandler?.removeCallbacks(playbackRunnable!!)
-        stopNote() // Ensure that playback stops
+        soundPool.autoPause() // Ensure that playback stops
         playbackHandler = null
         playbackRunnable = null
+
+        // Disable and enable buttons
+        val dButtons = listOf(binding.micStop, binding.pause, binding.stop)
+        dButtons.forEach { button ->
+            disableButton(button)
+        }
+        val eButtons = listOf(binding.play, binding.micPlay)
+        eButtons.forEach { button ->
+            enableButton(button)
+        }
     }
 
     override fun onDestroyView() {

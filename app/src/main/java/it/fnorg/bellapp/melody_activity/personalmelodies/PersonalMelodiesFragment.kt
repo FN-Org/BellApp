@@ -59,7 +59,7 @@ class PersonalMelodiesFragment : Fragment() {
             } else {
                 binding.noMelodiesTV.visibility = View.GONE
                 binding.rvMelody.visibility = View.VISIBLE
-                binding.rvMelody.adapter = MelodyAdapter(requireContext(), melodies)
+                binding.rvMelody.adapter = MelodyAdapter(requireContext(), melodies, viewModel)
             }
         })
 
@@ -80,8 +80,13 @@ class PersonalMelodiesFragment : Fragment() {
             } else {
                 binding.noMelodiesTV.visibility = View.GONE
                 binding.rvMelody.visibility = View.VISIBLE
-                binding.rvMelody.adapter = MelodyAdapter(requireContext(), melodies)
+                binding.rvMelody.adapter = MelodyAdapter(requireContext(), melodies, viewModel)
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.stopPlayback()
     }
 }

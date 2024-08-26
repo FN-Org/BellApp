@@ -19,6 +19,7 @@
             android:layout_weight="0"
             android:text="TextView"
             android:layout_marginStart="15dp"
+            android:layout_marginEnd="10dp"
             android:textColor="@color/black"
             android:textStyle="bold" />
 
@@ -28,7 +29,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="TextView"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="20dp"
             android:textColor="@color/black"
             android:textStyle="bold" />
     </LinearLayout>
@@ -38,13 +39,26 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/playMelody"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
-            app:srcCompat="@drawable/ic_play" />
+            android:layout_marginEnd="10dp">
+
+            <ImageView
+                android:id="@+id/playMelody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_play" />
+
+            <ImageView
+                android:id="@+id/pauseMelody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_pause" />
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/soundWaveIv"
@@ -59,6 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
             app:srcCompat="@drawable/ic_bin" />
     </LinearLayout>
 

@@ -1,5 +1,8 @@
 package it.fnorg.bellapp.melody_activity
 
+import android.media.SoundPool
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +25,17 @@ class MelodyViewModel : ViewModel() {
 
     // Firebase Storage reference
     private val storageReference = FirebaseStorage.getInstance().reference
+
+    // SoundPool
+    lateinit var soundPool: SoundPool
+    var soundMap = mutableMapOf<String, Int>()
+
+    var isPlaying = false
+    var isPaused = false
+    var playbackHandler: Handler? = null
+    var playbackRunnable: Runnable? = null
+    val notes = listOf("C", "D", "E", "F", "G", "A", "B")
+    private var pauseTime: Double = 0.0
 
     fun fetchMelodies() {
         val melodies = mutableListOf<MelodyFile>()
@@ -62,5 +76,99 @@ class MelodyViewModel : ViewModel() {
             .addOnFailureListener { e ->
                 Log.e("Download melody", "Failed to list files", e)
             }
+    }
+
+    fun startPlayback(recordList: MutableList<String>, stopFunction: () -> Unit) {
+        isPlaying = true
+        isPaused = false
+        playbackHandler = Handler(Looper.getMainLooper())
+        playbackRunnable = object : Runnable {
+            private var index = 0
+
+            override fun run() {
+                if (!isPlaying) {
+                    return
+                }
+                if (index < recordList.size) {
+                    val entry = recordList[index].trim().split(" ")
+                    if (entry.size == 2) {
+                        val note = entry[0]
+                        val pauseDurationStr = entry[1].replace(',', '.') // Converti la virgola in punto
+                        var pauseDuration = try {
+                            (pauseDurationStr.toDouble() * 1000).toLong() - 500 // Converti in millisecondi
+                        } catch (e: NumberFormatException) {
+                            e.printStackTrace()
+                            0L
+                        }
+
+                        if (pauseDuration <= 0) {
+                            pauseDuration = 1
+                        }
+
+                        val streamId = playNote(note)
+
+                        playbackHandler?.postDelayed({
+                            soundPool.stop(streamId)
+                            index++
+
+                            // Wait for the time between two notes
+                            playbackHandler?.postDelayed(this, pauseDuration)
+                        }, 500) // Note duration always 800ms (it is a bell)
+
+                    } else {
+                        index++
+                        playbackHandler?.post(this)
+                    }
+                } else {
+                    stopFunction()
+                }
+            }
+        }
+
+        // Activate the runnable
+        playbackHandler?.post(playbackRunnable!!)
+    }
+
+    private fun playNote(note: String): Int {
+        val noteIndex = note.toIntOrNull()
+
+        // Convert from bell number to bell note
+        if (noteIndex != null && noteIndex in 1..notes.size) {
+            val musicalNote = notes[noteIndex - 1]
+            val soundId = soundMap[musicalNote] ?: return 0
+            val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            return streamId
+        } else {
+            Log.e("Playback", "Nota non valida: $note")
+            return 0
+        }
+    }
+
+    fun stopPlayback() {
+        isPlaying = false
+        isPaused = false
+        playbackHandler?.removeCallbacks(playbackRunnable!!)
+        soundPool.autoPause() // Ensure that playback stops
+        playbackHandler = null
+        playbackRunnable = null
+    }
+
+    fun pausePlayback() {
+        if (isPlaying && !isPaused) {
+            isPaused = true
+            isPlaying = false
+            pauseTime = System.currentTimeMillis() / 1000.0
+            playbackHandler?.removeCallbacks(playbackRunnable!!)
+            soundPool.autoPause()
+        }
+    }
+
+    fun resumePlayback() {
+        if (isPaused && !isPlaying) {
+            isPlaying = true
+            isPaused = false
+            val resumeDelay = System.currentTimeMillis() / 1000.0 - pauseTime
+            playbackHandler?.postDelayed(playbackRunnable!!, resumeDelay.toLong())
+        }
     }
 }

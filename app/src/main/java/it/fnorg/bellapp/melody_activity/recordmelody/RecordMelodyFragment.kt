@@ -2,11 +2,7 @@ package it.fnorg.bellapp.melody_activity.recordmelody
 
 import android.app.AlertDialog
 import android.graphics.Color
-import android.media.AudioAttributes
-import android.media.AudioManager
-import android.media.SoundPool
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -41,20 +37,12 @@ import java.io.File
 class RecordMelodyFragment : Fragment() {
 
     private lateinit var binding: MelodyFragmentRecordMelodyBinding
-    private lateinit var soundPool: SoundPool
-    private val notes = listOf("C", "D", "E", "F", "G", "A", "B")
-    private val soundMap = mutableMapOf<String, Int>()
     private val handler = Handler(Looper.getMainLooper())
     private var isRecording = false
     private var startTime: Double = 0.0
     private val recordList = mutableListOf<String>()
     private var lastBell: String? = null
     private var lastClickTime: Double? = null
-    private var playbackHandler: Handler? = null
-    private var playbackRunnable: Runnable? = null
-    private var isPlaying = false
-    private var isPaused = false
-    private var pauseTime: Double = 0.0
     private var bipSoundId: Int = 0
 
     private val viewModel: MelodyViewModel by activityViewModels()
@@ -100,7 +88,7 @@ class RecordMelodyFragment : Fragment() {
         }
 
         binding.play.setOnClickListener {
-            if (recordList.isNotEmpty() && !isPlaying) {
+            if (recordList.isNotEmpty() && !viewModel.isPlaying) {
                 val dButtons = listOf(binding.micStop, binding.play, binding.micPlay)
                 dButtons.forEach { button ->
                     disableButton(button)
@@ -109,13 +97,13 @@ class RecordMelodyFragment : Fragment() {
                 eButtons.forEach { button ->
                     enableButton(button)
                 }
-                if (isPaused) resumePlayback()
-                else startPlayback()
+                if (viewModel.isPaused) viewModel.resumePlayback()
+                else viewModel.startPlayback(recordList, ::recordMelodyFragmentStopPlayback)
             }
         }
 
         binding.pause.setOnClickListener {
-            if (isPlaying) {
+            if (viewModel.isPlaying) {
                 val dButtons = listOf(binding.micStop, binding.pause, binding.micPlay)
                 dButtons.forEach { button ->
                     disableButton(button)
@@ -124,20 +112,12 @@ class RecordMelodyFragment : Fragment() {
                 eButtons.forEach { button ->
                     enableButton(button)
                 }
-                pausePlayback()
+                viewModel.pausePlayback()
             }
         }
 
         binding.stop.setOnClickListener {
-            val dButtons = listOf(binding.micStop, binding.pause, binding.stop)
-            dButtons.forEach { button ->
-                disableButton(button)
-            }
-            val eButtons = listOf(binding.play, binding.micPlay)
-            eButtons.forEach { button ->
-                enableButton(button)
-            }
-            stopPlayback()
+            recordMelodyFragmentStopPlayback()
         }
 
         // New melody button
@@ -160,31 +140,21 @@ class RecordMelodyFragment : Fragment() {
         // Bells generation
         generateBellButtons(viewModel.nBells)
 
-        // SoundPool initialization
-        soundPool = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val audioAttributes = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
-
-            SoundPool.Builder()
-                .setMaxStreams(6)
-                .setAudioAttributes(audioAttributes)
-                .build()
-        } else {
-            SoundPool(6, AudioManager.STREAM_MUSIC, 0)
-        }
-
-        // Notes sound
-        soundMap["C"] = soundPool.load(activity, R.raw.c4, 1)
-        soundMap["D"] = soundPool.load(activity, R.raw.d4, 1)
-        soundMap["E"] = soundPool.load(activity, R.raw.e4, 1)
-        soundMap["F"] = soundPool.load(activity, R.raw.f4, 1)
-        soundMap["G"] = soundPool.load(activity, R.raw.g4, 1)
-        // TODO: Mettere note A4 e B4
-
         // Countdown sound
-        bipSoundId = soundPool.load(activity, R.raw.countdown, 1)
+        bipSoundId = viewModel.soundPool.load(activity, R.raw.countdown, 1)
+    }
+
+    private fun recordMelodyFragmentStopPlayback() {
+        // Disable and enable buttons
+        val dButtons = listOf(binding.micStop, binding.pause, binding.stop)
+        dButtons.forEach { button ->
+            disableButton(button)
+        }
+        val eButtons = listOf(binding.play, binding.micPlay)
+        eButtons.forEach { button ->
+            enableButton(button)
+        }
+        viewModel.stopPlayback()
     }
 
     private fun generateBellButtons(numBells: Int) {
@@ -223,7 +193,7 @@ class RecordMelodyFragment : Fragment() {
             for (col in 0 until columnsInRow) {
                 val bellNumber = bellsAdded + 1
                 val bellButton = Button(activity).apply {
-                    text = notes[bellsAdded % notes.size]
+                    text = viewModel.notes[bellsAdded % viewModel.notes.size]
                     tag = bellNumber
                     setBackgroundResource(R.drawable.ic_bell)
                     setTextColor(Color.WHITE)
@@ -265,12 +235,12 @@ class RecordMelodyFragment : Fragment() {
             recordBellClick(bellNumber.toString())
 
             // Play the note
-            val note = notes[bellNumber - 1]
-            val soundId = soundMap[note] ?: return
-            val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            val note = viewModel.notes[bellNumber - 1]
+            val soundId = viewModel.soundMap[note] ?: return
+            val streamId = viewModel.soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
             // 500ms duration of the note sound
             handler.postDelayed({
-                soundPool.stop(streamId)
+                viewModel.soundPool.stop(streamId)
             }, 500)
 
             // Play the animation
@@ -307,7 +277,7 @@ class RecordMelodyFragment : Fragment() {
         }
 
         // Start the countdown effect
-        soundPool.play(bipSoundId, 1f, 1f, 1, 0, 1f)
+        viewModel.soundPool.play(bipSoundId, 1f, 1f, 1, 0, 1f)
 
         fun updateCountdown(timeLeft: Int) {
             if (timeLeft > 0) {
@@ -461,113 +431,8 @@ class RecordMelodyFragment : Fragment() {
         builder.show()
     }
 
-    private fun startPlayback() {
-        isPlaying = true
-        isPaused = false
-        playbackHandler = Handler(Looper.getMainLooper())
-        playbackRunnable = object : Runnable {
-            private var index = 0
-
-            override fun run() {
-                if (!isPlaying) {
-                    return
-                }
-                if (index < recordList.size) {
-                    val entry = recordList[index].trim().split(" ")
-                    if (entry.size == 2) {
-                        val note = entry[0]
-                        val pauseDurationStr = entry[1].replace(',', '.') // Converti la virgola in punto
-                        var pauseDuration = try {
-                            (pauseDurationStr.toDouble() * 1000).toLong() - 500// Converti in millisecondi
-                        } catch (e: NumberFormatException) {
-                            e.printStackTrace()
-                            0L
-                        }
-
-                        if (pauseDuration <= 0) {
-                            pauseDuration = 1
-                        }
-
-                        val streamId = playNote(note)
-
-                        playbackHandler?.postDelayed({
-                            soundPool.stop(streamId)
-                            index++
-
-                            // Wait for the time between two notes
-                            playbackHandler?.postDelayed(this, pauseDuration)
-                        }, 500) // Note duration always 800ms (it is a bell)
-
-                    } else {
-                        index++
-                        playbackHandler?.post(this)
-                    }
-                } else {
-                    stopPlayback()
-                }
-            }
-        }
-
-        // Activate the runnable
-        playbackHandler?.post(playbackRunnable!!)
-    }
-
-    private fun playNote(note: String): Int {
-        val noteIndex = note.toIntOrNull()
-
-        // Convert from bell number to bell note
-        if (noteIndex != null && noteIndex in 1..notes.size) {
-            val musicalNote = notes[noteIndex - 1]
-            val soundId = soundMap[musicalNote] ?: return 0
-            val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
-            return streamId
-        } else {
-            Log.e("Playback", "Nota non valida: $note")
-            return 0
-        }
-    }
-
-    private fun pausePlayback() {
-        if (isPlaying && !isPaused) {
-            isPaused = true
-            isPlaying = false
-            pauseTime = System.currentTimeMillis() / 1000.0
-            playbackHandler?.removeCallbacks(playbackRunnable!!)
-            soundPool.autoPause()
-        }
-    }
-
-    private fun resumePlayback() {
-        if (isPaused && !isPlaying) {
-            isPlaying = true
-            isPaused = false
-            val resumeDelay = System.currentTimeMillis() / 1000.0 - pauseTime
-            playbackHandler?.postDelayed(playbackRunnable!!, resumeDelay.toLong())
-        }
-    }
-
-    private fun stopPlayback() {
-        isPlaying = false
-        isPaused = false
-        playbackHandler?.removeCallbacks(playbackRunnable!!)
-        soundPool.autoPause() // Ensure that playback stops
-        playbackHandler = null
-        playbackRunnable = null
-
-        // Disable and enable buttons
-        val dButtons = listOf(binding.micStop, binding.pause, binding.stop)
-        dButtons.forEach { button ->
-            disableButton(button)
-        }
-        val eButtons = listOf(binding.play, binding.micPlay)
-        eButtons.forEach { button ->
-            enableButton(button)
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        soundPool.release()
-        playbackHandler?.removeCallbacks(playbackRunnable!!)
+        viewModel.stopPlayback()
     }
 }

@@ -1,6 +1,8 @@
 package it.fnorg.bellapp.melody_activity.recordmelody
 
 import android.app.AlertDialog
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -49,6 +51,14 @@ class RecordMelodyFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Toast.makeText(requireContext(), R.string.portrait_orientation, Toast.LENGTH_SHORT).show()
+        }
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
     override fun onCreateView(
@@ -434,5 +444,10 @@ class RecordMelodyFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.stopPlayback()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 }

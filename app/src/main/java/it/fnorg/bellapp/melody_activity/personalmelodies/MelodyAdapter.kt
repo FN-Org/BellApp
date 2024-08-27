@@ -1,10 +1,12 @@
 package it.fnorg.bellapp.melody_activity.personalmelodies
 
+import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.storage.FirebaseStorage
@@ -21,6 +23,7 @@ class MelodyAdapter(
 ) : RecyclerView.Adapter<MelodyAdapter.MelodyViewHolder>() {
 
     private var lastClickedMelody = -1
+    private var lastClickedViewHolder: MelodyViewHolder? = null
 
     init {
         melodyList = melodyList.sortedBy { it.number }.toMutableList()
@@ -44,6 +47,7 @@ class MelodyAdapter(
         holder.binding.titleTv.text = melody.title
 
         holder.binding.playMelody.setOnClickListener {
+            lastClickedViewHolder = holder
             val currentPosition = position
             if (melodyList[currentPosition].recordList.isNotEmpty() &&
                 !viewModel.isPlaying
@@ -63,30 +67,46 @@ class MelodyAdapter(
         }
 
         holder.binding.pauseMelody.setOnClickListener {
+            lastClickedViewHolder = null
             viewModel.pausePlayback()
             holder.binding.playMelody.visibility = View.VISIBLE
             holder.binding.pauseMelody.visibility = View.GONE
         }
 
         holder.binding.deleteMelodyIv.setOnClickListener {
-            val storageReference = FirebaseStorage.getInstance().reference
-            val fileRef = storageReference.child("melodies/${viewModel.sysId}/${melody.number}.txt")
+            lastClickedViewHolder?.let { personalMelodiesFragmentStopPlayback(it) }
+            val builder = AlertDialog.Builder(mContext)
+            builder.setTitle(R.string.delete_confirmation)
+            builder.setMessage(mContext.getString(R.string.delete_melody_message, melody.title))
 
-            fileRef.delete().addOnSuccessListener {
-                // Assicurati che melodyList sia MutableList
-                (melodyList as? MutableList)?.let {
-                    it.removeAt(position)
-                    renameFilesAfterDeletion(position)
-                    updateMelodyNumbers()
-                    notifyItemRangeChanged(position, it.size)
+            builder.setPositiveButton(R.string.yes) { dialog, _ ->
+                val storageReference = FirebaseStorage.getInstance().reference
+                val fileRef = storageReference.child("melodies/${viewModel.sysId}/${melody.number}.txt")
+
+                fileRef.delete().addOnSuccessListener {
+                    (melodyList as? MutableList)?.let {
+                        it.removeAt(position)
+                        renameFilesAfterDeletion(position)
+                        updateMelodyNumbers()
+                        notifyItemRangeChanged(position, it.size)
+                        Toast.makeText(mContext, R.string.melody_deleted, Toast.LENGTH_SHORT).show()
+                    }
+                }.addOnFailureListener { exception ->
+                    Log.e("MelodyAdapter", "Failed to delete file", exception)
+                    Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
                 }
 
-                Toast.makeText(mContext, R.string.melody_deleted, Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener { exception ->
-                Log.e("MelodyAdapter", "Failed to delete file", exception)
-                Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
             }
+
+            builder.setNegativeButton(R.string.no) { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            val alert = builder.create()
+            alert.show()
         }
+
     }
 
     override fun getItemCount(): Int {

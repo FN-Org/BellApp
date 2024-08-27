@@ -74,6 +74,8 @@ class RecordMelodyFragment : Fragment() {
 
         val navController = findNavController()
 
+        viewModel.fetchMelodies()
+
         // Navbar buttons
         binding.backArrow.setOnClickListener {
             navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)

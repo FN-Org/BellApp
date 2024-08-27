@@ -117,4 +117,7 @@
 
     <string name="melody_deleted">Melody deleted successfully</string>
 
+    <string name="delete_confirmation">Delete melody</string>
+    <string name="delete_melody_message">Are you sure you want to delete the melody "%1$s"?</string>
+
 </resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/melody_navigation"
+    app:startDestination="@id/personalMelodiesFragment">
+    <fragment
+        android:id="@+id/personalMelodiesFragment"
+        android:name="it.fnorg.bellapp.melody_activity.personalmelodies.PersonalMelodiesFragment"
+        android:label="melody_fragment_personal_melodies"
+        tools:layout="@layout/melody_fragment_personal_melodies" >
+        <action
+            android:id="@+id/action_personalMelodiesFragment_to_recordMelodyFragment"
+            app:destination="@id/recordMelodyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recordMelodyFragment"
+        android:name="it.fnorg.bellapp.melody_activity.recordmelody.RecordMelodyFragment"
+        android:label="RecordMelodyFragment" >
+        <action
+            android:id="@+id/action_recordMelodyFragment_to_personalMelodiesFragment"
+            app:destination="@id/personalMelodiesFragment" />
+    </fragment>
+</navigation>

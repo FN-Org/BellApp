@@ -4,20 +4,21 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <queries>
+
         <!-- Permission to open a browser -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
+
             <data android:scheme="http" />
         </intent>
         <intent>
             <action android:name="android.intent.action.VIEW" />
+
             <data android:scheme="https" />
         </intent>
     </queries>
@@ -25,14 +26,17 @@
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_bell_app"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_bell_app_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BellApp"
-        android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
+        <activity
+            android:name=".melody_activity.MelodyActivity"
+            android:exported="false" />
         <activity
             android:name=".welcome_activity.WelcomeActivity"
             android:exported="true">
@@ -45,18 +49,20 @@
         <activity
             android:name=".login_activity.LogInActivity"
             android:exported="true">
+
         </activity>
         <activity
             android:name=".main_activity.MainActivity"
             android:exported="false">
+
         </activity>
         <activity
             android:name=".calendar_activity.CalendarActivity"
             android:exported="false">
+
         </activity>
 
-        <receiver android:name=".main_activity.ReminderReceiver"/>
-
+        <receiver android:name=".main_activity.ReminderReceiver" />
     </application>
 
 </manifest>

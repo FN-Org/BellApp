@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import it.fnorg.bellapp.R
-import it.fnorg.bellapp.calendar_activity.CalendarActivityViewModel
+import it.fnorg.bellapp.calendar_activity.CalendarViewModel
 import it.fnorg.bellapp.calendar_activity.Event
 import it.fnorg.bellapp.calendar_activity.dateFormatter
 import it.fnorg.bellapp.calendar_activity.eventDateTimeFormatter
@@ -26,10 +26,10 @@ class EventListAdapter(
 ) :
     RecyclerView.Adapter<EventListAdapter.EventsViewHolder>() {
 
-    private var viewModel: CalendarActivityViewModel
+    private var viewModel: CalendarViewModel
 
     init {
-        viewModel = ViewModelProvider(fragment).get(CalendarActivityViewModel::class.java)
+        viewModel = ViewModelProvider(fragment).get(CalendarViewModel::class.java)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventsViewHolder {

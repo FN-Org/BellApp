@@ -48,7 +48,7 @@ fun Timestamp.toLocalDateTime(): LocalDateTime {
 /**
  * ViewModel for managing calendar-related data and operations.
  */
-class CalendarActivityViewModel : ViewModel() {
+class CalendarViewModel : ViewModel() {
 
     // LiveData for events list
     private val _events = MutableLiveData<List<Event>>()
@@ -61,7 +61,7 @@ class CalendarActivityViewModel : ViewModel() {
     // Firebase Firestore instance
     private val db = Firebase.firestore
 
-    var sysId:String = ""
+    var sysId: String = ""
 
     // Initialize LiveData lists with empty lists
     init {

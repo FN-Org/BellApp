@@ -58,9 +58,9 @@
         <receiver android:name=".main_activity.ReminderReceiver"/>
 
         <service
-            android:name=".BellAppFirebaseMessagingService"
+            android:name=".main_activity.BellAppFirebaseMessagingService"
             android:exported="true"
-            android:enabled = "true">
+            android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

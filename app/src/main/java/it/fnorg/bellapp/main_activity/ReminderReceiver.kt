@@ -1,6 +1,5 @@
 package it.fnorg.bellapp.main_activity
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -12,6 +11,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.createNotificationChannel
 
 /**
  * BroadcastReceiver class to handle daily reminder notifications.
@@ -19,6 +19,8 @@ import it.fnorg.bellapp.R
 class ReminderReceiver : BroadcastReceiver() {
 
     private val CHANNELID = "Daily_reminder"
+    private val channelName = "Daily Reminder Channel"
+    private val channelDescriptionText = "Channel for daily reminders"
 
     /**
      * Called when the BroadcastReceiver receives an Intent broadcast.
@@ -34,36 +36,15 @@ class ReminderReceiver : BroadcastReceiver() {
             // Check if the notification channel exists for API 26+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 if (notificationManager.getNotificationChannel(CHANNELID) == null) {
-                    createNotificationChannel(context)
+                    createNotificationChannel(context,CHANNELID,channelName,channelDescriptionText)
                 }
             }
             showNotification(context)
         }
     }
 
-    /**
-     * Creates a notification channel for devices running Android O or higher.
-     *
-     * @param context The Context in which the receiver is running.
-     */
-    private fun createNotificationChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Daily Reminder Channel"
-            val descriptionText = "Channel for daily reminders"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val mChannel = NotificationChannel(
-                CHANNELID,
-                name,
-                importance
-            )
-            mChannel.description = descriptionText
 
-            val notificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            notificationManager.createNotificationChannel(mChannel)
-        }
-    }
 
     /**
      * Shows a notification to remind the user of a task.

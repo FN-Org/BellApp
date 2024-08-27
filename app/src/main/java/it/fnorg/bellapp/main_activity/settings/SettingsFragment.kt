@@ -3,9 +3,11 @@ package it.fnorg.bellapp.main_activity.settings
 import android.Manifest
 import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.icu.util.Calendar
@@ -33,13 +35,13 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.messaging.FirebaseMessaging
-import it.fnorg.bellapp.BellAppFirebaseMessagingService
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.addFCMTokenToUser
 import it.fnorg.bellapp.databinding.MainFragmentSettingsBinding
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
 import it.fnorg.bellapp.openLink
+import it.fnorg.bellapp.updateFCMTokenToSystems
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -226,6 +228,9 @@ class SettingsFragment : Fragment() {
                             val token = task.result
 
                             addFCMTokenToUser(token)
+                            val systemsIds = viewModel.systems.value?.map { it.id } ?: emptyList()
+
+                            updateFCMTokenToSystems(token,systemsIds)
                         }
                     }
                     Toast.makeText(requireContext(), R.string.event_notification_toast, Toast.LENGTH_SHORT)
@@ -234,6 +239,13 @@ class SettingsFragment : Fragment() {
                     Toast.makeText(requireContext(), R.string.notification_denied, Toast.LENGTH_SHORT)
                         .show()
                     binding.eventsNotificationSwitch.isChecked = false
+                }
+            }
+            else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val notificationManager = requireContext().getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    val id: String = "Firebase Notification"
+                    notificationManager.deleteNotificationChannel(id)
                 }
             }
         }

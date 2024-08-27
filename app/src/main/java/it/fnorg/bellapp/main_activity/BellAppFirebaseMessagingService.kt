@@ -1,10 +1,8 @@
-package it.fnorg.bellapp
+package it.fnorg.bellapp.main_activity
 
 import android.Manifest
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -12,17 +10,18 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.fragment.app.activityViewModels
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import it.fnorg.bellapp.main_activity.MainActivity
+import it.fnorg.bellapp.R
+import it.fnorg.bellapp.addFCMTokenToUser
+import it.fnorg.bellapp.createNotificationChannel
+import it.fnorg.bellapp.getSystemsIds
 import it.fnorg.bellapp.main_activity.settings.dataStore
+import it.fnorg.bellapp.updateFCMTokenToSystems
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -32,11 +31,13 @@ import kotlinx.coroutines.launch
 
 class BellAppFirebaseMessagingService : FirebaseMessagingService() {
 
-    private val CHANNELID = "Firebase Notification"
+    val CHANNELID = "Firebase Notification"
+    private val channelName = "Firebase cloud messaging"
+    private val channelDescription = "Firebase cloud messaging notification after event execution"
     private val NOTIFICATIONID = 2
     private val EVENT_NOTIFICATION = booleanPreferencesKey("event_notification")
 
-    private val scope = CoroutineScope(Dispatchers.IO + Job()) // Crea un CoroutineScope dedicato per il servizio
+    private val scope = CoroutineScope(NonCancellable) // Crea un CoroutineScope dedicato per il servizio
 
     private val TAG = "BellAppFirebaseMessagingService"
 
@@ -48,11 +49,16 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
         Log.d(TAG, "Refreshed token: $token")
 
         addFCMTokenToUser(token)
+        getSystemsIds() { systemsId ->
+           updateFCMTokenToSystems(token,systemsId)
+        }
     }
 
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+
+        Log.d(TAG, "Message from ${message.from}")
 
         message.notification?.let { notification -> // Usare ?.let per evitare null checks multipli
             Log.d(TAG, "Message notification from ${message.from}")
@@ -105,7 +111,7 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
         // Check if the notification channel exists for API 26+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (notificationManager.getNotificationChannel(CHANNELID) == null) {
-                createNotificationChannel(this)
+                createNotificationChannel(this,CHANNELID,channelName,channelDescription)
             }
         }
 
@@ -120,23 +126,5 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
 
     }
 
-    private fun createNotificationChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Firebase Notification"
-            val descriptionText = "Channel for notification from firebase cloud messaging"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val mChannel = NotificationChannel(
-                CHANNELID,
-                name,
-                importance
-            )
-            mChannel.description = descriptionText
-
-            val notificationManager =
-                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-            notificationManager.createNotificationChannel(mChannel)
-        }
-    }
 
 }

@@ -18,6 +18,7 @@ import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.System
 import it.fnorg.bellapp.main_activity.MainActivity
 import it.fnorg.bellapp.main_activity.MainViewModel
+import it.fnorg.bellapp.removeFCMTokenFromSystem
 
 /**
  * Adapter for the RecyclerView in the home screen, responsible for displaying
@@ -83,8 +84,10 @@ class HomeListAdapter (
                 builder.setTitle(R.string.remove_sys)
                 // Set up the buttons
                 builder.setPositiveButton(mContext.getString(R.string.yes).uppercase()) { dialog, which ->
+                    removeFCMTokenFromSystem(sys.id)
                     viewModel.removeSys(mContext, sys.id)
                     viewModel.fetchSysHomeData()
+
                 }
                 builder.setNegativeButton(mContext.getString(R.string.no).uppercase()) { dialog, which ->
                     dialog.cancel()

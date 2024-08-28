@@ -7,94 +7,100 @@
     android:background="@color/white"
     tools:context=".calendar_activity.monthview.MonthViewFragment">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/calendarAppBarLayout"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/blue"
-            android:theme="@style/Theme.NavigationDrawer.AppBarOverlay">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/calendarAppBarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:background="@color/blue"
+                android:theme="@style/Theme.NavigationDrawer.AppBarOverlay">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <ImageView
-                        android:id="@+id/calendarBackArrow"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        app:srcCompat="@drawable/ic_arrow_back"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="50dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
-                            android:id="@+id/calendarPreviousMonthImage"
+                            android:id="@+id/calendarBackArrow"
                             android:layout_width="36dp"
                             android:layout_height="36dp"
-                            android:layout_gravity="start"
-                            android:layout_marginEnd="10dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            app:srcCompat="@drawable/ic_left_chevron"
-                            app:tint="@color/white" />
+                            app:srcCompat="@drawable/ic_arrow_back"/>
 
-                        <TextView
-                            android:id="@+id/calendarMonthYearText"
+                        <LinearLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:fontFamily="sans-serif-medium"
-                            android:textColor="@color/white"
-                            android:textSize="22sp"
-                            tools:text="April 2018" />
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="50dp"
+                            android:orientation="horizontal">
 
-                        <ImageView
-                            android:id="@+id/calendarNextMonthImage"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:layout_gravity="end"
-                            android:layout_marginStart="10dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            app:srcCompat="@drawable/ic_right_chevron"
-                            app:tint="@color/white" />
+                            <ImageView
+                                android:id="@+id/calendarPreviousMonthImage"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_gravity="start"
+                                android:layout_marginEnd="10dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                app:srcCompat="@drawable/ic_left_chevron"
+                                app:tint="@color/white" />
+
+                            <TextView
+                                android:id="@+id/calendarMonthYearText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="@color/white"
+                                android:textSize="22sp"
+                                tools:text="April 2018" />
+
+                            <ImageView
+                                android:id="@+id/calendarNextMonthImage"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_gravity="end"
+                                android:layout_marginStart="10dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                app:srcCompat="@drawable/ic_right_chevron"
+                                app:tint="@color/white" />
+                        </LinearLayout>
+
                     </LinearLayout>
 
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.appbar.AppBarLayout>
 
-        </com.google.android.material.appbar.AppBarLayout>
+            <com.kizitonwose.calendar.view.CalendarView
+                android:id="@+id/calendarView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cv_dayViewResource="@layout/calendar_day"
+                app:cv_monthHeaderResource="@layout/calendar_header"
+                app:cv_outDateStyle="endOfGrid" />
 
-        <com.kizitonwose.calendar.view.CalendarView
-            android:id="@+id/calendarView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cv_dayViewResource="@layout/calendar_day"
-            app:cv_monthHeaderResource="@layout/calendar_header"
-            app:cv_outDateStyle="endOfGrid" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/calendarRv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/calendarRv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
-    </LinearLayout>
+    </ScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/calendarAddEventButton"

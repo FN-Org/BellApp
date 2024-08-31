@@ -3,9 +3,11 @@ package it.fnorg.bellapp.main_activity.settings
 import android.Manifest
 import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.icu.util.Calendar
@@ -32,11 +34,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.messaging.FirebaseMessaging
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.addFCMTokenToUser
 import it.fnorg.bellapp.databinding.MainFragmentSettingsBinding
 import it.fnorg.bellapp.main_activity.MainViewModel
 import it.fnorg.bellapp.main_activity.ReminderReceiver
 import it.fnorg.bellapp.openLink
+import it.fnorg.bellapp.updateFCMTokenToSystems
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -70,6 +75,7 @@ class SettingsFragment : Fragment() {
 
     private val REMINDER_SET = booleanPreferencesKey("reminder_set")
     private val REMINDER_TIME_SET = stringPreferencesKey("reminder_time_set")
+    private val EVENT_NOTIFICATION = booleanPreferencesKey("event_notification")
 
     companion object {
         fun newInstance() = SettingsFragment()
@@ -129,7 +135,7 @@ class SettingsFragment : Fragment() {
         binding.reminderSwitch.setOnCheckedChangeListener { _, isChecked ->
             val timeGroup: Group = binding.timeGroup
             if (isChecked) {
-                if (checkNotifyPermission(binding.root)) {
+                if (checkNotifyPermission()) {
                     timeGroup.visibility = View.VISIBLE
                 } else {
                     binding.reminderSwitch.isChecked = false
@@ -180,6 +186,10 @@ class SettingsFragment : Fragment() {
             settings[REMINDER_TIME_SET]
         }
 
+        val eventNotificationFlow: Flow<Boolean> = requireContext().dataStore.data.map { settings ->
+            settings[EVENT_NOTIFICATION] == true
+        }
+        var eventNotificationBool = false
         viewLifecycleOwner.lifecycleScope.launch {
             if (reminderSetFlow.first()) {
                 binding.reminderSwitch.isChecked = true
@@ -187,6 +197,8 @@ class SettingsFragment : Fragment() {
                 if (reminderSetTime != null)
                     binding.reminderEditTextTime.setText(reminderSetTime)
             }
+            eventNotificationBool = eventNotificationFlow.first()
+            binding.eventsNotificationSwitch.isChecked = eventNotificationBool
         }
 
         // Set click listener for image picker button
@@ -207,6 +219,41 @@ class SettingsFragment : Fragment() {
         } else {
             binding.binIv.visibility = View.GONE
         }
+
+        binding.eventsNotificationSwitch.setOnClickListener {
+            if (binding.eventsNotificationSwitch.isChecked) {
+                if (checkNotifyPermission()) {
+                    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val token = task.result
+
+                            addFCMTokenToUser(token)
+                            val systemsIds = viewModel.systems.value?.map { it.id } ?: emptyList()
+
+                            updateFCMTokenToSystems(token,systemsIds)
+                        }
+                    }
+                    Toast.makeText(requireContext(), R.string.event_notification_toast, Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    Toast.makeText(requireContext(), R.string.notification_denied, Toast.LENGTH_SHORT)
+                        .show()
+                    binding.eventsNotificationSwitch.isChecked = false
+                }
+            }
+            else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val notificationManager = requireContext().getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    val id: String = "Firebase Notification"
+                    notificationManager.deleteNotificationChannel(id)
+                }
+            }
+        }
+
+        binding.eventsNotificationSwitch.setOnCheckedChangeListener { _, _ ->
+            viewLifecycleOwner.lifecycleScope.launch { setEventNotificationPreference(binding.eventsNotificationSwitch.isChecked) }
+        }
+
 
         // Set click listeners for external links (GitHub profiles)
         binding.githubFede.setOnClickListener {
@@ -280,7 +327,7 @@ class SettingsFragment : Fragment() {
      * @param view View instance to handle permission rationale.
      * @return True if notification permission is granted, false otherwise.
      */
-    private fun checkNotifyPermission(view: View): Boolean {
+    private fun checkNotifyPermission(): Boolean {
         val context = requireContext()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             when {
@@ -353,6 +400,17 @@ class SettingsFragment : Fragment() {
     private suspend fun setReminderTimePreference(value: String) {
         requireContext().dataStore.edit { settings ->
             settings[REMINDER_TIME_SET] = value
+        }
+    }
+
+    /**
+     * Stores the event notification switch state in the DataStore.
+     *
+     * @param value Boolean value indicating if the reminder is set.
+     */
+    private suspend fun setEventNotificationPreference(value: Boolean) {
+        requireContext().dataStore.edit { settings ->
+            settings[EVENT_NOTIFICATION] = value
         }
     }
 }

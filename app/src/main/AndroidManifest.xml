@@ -61,7 +61,17 @@
             android:exported="false">
 
         </activity>
-
+        <service
+            android:name=".main_activity.BellAppFirebaseMessagingService"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="Firebase Notification" />
         <receiver android:name=".main_activity.ReminderReceiver" />
     </application>
 

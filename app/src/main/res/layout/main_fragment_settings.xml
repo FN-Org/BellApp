@@ -108,13 +108,12 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/galleyText"
+                android:id="@+id/galleryText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="320dp"
                 android:layout_marginEnd="170dp"
-                android:gravity="center"
                 android:text="Choose an image from gallery"
                 android:textColor="@color/black"
                 android:textSize="18sp"
@@ -144,7 +143,7 @@
                 android:paddingEnd="7dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_gallery"
-                app:layout_constraintStart_toEndOf="@+id/galleyText"
+                app:layout_constraintStart_toEndOf="@+id/galleryText"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/seasalt" />
 
@@ -159,6 +158,33 @@
                 app:layout_constraintStart_toEndOf="@+id/imagePicker"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="400dp"
+                android:text="- Events Notification"
+                android:textColor="@color/lapis"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/events_notification_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="30dp"
+                android:text="@string/events_notification"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
             <TextView
                 android:id="@+id/textView4"
@@ -241,6 +267,8 @@
                 android:src="@drawable/ic_github"
                 app:layout_constraintStart_toEndOf="@+id/github_3"
                 app:layout_constraintTop_toTopOf="parent" />
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

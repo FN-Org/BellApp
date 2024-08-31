@@ -13,7 +13,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:paddingBottom="25dp">
 
             <TextView
                 android:id="@+id/reminderTitle"
@@ -267,7 +268,6 @@
                 android:src="@drawable/ic_github"
                 app:layout_constraintStart_toEndOf="@+id/github_3"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

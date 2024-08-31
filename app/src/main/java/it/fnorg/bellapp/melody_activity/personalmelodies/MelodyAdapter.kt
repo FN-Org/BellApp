@@ -6,12 +6,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.calendar_activity.CalendarViewModel
 import it.fnorg.bellapp.databinding.MelodyPersonalListItemBinding
 import it.fnorg.bellapp.melody_activity.MelodyFile
 import it.fnorg.bellapp.melody_activity.MelodyViewModel
@@ -19,7 +20,9 @@ import it.fnorg.bellapp.melody_activity.MelodyViewModel
 class MelodyAdapter(
     private val mContext: Context,
     private var melodyList: List<MelodyFile>,
-    private val viewModel: MelodyViewModel
+    private val melodyViewModel: MelodyViewModel,
+    private val calendarViewModel: CalendarViewModel,
+    private val lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<MelodyAdapter.MelodyViewHolder>() {
 
     private var lastClickedMelody = -1
@@ -46,16 +49,24 @@ class MelodyAdapter(
         holder.binding.melodyNumTv.text = melody.number.toString()
         holder.binding.titleTv.text = melody.title
 
+        // Observe the LiveData of the melody list
+        calendarViewModel.melodies.observe(lifecycleOwner) { melodies ->
+            // Check if the current melody is present in the list from the CalendarViewModel
+            val isMelodyPresent = melodies.any { it.name == melody.title }
+            // Update the visibility of the TextView
+            holder.binding.syncMessage.visibility = if (isMelodyPresent) View.GONE else View.VISIBLE
+        }
+
         holder.binding.playMelody.setOnClickListener {
             lastClickedViewHolder = holder
             val currentPosition = position
             if (melodyList[currentPosition].recordList.isNotEmpty() &&
-                !viewModel.isPlaying
+                !melodyViewModel.isPlaying
             ) {
-                if (viewModel.isPaused && currentPosition == lastClickedMelody) {
-                    viewModel.resumePlayback()
+                if (melodyViewModel.isPaused && currentPosition == lastClickedMelody) {
+                    melodyViewModel.resumePlayback()
                 } else {
-                    viewModel.startPlayback(melodyList[currentPosition].recordList) {
+                    melodyViewModel.startPlayback(melodyList[currentPosition].recordList) {
                         personalMelodiesFragmentStopPlayback(holder)
                     }
                 }
@@ -68,7 +79,7 @@ class MelodyAdapter(
 
         holder.binding.pauseMelody.setOnClickListener {
             lastClickedViewHolder = null
-            viewModel.pausePlayback()
+            melodyViewModel.pausePlayback()
             holder.binding.playMelody.visibility = View.VISIBLE
             holder.binding.pauseMelody.visibility = View.GONE
         }
@@ -81,7 +92,7 @@ class MelodyAdapter(
 
             builder.setPositiveButton(R.string.yes) { dialog, _ ->
                 val storageReference = FirebaseStorage.getInstance().reference
-                val fileRef = storageReference.child("melodies/${viewModel.sysId}/${melody.number}.txt")
+                val fileRef = storageReference.child("melodies/${melodyViewModel.sysId}/${melody.number}.txt")
 
                 fileRef.delete().addOnSuccessListener {
                     (melodyList as? MutableList)?.let {
@@ -116,7 +127,7 @@ class MelodyAdapter(
     private fun personalMelodiesFragmentStopPlayback(holder: MelodyViewHolder) {
         holder.binding.playMelody.visibility = View.VISIBLE
         holder.binding.pauseMelody.visibility = View.GONE
-        viewModel.stopPlayback()
+        melodyViewModel.stopPlayback()
     }
 
     private fun downloadFile(fileRef: StorageReference, callback: (ByteArray) -> Unit) {
@@ -148,12 +159,12 @@ class MelodyAdapter(
         val storageReference = storage.reference
 
         val filesToRename = melodyList.drop(deletedPosition).map { melody ->
-            storageReference.child("melodies/${viewModel.sysId}/${melody.number}.txt")
+            storageReference.child("melodies/${melodyViewModel.sysId}/${melody.number}.txt")
         }
 
         filesToRename.forEachIndexed { index, fileRef ->
             val newFileName = "${deletedPosition + index + 1}.txt"
-            val newFileRef = storageReference.child("melodies/${viewModel.sysId}/$newFileName")
+            val newFileRef = storageReference.child("melodies/${melodyViewModel.sysId}/$newFileName")
 
             // Scarica il file esistente
             downloadFile(fileRef) { fileBytes ->

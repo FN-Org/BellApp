@@ -9,10 +9,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.calendar_activity.CalendarViewModel
 
 class MelodyActivity : AppCompatActivity() {
 
-    private val viewModel: MelodyViewModel by viewModels()
+    private val melodyViewModel: MelodyViewModel by viewModels()
+    private val calendarViewModel: CalendarViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,12 +28,13 @@ class MelodyActivity : AppCompatActivity() {
         val numBells = intent.getIntExtra("NUM_BELLS", 0)
 
         if (sysId != null && numBells > 0) {
-            viewModel.sysId = sysId
-            viewModel.nBells = numBells
+            melodyViewModel.sysId = sysId
+            melodyViewModel.nBells = numBells
+            calendarViewModel.sysId = sysId
         }
 
         // SoundPool initialization
-        viewModel.soundPool = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        melodyViewModel.soundPool = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val audioAttributes = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -46,12 +49,12 @@ class MelodyActivity : AppCompatActivity() {
         }
 
         // Notes sound
-        viewModel.soundMap["A"] = viewModel.soundPool.load(this, R.raw.a4, 1)
-        viewModel.soundMap["B"] = viewModel.soundPool.load(this, R.raw.b4, 1)
-        viewModel.soundMap["C"] = viewModel.soundPool.load(this, R.raw.c4, 1)
-        viewModel.soundMap["D"] = viewModel.soundPool.load(this, R.raw.d4, 1)
-        viewModel.soundMap["E"] = viewModel.soundPool.load(this, R.raw.e4, 1)
-        viewModel.soundMap["F"] = viewModel.soundPool.load(this, R.raw.f4, 1)
-        viewModel.soundMap["G"] = viewModel.soundPool.load(this, R.raw.g4, 1)
+        melodyViewModel.soundMap["A"] = melodyViewModel.soundPool.load(this, R.raw.a4, 1)
+        melodyViewModel.soundMap["B"] = melodyViewModel.soundPool.load(this, R.raw.b4, 1)
+        melodyViewModel.soundMap["C"] = melodyViewModel.soundPool.load(this, R.raw.c4, 1)
+        melodyViewModel.soundMap["D"] = melodyViewModel.soundPool.load(this, R.raw.d4, 1)
+        melodyViewModel.soundMap["E"] = melodyViewModel.soundPool.load(this, R.raw.e4, 1)
+        melodyViewModel.soundMap["F"] = melodyViewModel.soundPool.load(this, R.raw.f4, 1)
+        melodyViewModel.soundMap["G"] = melodyViewModel.soundPool.load(this, R.raw.g4, 1)
     }
 }

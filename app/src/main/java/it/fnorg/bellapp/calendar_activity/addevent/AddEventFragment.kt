@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarViewModel
@@ -72,9 +71,12 @@ class AddEventFragment : Fragment() {
 
         // Melodies' observer & spinner for melodies
         viewModel.melodies.observe(viewLifecycleOwner) { melodies ->
+
+            val sortedMelodies = melodies.sortedBy { it.number }
+
             val adapter1 = MelodyAdapter(
                 requireContext(),
-                melodies
+                sortedMelodies
             )
             adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerMelodies.adapter = adapter1
@@ -87,7 +89,7 @@ class AddEventFragment : Fragment() {
                 dateTextView.setText(args.eventDate)
 
                 // Find the selected melody index
-                val selectedMelodyIndex = melodies.indexOfFirst { it.number == args.eventMelody }
+                val selectedMelodyIndex = sortedMelodies.indexOfFirst { it.number == args.eventMelody }
                 if (selectedMelodyIndex != -1) {
                     spinnerMelodies.setSelection(selectedMelodyIndex)
                 }

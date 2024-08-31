@@ -77,6 +77,17 @@
             app:srcCompat="@drawable/ic_bin" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/syncMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/lightred"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:text="@string/sync_message" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"

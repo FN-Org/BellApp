@@ -123,4 +123,6 @@
     <string name="delete_confirmation">Delete melody</string>
     <string name="delete_melody_message">Are you sure you want to delete the melody "%1$s"?</string>
 
+    <string name="sync_message">Melody NOT yet synchronized. \n Push the physical button in the system</string>
+
 </resources>

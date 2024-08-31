@@ -16,7 +16,7 @@ import it.fnorg.bellapp.login_activity.LogInActivity
  */
 class CalendarActivity : AppCompatActivity() {
 
-    private val viewModel: CalendarActivityViewModel by viewModels()
+    private val viewModel: CalendarViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

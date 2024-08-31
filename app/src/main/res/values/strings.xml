@@ -27,7 +27,7 @@
         You just need to know the system ID and its PIN.
     </string>
     <string name="calendar">Calendar</string>
-    <string name="play">Play melody</string>
+    <string name="play">My melodies</string>
     <string name="name_changed">Name successfully changed!</string>
     <string name="empty_name">Name cannot be empty, please try again</string>
     <string name="sys_removed">System successfully removed!</string>
@@ -103,9 +103,23 @@
     <string name="connection_warning">Please remember to activate your internet connection while using the application</string>
     <string name="connection_warning_1">Check your internet connection before creating or updating your events</string>
     <string name="connection_warning_2">Check your internet connection before trying to link a system</string>
+    <string name="portrait_orientation">For a better experience, please use portrait mode</string>
 
     <!-- General Toast -->
     <string name="back_before_exit_toast">Press back again to exit from the application</string>
     <string name="coming_soon">COMING SOON!</string>
+
+    <!-- NUOVI MESSAGGI -->
+    <string name="noMelodies">
+        You don\'t have any personal melodies yet.
+        Press the button below and try to create one from scratch
+    </string>
+
+    <string name="melody_created">Melody created and saved successfully</string>
+
+    <string name="melody_deleted">Melody deleted successfully</string>
+
+    <string name="delete_confirmation">Delete melody</string>
+    <string name="delete_melody_message">Are you sure you want to delete the melody "%1$s"?</string>
 
 </resources>

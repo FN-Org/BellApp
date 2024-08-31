@@ -4,13 +4,13 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import it.fnorg.bellapp.melody_activity.MelodyActivity
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarActivity
 import it.fnorg.bellapp.databinding.MainHomeListItemBinding
@@ -34,6 +34,8 @@ class HomeListAdapter (
     private val viewModel: MainViewModel
 ) : RecyclerView.Adapter<HomeListAdapter.SysHolder>() {
 
+    private var filteredSysList: List<System> = sysList
+
     /**
      * ViewHolder class for holding the views of each system item.
      *
@@ -48,12 +50,12 @@ class HomeListAdapter (
     }
 
     override fun getItemCount(): Int {
-        return sysList.size
+        return filteredSysList.size
     }
 
     override fun onBindViewHolder(holder: SysHolder, position: Int)
     {
-        val sys = sysList[position]
+        val sys = filteredSysList[position]
         val binding = holder.binding
 
         if (sys.name.isNotBlank()) {
@@ -109,8 +111,18 @@ class HomeListAdapter (
         }
 
         // Handle click on play button
-        binding.playButton.setOnClickListener {
-            Toast.makeText(mContext, mContext.getString(R.string.coming_soon), Toast.LENGTH_SHORT).show()
+        binding.createMelodyButton.setOnClickListener {
+            val intent = Intent(mContext, MelodyActivity::class.java)
+
+            viewModel.fetchSysData(sys.id) { success ->
+                if (success) {
+                    intent.putExtra("SYS_ID", sys.id)
+                    intent.putExtra("NUM_BELLS", viewModel.system.value!!.nBells)
+                    mContext.startActivity(intent)
+                } else {
+                    Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -171,5 +183,17 @@ class HomeListAdapter (
         numMelTv.text = sys.nMelodies.toString()
 
         builder.show()
+    }
+
+    fun filter(query: String) {
+        val lowerCaseQuery = query.lowercase()
+
+        filteredSysList = if (lowerCaseQuery.isEmpty()) {
+            sysList
+        } else {
+            sysList.filter { it.name.lowercase().contains(lowerCaseQuery) }
+        }
+
+        notifyDataSetChanged()
     }
 }

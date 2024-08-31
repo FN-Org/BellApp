@@ -1,5 +1,6 @@
 package it.fnorg.bellapp.main_activity.home
 
+import android.content.res.ColorStateList
 import androidx.lifecycle.Observer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,6 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import it.fnorg.bellapp.R
@@ -18,10 +22,6 @@ import it.fnorg.bellapp.main_activity.MainViewModel
  * Fragment representing the home screen of the application.
  */
 class HomeFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = HomeFragment()
-    }
 
     private val viewModel: MainViewModel by activityViewModels()
 
@@ -60,6 +60,39 @@ class HomeFragment : Fragment() {
                 binding.rvHome.visibility = View.VISIBLE
                 val homeListAdapter = HomeListAdapter(requireContext(), systems, viewModel)
                 binding.rvHome.adapter = homeListAdapter
+            }
+        })
+
+        val searchBar = binding.searchView
+        val fab = binding.homeSearchButton
+
+        fab.setOnClickListener {
+            if (searchBar.visibility == View.GONE) {
+                searchBar.visibility = View.VISIBLE
+                searchBar.setIconifiedByDefault(false)
+                searchBar.isIconified = true
+                searchBar.isIconified = false
+                searchBar.requestFocusFromTouch()
+                fab.setImageResource(R.drawable.ic_close)
+                val blackColor = ContextCompat.getColor(requireContext(), R.color.black)
+                ImageViewCompat.setImageTintList(fab, ColorStateList.valueOf(blackColor))
+            }
+            else {
+                searchBar.visibility = View.GONE
+                fab.setImageResource(R.drawable.ic_search)
+                searchBar.setQuery("", false)
+                searchBar.clearFocus()
+            }
+        }
+
+        searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                (binding.rvHome.adapter as? HomeListAdapter)?.filter(newText.orEmpty())
+                return true
             }
         })
 

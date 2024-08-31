@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarViewModel
@@ -26,6 +27,7 @@ import it.fnorg.bellapp.isInternetAvailable
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * Fragment for managing events in the calendar, including creation, deletion, and updates.
@@ -211,8 +213,21 @@ class AddEventFragment : Fragment() {
                     melodyNumber = melodyNumber,
                     color = color
                 )
+                viewModel.saveEvent(event, args.eventId) { result ->
+                    when(result){
+                        1-> Toast.makeText(context,R.string.event_created, Toast.LENGTH_SHORT).show()
+                        2-> Toast.makeText(context,R.string.event_updated, Toast.LENGTH_SHORT).show()
+                        -1 -> Toast.makeText(context,R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                        -2 -> {
+                            val sww_try_again = context?.getString(R.string.sww_try_again)
+                            val updating_oldEvent =
+                                context?.getString(R.string.updating_oldEvent)?.lowercase()
+                            Toast.makeText(context,"$sww_try_again,$updating_oldEvent", Toast.LENGTH_LONG).show()
+                        }
 
-                viewModel.saveEvent(requireContext(), event, args.eventId)
+                        else -> Toast.makeText(context,R.string.sww_try_again,Toast.LENGTH_SHORT).show()
+                    }
+                }
 
                 view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
             }

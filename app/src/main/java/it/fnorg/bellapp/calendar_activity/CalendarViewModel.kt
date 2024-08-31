@@ -84,12 +84,12 @@ class CalendarViewModel : ViewModel() {
             Log.w("BellAppDB", "sysId is empty, cannot fetch events.")
             return
         }
+        val eventList = mutableListOf<Event>()
         db.collection("systems")
             .document(sysId)
             .collection("events")
             .get()
             .addOnSuccessListener { result ->
-                val eventList = mutableListOf<Event>()
                 for (document in result) {
                     document.toObject<Event>().let { event ->
                         eventList.add(event)
@@ -99,7 +99,24 @@ class CalendarViewModel : ViewModel() {
                 Log.w("BellAppDB", "Success events: $sysId")
             }
             .addOnFailureListener { exception ->
-                Log.w("BellAppDB", "Error getting documents.", exception)
+                Log.w("BellAppDB", "Error getting new events documents.", exception)
+            }
+
+        db.collection("systems")
+            .document(sysId)
+            .collection("oldEvents")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    document.toObject<Event>().let { event ->
+                        eventList.add(event)
+                    }
+                }
+                _events.value = eventList
+                Log.w("BellAppDB", "Success events: $sysId")
+            }
+            .addOnFailureListener { exception ->
+                Log.w("BellAppDB", "Error getting old events documents.", exception)
             }
     }
 
@@ -137,9 +154,8 @@ class CalendarViewModel : ViewModel() {
      * @param event The event object to be saved or updated.
      * @param identifier The identifier of the event. If "default", a new event is created; otherwise, the existing event is updated.
      */
-    fun saveEvent(context: Context, event: Event, identifier: String) {
+    fun saveEvent(event: Event, identifier: String, callback: (Int) -> Unit) {
         if (identifier == "default") {
-            // Create a new event document
             val newEvent = db.collection("systems")
                 .document(sysId)
                 .collection("events")
@@ -149,16 +165,16 @@ class CalendarViewModel : ViewModel() {
 
             newEvent.set(event)
                 .addOnSuccessListener {
-                    Toast.makeText(context, context.getString(R.string.event_created), Toast.LENGTH_SHORT).show()
+
                     Log.d("BellAppDB", "Event successfully created!")
+                    callback(1)
                 }
-                .addOnFailureListener{
-                    Toast.makeText(context, context.getString(R.string.sww_try_again), Toast.LENGTH_SHORT).show()
+                .addOnFailureListener {
+
                     Log.d("BellAppDB", "Error creating event")
+                    callback(-1)
                 }
-        }
-        else {
-            // Update an existing event document
+        } else {
             val modifiedEvent = db.collection("systems")
                 .document(sysId)
                 .collection("events")
@@ -166,18 +182,21 @@ class CalendarViewModel : ViewModel() {
 
             modifiedEvent.update("color", event.color,
                 "melodyName", event.melodyName,
-                                    "melodyNumber", event.melodyNumber,
-                                    "time", event.time)
+                "melodyNumber", event.melodyNumber,
+                "time", event.time)
                 .addOnSuccessListener {
-                    Toast.makeText(context, context.getString(R.string.event_updated), Toast.LENGTH_SHORT).show()
+
                     Log.d("BellAppDB", "Event successfully updated!")
+                    callback(2)
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(context, context.getString(R.string.sww_try_again), Toast.LENGTH_SHORT).show()
+
                     Log.w("BellAppDB", "Error updating document", e)
+                    callback(-2)
                 }
         }
     }
+
 
     /**
      * Deletes an event from the Firestore database.
@@ -193,7 +212,19 @@ class CalendarViewModel : ViewModel() {
                 Log.d("BellAppDB", "Event successfully deleted")
             }
             .addOnFailureListener{ e ->
-                Log.w("BellAppDB", "Error deleting document", e)
+                Log.w("BellAppDB", "Error deleting document in oldEvents", e)
             }
+
+        db.collection("systems")
+            .document(sysId)
+            .collection("oldEvents")
+            .document(eventId).delete()
+            .addOnSuccessListener {
+                Log.d("BellAppDB", "Old event successfully deleted")
+            }
+            .addOnFailureListener{ e ->
+                Log.w("BellAppDB", "Error deleting document in oldEvents", e)
+            }
+
     }
 }

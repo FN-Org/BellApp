@@ -11,9 +11,9 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.calendar_activity.CalendarViewModel
 import it.fnorg.bellapp.databinding.MelodyFragmentPersonalMelodiesBinding
 import it.fnorg.bellapp.main_activity.MainActivity
-import it.fnorg.bellapp.main_activity.home.HomeListAdapter
 import it.fnorg.bellapp.melody_activity.MelodyViewModel
 
 /**
@@ -23,7 +23,8 @@ import it.fnorg.bellapp.melody_activity.MelodyViewModel
  */
 class PersonalMelodiesFragment : Fragment() {
 
-    private val viewModel: MelodyViewModel by activityViewModels()
+    private val melodyViewModel: MelodyViewModel by activityViewModels()
+    private val calendarViewModel : CalendarViewModel by activityViewModels()
 
     private lateinit var binding: MelodyFragmentPersonalMelodiesBinding
 
@@ -44,7 +45,8 @@ class PersonalMelodiesFragment : Fragment() {
 
         val navController = findNavController()
 
-        viewModel.fetchMelodies()
+        melodyViewModel.fetchMelodies() // Fetch system melodies from firebase storage
+        calendarViewModel.fetchMelodiesData() // Fetch system melodies from firebase firestore
 
         binding.backArrow.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
@@ -52,14 +54,20 @@ class PersonalMelodiesFragment : Fragment() {
         }
 
         binding.rvMelody.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
+        melodyViewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
             if (melodies.isEmpty()) {
                 binding.noMelodiesTV.visibility = View.VISIBLE
                 binding.rvMelody.visibility = View.GONE
             } else {
                 binding.noMelodiesTV.visibility = View.GONE
                 binding.rvMelody.visibility = View.VISIBLE
-                binding.rvMelody.adapter = MelodyAdapter(requireContext(), melodies, viewModel)
+                binding.rvMelody.adapter =
+                    MelodyAdapter(
+                        requireContext(),
+                        melodies,
+                        melodyViewModel,
+                        calendarViewModel,
+                        viewLifecycleOwner)
             }
         })
 
@@ -72,21 +80,28 @@ class PersonalMelodiesFragment : Fragment() {
         super.onResume()
 
         // Refresh system data when fragment resumes
-        viewModel.fetchMelodies()
-        viewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
+        melodyViewModel.fetchMelodies() // Fetch system melodies from firebase storage
+        calendarViewModel.fetchMelodiesData() // Fetch system melodies from firebase firestore
+        melodyViewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
             if (melodies.isEmpty()) {
                 binding.noMelodiesTV.visibility = View.VISIBLE
                 binding.rvMelody.visibility = View.GONE
             } else {
                 binding.noMelodiesTV.visibility = View.GONE
                 binding.rvMelody.visibility = View.VISIBLE
-                binding.rvMelody.adapter = MelodyAdapter(requireContext(), melodies, viewModel)
+                binding.rvMelody.adapter =
+                    MelodyAdapter(
+                        requireContext(),
+                        melodies,
+                        melodyViewModel,
+                        calendarViewModel,
+                        viewLifecycleOwner)
             }
         })
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.stopPlayback()
+        melodyViewModel.stopPlayback()
     }
 }

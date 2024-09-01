@@ -26,7 +26,6 @@ import it.fnorg.bellapp.isInternetAvailable
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 /**
  * Fragment for managing events in the calendar, including creation, deletion, and updates.

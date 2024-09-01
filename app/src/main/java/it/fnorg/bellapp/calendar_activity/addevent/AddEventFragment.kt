@@ -111,18 +111,6 @@ class AddEventFragment : Fragment() {
                         view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
                     }
                 }
-
-                // Old events
-                val indexOfEvent = viewModel.events.value?.indexOfFirst { it.id == args.eventId }
-
-                if (indexOfEvent != null) {
-                    if (indexOfEvent>=viewModel.oldEventsStartingIndex){
-                        saveButton.visibility = View.GONE;
-                        saveButton.isEnabled = false;
-                        val eventAlreadyHappenedTextView = view.findViewById<TextView>(R.id.already_happenedTV)
-                        eventAlreadyHappenedTextView.visibility = View.VISIBLE
-                    }
-                }
             } else {
                 if (args.eventDate != "default")
                     dateTextView.setText(args.eventDate)

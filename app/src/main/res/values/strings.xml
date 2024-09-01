@@ -104,6 +104,7 @@
     <string name="connection_warning">Please remember to activate your internet connection while using the application</string>
     <string name="connection_warning_1">Check your internet connection before creating or updating your events</string>
     <string name="connection_warning_2">Check your internet connection before trying to link a system</string>
+    <string name="connection_warning_3">Check your internet connection before trying to save a new melody</string>
     <string name="portrait_orientation">For a better experience, please use portrait mode</string>
 
     <!-- General Toast -->

@@ -197,7 +197,6 @@ class CalendarViewModel : ViewModel() {
         }
     }
 
-
     /**
      * Deletes an event from the Firestore database.
      *

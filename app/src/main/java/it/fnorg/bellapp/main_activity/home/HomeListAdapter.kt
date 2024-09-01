@@ -98,7 +98,6 @@ class HomeListAdapter (
             }
         }
 
-
         // Handle click on info button
         binding.infoIv.setOnClickListener{
             viewModel.fetchSysData(sys.id) { success ->
@@ -120,7 +119,7 @@ class HomeListAdapter (
                     intent.putExtra("NUM_BELLS", viewModel.system.value!!.nBells)
                     mContext.startActivity(intent)
                 } else {
-                    Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(mContext, R.string.sww_connection, Toast.LENGTH_SHORT).show()
                 }
             }
         }

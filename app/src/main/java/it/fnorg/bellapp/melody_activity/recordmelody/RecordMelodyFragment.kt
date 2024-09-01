@@ -24,10 +24,12 @@ import android.widget.TableRow
 import android.widget.Toast
 import androidx.core.view.children
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.storage.FirebaseStorage
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MelodyFragmentRecordMelodyBinding
+import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.melody_activity.MelodyViewModel
 import java.io.File
 
@@ -82,7 +84,13 @@ class RecordMelodyFragment : Fragment() {
         }
 
         binding.saveMelodyButton.setOnClickListener {
-            showSaveMelodyDialog()
+            // Update or create the event only if you are connected
+            if (!isInternetAvailable(requireContext())) {
+                Toast.makeText(requireContext(), requireContext().getString(R.string.connection_warning_3), Toast.LENGTH_SHORT).show()
+            }
+            else {
+                showSaveMelodyDialog()
+            }
         }
 
         // Control panel buttons

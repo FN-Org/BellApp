@@ -113,7 +113,7 @@ class MelodyViewModel : ViewModel() {
 
                             // Wait for the time between two notes
                             playbackHandler?.postDelayed(this, pauseDuration)
-                        }, 500) // Note duration always 800ms (it is a bell)
+                        }, 500) // Note duration always 500ms (it is a bell)
 
                     } else {
                         index++

@@ -214,6 +214,7 @@ class AddEventFragment : Fragment() {
                     melodyNumber = melodyNumber,
                     color = color
                 )
+
                 viewModel.saveEvent(event, args.eventId) { result ->
                     when(result){
                         1-> Toast.makeText(context,R.string.event_created, Toast.LENGTH_SHORT).show()

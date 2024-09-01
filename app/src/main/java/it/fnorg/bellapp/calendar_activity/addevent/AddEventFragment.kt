@@ -106,6 +106,18 @@ class AddEventFragment : Fragment() {
                         view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
                     }
                 }
+
+                // Old events
+                val indexOfEvent = viewModel.events.value?.indexOfFirst { it.id == args.eventId }
+
+                if (indexOfEvent != null) {
+                    if (indexOfEvent>=viewModel.oldEventsStartingIndex){
+                        saveButton.visibility = View.GONE;
+                        saveButton.isEnabled = false;
+                        val eventAlreadyHappenedTextView = view.findViewById<TextView>(R.id.already_happenedTV)
+                        eventAlreadyHappenedTextView.visibility = View.VISIBLE
+                    }
+                }
             } else {
                 if (args.eventDate != "default")
                     dateTextView.setText(args.eventDate)
@@ -217,13 +229,6 @@ class AddEventFragment : Fragment() {
                     when(result){
                         1-> Toast.makeText(context,R.string.event_created, Toast.LENGTH_SHORT).show()
                         2-> Toast.makeText(context,R.string.event_updated, Toast.LENGTH_SHORT).show()
-                        -1 -> Toast.makeText(context,R.string.sww_try_again, Toast.LENGTH_SHORT).show()
-                        -2 -> {
-                            val sww_try_again = context?.getString(R.string.sww_try_again)
-                            val updating_oldEvent =
-                                context?.getString(R.string.updating_oldEvent)?.lowercase()
-                            Toast.makeText(context,"$sww_try_again,$updating_oldEvent", Toast.LENGTH_LONG).show()
-                        }
 
                         else -> Toast.makeText(context,R.string.sww_try_again,Toast.LENGTH_SHORT).show()
                     }

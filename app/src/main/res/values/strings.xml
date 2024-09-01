@@ -76,7 +76,7 @@
     <string name="deleted">Successfully  deleted</string>
     <string name="event_created">Event successfully created!</string>
     <string name="event_updated">Event successfully updated!</string>
-    <string name="updating_oldEvent">Remember: you can\'t modify an event already happened</string>
+    <string name="event_already_happened">This event already happened!</string>
 
     <!-- ALERT DIALOGS -->
 

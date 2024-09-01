@@ -1,8 +1,6 @@
 package it.fnorg.bellapp.calendar_activity
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -63,6 +61,8 @@ class CalendarViewModel : ViewModel() {
 
     var sysId: String = ""
 
+    var oldEventsStartingIndex = 0;
+
     // Initialize LiveData lists with empty lists
     init {
         _events.value = emptyList()
@@ -96,6 +96,7 @@ class CalendarViewModel : ViewModel() {
                     }
                 }
                 _events.value = eventList
+                oldEventsStartingIndex = eventList.size
                 Log.w("BellAppDB", "Success events: $sysId")
             }
             .addOnFailureListener { exception ->
@@ -209,10 +210,10 @@ class CalendarViewModel : ViewModel() {
             .collection("events")
             .document(eventId).delete()
             .addOnSuccessListener {
-                Log.d("BellAppDB", "Event successfully deleted")
+                Log.d("BellAppDB", "Event successfully deleted from events")
             }
             .addOnFailureListener{ e ->
-                Log.w("BellAppDB", "Error deleting document in oldEvents", e)
+                Log.w("BellAppDB", "Error deleting document in events", e)
             }
 
         db.collection("systems")
@@ -220,7 +221,7 @@ class CalendarViewModel : ViewModel() {
             .collection("oldEvents")
             .document(eventId).delete()
             .addOnSuccessListener {
-                Log.d("BellAppDB", "Old event successfully deleted")
+                Log.d("BellAppDB", "Old event successfully deleted from oldEvents")
             }
             .addOnFailureListener{ e ->
                 Log.w("BellAppDB", "Error deleting document in oldEvents", e)

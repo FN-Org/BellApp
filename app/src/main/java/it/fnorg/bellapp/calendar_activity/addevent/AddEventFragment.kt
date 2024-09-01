@@ -41,6 +41,9 @@ class AddEventFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel.fetchEventsData()
+        viewModel.fetchMelodiesData()
     }
 
     override fun onCreateView(
@@ -101,8 +104,10 @@ class AddEventFragment : Fragment() {
                         Toast.makeText(requireContext(), requireContext().getString(R.string.sww_connection), Toast.LENGTH_SHORT).show()
                         view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
                     } else {
-                        viewModel.deleteEvent(args.eventId)
-                        Toast.makeText(requireActivity(), R.string.deleted, Toast.LENGTH_SHORT).show()
+                        viewModel.deleteEvent(args.eventId){ result ->
+                            if (result>0) Toast.makeText(requireActivity(), R.string.deleted, Toast.LENGTH_SHORT).show()
+                            else Toast.makeText(requireContext(),R.string.sww_try_again,Toast.LENGTH_SHORT).show()
+                        }
                         view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
                     }
                 }

@@ -204,28 +204,33 @@ class CalendarViewModel : ViewModel() {
      *
      * @param eventId The ID of the event to be deleted.
      */
-    fun deleteEvent(eventId: String) {
+    fun deleteEvent(eventId: String,callback: (Int) -> Unit) {
         db.collection("systems")
             .document(sysId)
             .collection("events")
             .document(eventId).delete()
             .addOnSuccessListener {
                 Log.d("BellAppDB", "Event successfully deleted from events")
+                callback(1)
             }
             .addOnFailureListener{ e ->
                 Log.w("BellAppDB", "Error deleting document in events", e)
+                callback(-1)
             }
+    }
 
+    fun deleteOldEvent(eventId: String,callback: (Int) -> Unit){
         db.collection("systems")
             .document(sysId)
             .collection("oldEvents")
             .document(eventId).delete()
             .addOnSuccessListener {
-                Log.d("BellAppDB", "Old event successfully deleted from oldEvents")
+                Log.d("BellAppDB", "Event successfully deleted from oldEvents")
+                callback(1)
             }
             .addOnFailureListener{ e ->
                 Log.w("BellAppDB", "Error deleting document in oldEvents", e)
+                callback(-1)
             }
-
     }
 }

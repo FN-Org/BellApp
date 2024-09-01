@@ -73,7 +73,7 @@ class MonthViewFragment : Fragment() {
         val startMonth = currentMonth.minusMonths(200)
         val endMonth = currentMonth.plusMonths(200)
 
-        eventsAdapter = EventListAdapter(requireContext(), this ,emptyList())
+        eventsAdapter = EventListAdapter(requireContext(), this ,viewModel,emptyList())
         binding.calendarRv.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = eventsAdapter
@@ -142,7 +142,7 @@ class MonthViewFragment : Fragment() {
 
     private fun updateAdapterForDate(date: LocalDate?) {
         val eventsForDate = events[date].orEmpty().sortedBy { it.time.toLocalDateTime().toLocalTime() }
-        eventsAdapter = EventListAdapter(requireContext(), this, eventsForDate)
+        eventsAdapter = EventListAdapter(requireContext(), this, viewModel,eventsForDate)
         binding.calendarRv.adapter = eventsAdapter
     }
 

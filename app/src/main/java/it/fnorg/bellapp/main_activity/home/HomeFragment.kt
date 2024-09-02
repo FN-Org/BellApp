@@ -105,16 +105,5 @@ class HomeFragment : Fragment() {
 
         // Refresh system data when fragment resumes
         viewModel.fetchSysHomeData()
-        viewModel.systems.observe(viewLifecycleOwner, Observer { systems ->
-            if (systems.isNullOrEmpty()) {
-                binding.homeMessage.visibility = View.VISIBLE
-                binding.rvHome.visibility = View.GONE
-            } else {
-                binding.homeMessage.visibility = View.GONE
-                binding.rvHome.visibility = View.VISIBLE
-                val homeListAdapter = HomeListAdapter(requireContext(), systems, viewModel)
-                binding.rvHome.adapter = homeListAdapter
-            }
-        })
     }
 }

@@ -2,6 +2,7 @@ package it.fnorg.bellapp.melody_activity.personalmelodies
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -45,9 +46,6 @@ class PersonalMelodiesFragment : Fragment() {
 
         val navController = findNavController()
 
-        melodyViewModel.fetchMelodies() // Fetch system melodies from firebase storage
-        calendarViewModel.fetchMelodiesData() // Fetch system melodies from firebase firestore
-
         binding.backArrow.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
             requireContext().startActivity(intent)
@@ -82,6 +80,22 @@ class PersonalMelodiesFragment : Fragment() {
         // Refresh system data when fragment resumes
         melodyViewModel.fetchMelodies() // Fetch system melodies from firebase storage
         calendarViewModel.fetchMelodiesData() // Fetch system melodies from firebase firestore
+        melodyViewModel.getSystemSync { result ->
+            when (result) {
+                false -> {
+                    binding.syncMessage2.text = requireContext().getString(R.string.not_sync)
+                    binding.syncMessage2.setTextColor(requireContext().getColor(R.color.warning))
+                }
+                true -> {
+                    binding.syncMessage2.text = requireContext().getString(R.string.sync)
+                    binding.syncMessage2.setTextColor(requireContext().getColor(R.color.white))
+                }
+                else -> {
+                    Log.w("PersonalMelodiesFragment", "Sync is now null")
+                }
+            }
+        }
+
         melodyViewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
             if (melodies.isEmpty()) {
                 binding.noMelodiesTV.visibility = View.VISIBLE

@@ -125,8 +125,17 @@
     <string name="melody_deleted">Melody deleted successfully</string>
 
     <string name="delete_confirmation">Delete melody</string>
-    <string name="delete_melody_message">Are you sure you want to delete the melody "%1$s"?</string>
+    <string name="delete_melody_message_1">Are you sure you want to delete the melody "%1$s"?</string>
+    <string name="delete_melody_message_2">
+        Are you sure you want to delete the melody "%1$s"? \n
+        If you click "yes" remember that, \n
+        for the correct functioning of the next scheduled events and all future melody performances, \n
+        it is mandatory to perform a synchronization via the physical button of the system.
+    </string>
 
-    <string name="sync_message">Melody NOT yet synchronized. \n Push the physical button in the system</string>
+    <string name="sync_message_1">Melody NOT yet synchronized. \n Push the physical button in the system</string>
+    <string name="sync_message_2">Default SYNC</string>
+    <string name="not_sync">NOT SYNC</string>
+    <string name="sync">SYNC</string>
 
 </resources>

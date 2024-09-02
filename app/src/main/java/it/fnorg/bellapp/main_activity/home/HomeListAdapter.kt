@@ -89,7 +89,7 @@ class HomeListAdapter (
                     removeFCMTokenFromSystem(sys.id)
                     viewModel.removeSys(mContext, sys.id)
                     viewModel.fetchSysHomeData()
-
+                    notifyDataSetChanged()
                 }
                 builder.setNegativeButton(mContext.getString(R.string.no).uppercase()) { dialog, which ->
                     dialog.cancel()

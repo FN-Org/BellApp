@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 
 data class MelodyFile(
@@ -23,8 +25,13 @@ class MelodyViewModel : ViewModel() {
     var sysId: String = ""
     var nBells: Int = 0
 
+    var isSync: Boolean? = null
+
     // Firebase Storage reference
     private val storageReference = FirebaseStorage.getInstance().reference
+
+    // Firebase Firestore reference
+    private val db = Firebase.firestore
 
     // SoundPool
     lateinit var soundPool: SoundPool
@@ -171,4 +178,49 @@ class MelodyViewModel : ViewModel() {
             playbackHandler?.postDelayed(playbackRunnable!!, resumeDelay.toLong())
         }
     }
+
+    fun getSystemSync(callback: (Boolean?) -> Unit) {
+        if (sysId.isNotEmpty()) {
+            val syncBoolRef = db.collection("systems").document(sysId)
+
+            syncBoolRef.get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        isSync = document.getBoolean("sync")
+                        callback(isSync)
+                    } else {
+                        Log.e("MelodyViewModel - Firestore", "Error: document does not exist")
+                        callback(null)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("MelodyViewModel - Firestore", "Error reading sync field of the document", exception)
+                    callback(null)
+                }
+        } else {
+            Log.w("MelodyViewModel", "sysId is empty")
+            callback(null)
+        }
+    }
+
+
+    fun setSystemSync(bool: Boolean, callback: (Boolean) -> Unit) {
+        if (sysId.isNotEmpty()) {
+            val syncBoolRef = db.collection("systems").document(sysId)
+
+            syncBoolRef.update("sync", bool) // Update the database
+                .addOnSuccessListener {
+                    isSync = bool // Update the view model value
+                    callback(true) // Operation successful
+                }
+                .addOnFailureListener { e ->
+                    Log.e("MelodyViewModel - Firestore", "Error updating sync field in the system document", e)
+                    callback(false) // Operation failed
+                }
+        } else {
+            Log.w("MelodyViewModel", "sysId is empty")
+            callback(false) // Operation failed due to empty sysId
+        }
+    }
+
 }

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import it.fnorg.bellapp.R
@@ -53,8 +54,105 @@ class MelodyAdapter(
         calendarViewModel.melodies.observe(lifecycleOwner) { melodies ->
             // Check if the current melody is present in the list from the CalendarViewModel
             val isMelodyPresent = melodies.any { it.name == melody.title }
+
             // Update the visibility of the TextView
-            holder.binding.syncMessage.visibility = if (isMelodyPresent) View.GONE else View.VISIBLE
+            // and of the bin ImageView with its listener
+            if (isMelodyPresent) {
+                holder.binding.syncMessage.visibility = View.GONE
+
+                holder.binding.deleteMelodyIv.setOnClickListener {
+                    lastClickedViewHolder?.let { personalMelodiesFragmentStopPlayback(it) }
+                    val builder = AlertDialog.Builder(mContext)
+                    builder.setTitle(R.string.delete_confirmation)
+                    builder.setMessage(mContext.getString(R.string.delete_melody_message_2, melody.title))
+
+                    builder.setPositiveButton(R.string.yes) { dialog, _ ->
+                        val storageReference = FirebaseStorage.getInstance().reference
+                        val fileRef = storageReference.child("melodies/${melodyViewModel.sysId}/${melody.number}.txt")
+
+                        val firestore = FirebaseFirestore.getInstance()
+                        val documentReference = firestore
+                            .collection("systems")
+                            .document(melodyViewModel.sysId)
+                            .collection("melodies")
+                            .document(melody.title)
+
+                        val syncBoolRef = firestore
+                            .collection("systems")
+                            .document(melodyViewModel.sysId)
+
+                        fileRef.delete()
+                            .addOnSuccessListener {
+                            (melodyList as? MutableList)?.let {
+                                it.removeAt(position)
+                                renameFilesAfterDeletion(position)
+                                updateMelodyNumbers()
+                                notifyItemRangeChanged(position, it.size)
+
+                                documentReference.delete()
+                                    .addOnSuccessListener {
+                                        melodyViewModel.setSystemSync(false) { result ->
+                                            if (result) Toast.makeText(mContext, R.string.melody_deleted, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                    .addOnFailureListener { exception ->
+                                        Log.e("MelodyAdapter - Firestore", "", exception)
+                                        Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                                    }
+                            }
+                        }.addOnFailureListener { exception ->
+                            Log.e("MelodyAdapter - Firebase Storage", "Failed to delete file", exception)
+                            Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                        }
+
+                        dialog.dismiss()
+                    }
+
+                    builder.setNegativeButton(R.string.no) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+
+                    val alert = builder.create()
+                    alert.show()
+                }
+            }
+            else {
+                holder.binding.syncMessage.visibility = View.VISIBLE
+
+                holder.binding.deleteMelodyIv.setOnClickListener {
+                    lastClickedViewHolder?.let { personalMelodiesFragmentStopPlayback(it) }
+                    val builder = AlertDialog.Builder(mContext)
+                    builder.setTitle(R.string.delete_confirmation)
+                    builder.setMessage(mContext.getString(R.string.delete_melody_message_1, melody.title))
+
+                    builder.setPositiveButton(R.string.yes) { dialog, _ ->
+                        val storageReference = FirebaseStorage.getInstance().reference
+                        val fileRef = storageReference.child("melodies/${melodyViewModel.sysId}/${melody.number}.txt")
+
+                        fileRef.delete().addOnSuccessListener {
+                            (melodyList as? MutableList)?.let {
+                                it.removeAt(position)
+                                renameFilesAfterDeletion(position)
+                                updateMelodyNumbers()
+                                notifyItemRangeChanged(position, it.size)
+                                Toast.makeText(mContext, R.string.melody_deleted, Toast.LENGTH_SHORT).show()
+                            }
+                        }.addOnFailureListener { exception ->
+                            Log.e("MelodyAdapter", "Failed to delete file", exception)
+                            Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                        }
+
+                        dialog.dismiss()
+                    }
+
+                    builder.setNegativeButton(R.string.no) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+
+                    val alert = builder.create()
+                    alert.show()
+                }
+            }
         }
 
         holder.binding.playMelody.setOnClickListener {
@@ -83,41 +181,6 @@ class MelodyAdapter(
             holder.binding.playMelody.visibility = View.VISIBLE
             holder.binding.pauseMelody.visibility = View.GONE
         }
-
-        holder.binding.deleteMelodyIv.setOnClickListener {
-            lastClickedViewHolder?.let { personalMelodiesFragmentStopPlayback(it) }
-            val builder = AlertDialog.Builder(mContext)
-            builder.setTitle(R.string.delete_confirmation)
-            builder.setMessage(mContext.getString(R.string.delete_melody_message, melody.title))
-
-            builder.setPositiveButton(R.string.yes) { dialog, _ ->
-                val storageReference = FirebaseStorage.getInstance().reference
-                val fileRef = storageReference.child("melodies/${melodyViewModel.sysId}/${melody.number}.txt")
-
-                fileRef.delete().addOnSuccessListener {
-                    (melodyList as? MutableList)?.let {
-                        it.removeAt(position)
-                        renameFilesAfterDeletion(position)
-                        updateMelodyNumbers()
-                        notifyItemRangeChanged(position, it.size)
-                        Toast.makeText(mContext, R.string.melody_deleted, Toast.LENGTH_SHORT).show()
-                    }
-                }.addOnFailureListener { exception ->
-                    Log.e("MelodyAdapter", "Failed to delete file", exception)
-                    Toast.makeText(mContext, R.string.sww_try_again, Toast.LENGTH_SHORT).show()
-                }
-
-                dialog.dismiss()
-            }
-
-            builder.setNegativeButton(R.string.no) { dialog, _ ->
-                dialog.dismiss()
-            }
-
-            val alert = builder.create()
-            alert.show()
-        }
-
     }
 
     override fun getItemCount(): Int {

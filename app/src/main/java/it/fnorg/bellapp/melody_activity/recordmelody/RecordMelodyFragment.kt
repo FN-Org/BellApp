@@ -26,6 +26,7 @@ import androidx.core.view.children
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MelodyFragmentRecordMelodyBinding
@@ -427,10 +428,13 @@ class RecordMelodyFragment : Fragment() {
                             dialog.dismiss()
                             val navController = findNavController()
                             navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
-                            Toast.makeText(requireContext(),getString(R.string.melody_created),Toast.LENGTH_SHORT).show()
+
+                            viewModel.setSystemSync(false) { result ->
+                                if (result) Toast.makeText(requireContext(),getString(R.string.melody_created),Toast.LENGTH_SHORT).show()
+                            }
                         }
                         .addOnFailureListener { e ->
-                            Log.e("FirebaseUpload", "Upload failed", e)
+                            Log.e("RecordMelodyFragment - Firebase Storage", "Upload failed", e)
 
                             // If the file is NOT uploaded correctly
                             dialog.dismiss()

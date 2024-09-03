@@ -43,6 +43,7 @@ class RecordMelodyFragment : Fragment() {
 
     private lateinit var binding: MelodyFragmentRecordMelodyBinding
     private val handler = Handler(Looper.getMainLooper())
+    private var isCountdown = false
     private var isRecording = false
     private var startTime: Double = 0.0
     private val recordList = mutableListOf<String>()
@@ -250,10 +251,13 @@ class RecordMelodyFragment : Fragment() {
     }
 
     private fun onBellClick(button: Button) {
-        if (isRecording) {
-            // Save the clicked bell (note)
-            val bellNumber = button.tag as Int
-            recordBellClick(bellNumber.toString())
+        // Save the clicked bell (note)
+        val bellNumber = button.tag as Int
+
+        if (!isCountdown) {
+            if (isRecording) {
+                recordBellClick(bellNumber.toString())
+            }
 
             // Play the note
             val note = viewModel.notes[bellNumber - 1]
@@ -284,6 +288,7 @@ class RecordMelodyFragment : Fragment() {
     }
 
     private fun startCountdownAndRecording() {
+        isCountdown = true
         binding.countdownTv.visibility = View.VISIBLE
         val countdownTime = 3
         val countdownHandler = Handler(Looper.getMainLooper())
@@ -307,6 +312,7 @@ class RecordMelodyFragment : Fragment() {
             } else {
                 binding.countdownTv.text = "REC"
                 startTime = System.currentTimeMillis() / 1000.0
+                isCountdown = false
                 isRecording = true
                 enableBellButtons(true)
                 enableButton(binding.micStop)
@@ -354,11 +360,14 @@ class RecordMelodyFragment : Fragment() {
             recordList.add(recordEntry)
         }
 
-        val buttons = listOf(binding.micPlay, binding.pause, binding.play, binding.stop)
-        buttons.forEach { button ->
+        val dButtons = listOf(binding.micStop, binding.pause, binding.stop)
+        dButtons.forEach { button ->
+            disableButton(button)
+        }
+        val eButtons = listOf(binding.micPlay, binding.pause, binding.play, binding.stop)
+        eButtons.forEach { button ->
             enableButton(button)
         }
-        disableButton(binding.micStop)
 
         // Reset variables
         lastBell = null

@@ -99,7 +99,7 @@ fun addFCMTokenToUser(token: String){
     }
 }
 
-fun updateFCMTokenToSystems(token: String,systemsId:List<String>) {
+fun updateFCMTokenToSystems(token: String, systemsId:List<String>) {
     val db = Firebase.firestore
     val uid = FirebaseAuth.getInstance().currentUser?.uid
     if (uid != null) {
@@ -121,7 +121,6 @@ fun updateFCMTokenToSystems(token: String,systemsId:List<String>) {
 }
 
 fun removeFCMTokenFromSystem(sysId: String){
-
     val db = Firebase.firestore
     val uid = FirebaseAuth.getInstance().currentUser?.uid
     if (uid != null) {

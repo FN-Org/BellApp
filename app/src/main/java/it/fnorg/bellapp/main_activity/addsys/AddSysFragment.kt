@@ -13,10 +13,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.messaging.FirebaseMessaging
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MainFragmentAddSysBinding
 import it.fnorg.bellapp.isInternetAvailable
 import it.fnorg.bellapp.main_activity.MainViewModel
+import it.fnorg.bellapp.updateFCMTokenToSystems
 
 /**
  * Fragment for adding a new system.
@@ -114,9 +116,20 @@ class AddSysFragment : Fragment() {
                         && sysId.isNotBlank() && sysLocation.isNotBlank() && sysName.isNotBlank()
                         && pinEditTv.text.toString().toInt() == sysPin)
                 && isInternetAvailable(requireContext())) {
-                viewModel.addSys(sysId, sysLocation, sysName)
-                Toast.makeText(requireContext(), R.string.successfully_add_sys, Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_nav_add_sys_to_nav_home2)
+
+                viewModel.addSys(sysId, sysLocation, sysName) { result ->
+                    if (result) {
+                        val systemIds: MutableList<String> = mutableListOf()
+                        systemIds.add(sysId)
+                        updateFCMTokenToSystems(FirebaseMessaging.getInstance().token.toString(), systemIds)
+
+                        Toast.makeText(requireContext(), R.string.successfully_add_sys, Toast.LENGTH_SHORT).show()
+                        findNavController().navigate(R.id.action_nav_add_sys_to_nav_home2)
+                    }
+                    else {
+                        Toast.makeText(requireContext(), R.string.sww_try_again, Toast.LENGTH_SHORT).show()
+                    }
+                }
             } else {
                 Toast.makeText(requireContext(), R.string.sww_try_again, Toast.LENGTH_LONG).show()
             }

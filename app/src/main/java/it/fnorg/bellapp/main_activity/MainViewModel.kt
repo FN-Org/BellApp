@@ -18,6 +18,7 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import it.fnorg.bellapp.R
+import it.fnorg.bellapp.updateFCMTokenToSystems
 
 /**
  * Data class representing a system.
@@ -188,7 +189,7 @@ class MainViewModel : ViewModel() {
      * @param location Location of the system.
      * @param name Name of the system.
      */
-    fun addSys(sysId: String, location: String, name: String) {
+    fun addSys(sysId: String, location: String, name: String, callback: (Boolean) -> Unit) {
         val selectedFields = mapOf(
             "id" to sysId,
             "name" to name,
@@ -202,12 +203,16 @@ class MainViewModel : ViewModel() {
                 .set(selectedFields)
                 .addOnSuccessListener {
                     Log.d("HomeViewModelAddSys", "Document successfully created")
+                    callback(true) // Success
                 }
                 .addOnFailureListener { e ->
                     Log.w("HomeViewModelAddSys", "Error writing document", e)
+                    callback(false) // Failure
                 }
+        } else {
+            Log.d("HomeViewModelAddSys", "uid was null")
+            callback(false) // Failure due to null uid
         }
-        else Log.d("HomeViewModelAddSys", "uid was null")
     }
 
     /**

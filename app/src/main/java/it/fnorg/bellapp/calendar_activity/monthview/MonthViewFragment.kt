@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.setPadding
 import androidx.navigation.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kizitonwose.calendar.core.CalendarDay
@@ -186,9 +187,17 @@ class MonthViewFragment : Fragment() {
 
                 if (data.position == DayPosition.MonthDate) {
                     textView.setTextColor(ContextCompat.getColor(context, R.color.white))
-                    layout.setBackgroundResource(if (selectedDate == data.date) R.drawable.calendar_day_selected else 0)
 
-                    val events = this@MonthViewFragment.events[data.date]?.sortedBy {
+                    if (selectedDate == data.date) {
+                        layout.setBackgroundResource(R.drawable.calendar_day_selected)
+                        layout.setPadding(5)  // Imposta il padding
+                    } else {
+                        layout.setBackgroundResource(0)
+                        layout.setPadding(0)  // Resetta il padding (se necessario)
+                    }
+
+
+                val events = this@MonthViewFragment.events[data.date]?.sortedBy {
                         it.time.toLocalDateTime().toLocalTime()
                     }
                     events?.let { eventList ->
@@ -254,7 +263,7 @@ class MonthViewFragment : Fragment() {
                         }
                     }
                 } else {
-                    textView.setTextColor(ContextCompat.getColor(context, R.color.naples))
+                    textView.setTextColor(ContextCompat.getColor(context, R.color.persianorange))
                     layout.background = null
                 }
             }

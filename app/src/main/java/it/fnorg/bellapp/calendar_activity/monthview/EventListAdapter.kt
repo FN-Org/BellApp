@@ -32,7 +32,6 @@ class EventListAdapter(
 ) :
     RecyclerView.Adapter<EventListAdapter.EventsViewHolder>() {
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = CalendarEventItemViewBinding.inflate(inflater, parent, false)
@@ -59,9 +58,11 @@ class EventListAdapter(
             val indexOfEvent = viewModel.events.value?.indexOfFirst { it.id == event.id }
 
             if (indexOfEvent != null) {
-                if (indexOfEvent>=viewModel.oldEventsStartingIndex){
+                if (indexOfEvent >= (viewModel.oldEventsStartingIndex)) {
                     binding.deleteEvent.visibility = View.VISIBLE
-                    binding.deleteEvent.setOnClickListener{
+                    binding.itemEventDateText.setBackgroundColor(ContextCompat.getColor(mContext, R.color.silver))
+
+                    binding.deleteEvent.setOnClickListener {
                         if (!isInternetAvailable(mContext)) {
                             Toast.makeText(mContext,R.string.sww_connection, Toast.LENGTH_SHORT).show()
                         } else {
@@ -70,8 +71,8 @@ class EventListAdapter(
                             builder.setMessage(mContext.getString(R.string.delete_event_message, ))
 
                             builder.setPositiveButton(R.string.yes) { dialog, _ ->
-                                viewModel.deleteOldEvent(event.id){ result ->
-                                    if (result>0) {
+                                viewModel.deleteOldEvent(event.id) { result ->
+                                    if (result > 0) {
                                         Toast.makeText(mContext, R.string.deleted, Toast.LENGTH_SHORT).show()
                                         viewModel.fetchEventsData()
                                         notifyDataSetChanged()

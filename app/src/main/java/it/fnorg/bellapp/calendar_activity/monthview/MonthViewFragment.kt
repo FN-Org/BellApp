@@ -1,5 +1,6 @@
 package it.fnorg.bellapp.calendar_activity.monthview
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
@@ -142,7 +143,7 @@ class MonthViewFragment : Fragment() {
 
     private fun updateAdapterForDate(date: LocalDate?) {
         val eventsForDate = events[date].orEmpty().sortedBy { it.time.toLocalDateTime().toLocalTime() }
-        eventsAdapter = EventListAdapter(requireContext(), this, viewModel,eventsForDate)
+        eventsAdapter = EventListAdapter(requireContext(), this, viewModel, eventsForDate)
         binding.calendarRv.adapter = eventsAdapter
     }
 
@@ -187,22 +188,65 @@ class MonthViewFragment : Fragment() {
                     textView.setTextColor(ContextCompat.getColor(context, R.color.white))
                     layout.setBackgroundResource(if (selectedDate == data.date) R.drawable.calendar_day_selected else 0)
 
-                    val events = this@MonthViewFragment.events[data.date]?.sortedBy { it.time.toLocalDateTime().toLocalTime() }
-                    if (events != null) {
-                        if (events.count() == 1) {
-                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[0].color-1].color))
-                        } else {
-                            eventTopView.setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[0].color-1].color))
-                            eventBottomView.setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[1].color-1].color))
+                    val events = this@MonthViewFragment.events[data.date]?.sortedBy {
+                        it.time.toLocalDateTime().toLocalTime()
+                    }
+                    events?.let { eventList ->
+                        when (eventList.size) {
+                            1 -> {
+                                val indexOfEvent =
+                                    viewModel.events.value?.indexOfFirst { it.id == eventList[0].id }
+                                val eventColor =
+                                    if (indexOfEvent != null && indexOfEvent >= viewModel.oldEventsStartingIndex) {
+                                        R.color.silver
+                                    } else {
+                                        viewModel.colorsList[eventList[0].color - 1].color
+                                    }
+                                eventBottomView.setBackgroundColor(
+                                    ContextCompat.getColor(
+                                        context,
+                                        eventColor
+                                    )
+                                )
+                            }
 
-                            if (events.count() > 2) {
+                            2 -> {
+                                eventTopView.setBackgroundColor(
+                                    getEventColor(
+                                        context,
+                                        eventList[0]
+                                    )
+                                )
+                                eventBottomView.setBackgroundColor(
+                                    getEventColor(
+                                        context,
+                                        eventList[1]
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                eventTopView.setBackgroundColor(
+                                    getEventColor(
+                                        context,
+                                        eventList[0]
+                                    )
+                                )
+                                eventBottomView.setBackgroundColor(
+                                    getEventColor(
+                                        context,
+                                        eventList[1]
+                                    )
+                                )
+
                                 eventsContainer.removeAllViews()
-                                for (i in 2 until events.size) {
+                                for (i in 2 until eventList.size) {
+                                    val dotColor = getEventColor(context, eventList[i])
                                     val dot = View(context).apply {
                                         layoutParams = LinearLayout.LayoutParams(16, 16).apply {
                                             marginEnd = 8
                                         }
-                                        setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[events[i].color-1].color))
+                                        setBackgroundColor(dotColor)
                                     }
                                     eventsContainer.addView(dot)
                                 }
@@ -246,5 +290,15 @@ class MonthViewFragment : Fragment() {
 
         viewModel.fetchEventsData()
         viewModel.fetchMelodiesData()
+    }
+
+    // Helper function to determine the color of the event
+    private fun getEventColor(context: Context, event: Event): Int {
+        val indexOfEvent = viewModel.events.value?.indexOfFirst { it.id == event.id }
+        return if (indexOfEvent != null && indexOfEvent >= viewModel.oldEventsStartingIndex) {
+            ContextCompat.getColor(context, R.color.silver)
+        } else {
+            ContextCompat.getColor(context, viewModel.colorsList[event.color - 1].color)
+        }
     }
 }

@@ -89,8 +89,8 @@ class CalendarViewModel : ViewModel() {
             .document(sysId)
             .collection("events")
             .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
+            .addOnSuccessListener { result1 ->
+                for (document in result1) {
                     document.toObject<Event>().let { event ->
                         eventList.add(event)
                     }
@@ -98,26 +98,26 @@ class CalendarViewModel : ViewModel() {
                 _events.value = eventList
                 oldEventsStartingIndex = eventList.size
                 Log.w("BellAppDB", "Success events: $sysId")
+
+                db.collection("systems")
+                    .document(sysId)
+                    .collection("oldEvents")
+                    .get()
+                    .addOnSuccessListener { result2 ->
+                        for (document in result2) {
+                            document.toObject<Event>().let { event ->
+                                eventList.add(event)
+                            }
+                        }
+                        _events.value = eventList
+                        Log.w("BellAppDB", "Success events: $sysId")
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.w("BellAppDB", "Error getting old events documents.", exception)
+                    }
             }
             .addOnFailureListener { exception ->
                 Log.w("BellAppDB", "Error getting new events documents.", exception)
-            }
-
-        db.collection("systems")
-            .document(sysId)
-            .collection("oldEvents")
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    document.toObject<Event>().let { event ->
-                        eventList.add(event)
-                    }
-                }
-                _events.value = eventList
-                Log.w("BellAppDB", "Success events: $sysId")
-            }
-            .addOnFailureListener { exception ->
-                Log.w("BellAppDB", "Error getting old events documents.", exception)
             }
     }
 
@@ -225,6 +225,9 @@ class CalendarViewModel : ViewModel() {
             .document(eventId).delete()
             .addOnSuccessListener {
                 Log.d("BellAppDB", "Event successfully deleted from oldEvents")
+
+                // Aggiorna la lista degli eventi nel ViewModel
+                _events.value = _events.value?.filter { it.id != eventId }
                 callback(1)
             }
             .addOnFailureListener{ e ->

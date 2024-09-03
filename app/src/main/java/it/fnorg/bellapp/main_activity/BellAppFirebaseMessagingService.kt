@@ -41,10 +41,6 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
 
     private val TAG = "BellAppFirebaseMessagingService"
 
-
-
-
-
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
 
@@ -53,7 +49,6 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
            updateFCMTokenToSystems(token,systemsId)
         }
     }
-
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)

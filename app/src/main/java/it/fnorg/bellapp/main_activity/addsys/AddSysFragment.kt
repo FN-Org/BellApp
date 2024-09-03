@@ -119,12 +119,16 @@ class AddSysFragment : Fragment() {
 
                 viewModel.addSys(sysId, sysLocation, sysName) { result ->
                     if (result) {
-                        val systemIds: MutableList<String> = mutableListOf()
-                        systemIds.add(sysId)
-                        updateFCMTokenToSystems(FirebaseMessaging.getInstance().token.toString(), systemIds)
-
-                        Toast.makeText(requireContext(), R.string.successfully_add_sys, Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.action_nav_add_sys_to_nav_home2)
+                        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val token = task.result
+                                val systemIds: MutableList<String> = mutableListOf()
+                                systemIds.add(sysId)
+                                updateFCMTokenToSystems(token, systemIds)
+                                Toast.makeText(requireContext(), R.string.successfully_add_sys, Toast.LENGTH_SHORT).show()
+                                findNavController().navigate(R.id.action_nav_add_sys_to_nav_home2)
+                            }
+                        }
                     }
                     else {
                         Toast.makeText(requireContext(), R.string.sww_try_again, Toast.LENGTH_SHORT).show()

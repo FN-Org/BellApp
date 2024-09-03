@@ -364,7 +364,7 @@ class RecordMelodyFragment : Fragment() {
         dButtons.forEach { button ->
             disableButton(button)
         }
-        val eButtons = listOf(binding.micPlay, binding.pause, binding.play, binding.stop)
+        val eButtons = listOf(binding.micPlay, binding.play)
         eButtons.forEach { button ->
             enableButton(button)
         }

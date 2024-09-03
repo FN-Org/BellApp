@@ -76,7 +76,7 @@ class MonthViewFragment : Fragment() {
         val endMonth = currentMonth.plusMonths(200)
 
         eventsAdapter = EventListAdapter(requireContext(), this ,viewModel,emptyList())
-        binding.calendarRv.apply {
+        binding.calendarRv?.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = eventsAdapter
         }
@@ -85,35 +85,35 @@ class MonthViewFragment : Fragment() {
             events = eventsList.groupBy { it.time.toLocalDateTime().toLocalDate() }
             updateAdapterForDate(selectedDate)
             configureBinders(daysOfWeek)
-            binding.calendarView.notifyCalendarChanged() // Notify the calendar to update its views
+            binding.calendarView?.notifyCalendarChanged() // Notify the calendar to update its views
         }
 
-        binding.calendarView.setup(startMonth, endMonth, daysOfWeek.first())
-        binding.calendarView.scrollToMonth(currentMonth)
+        binding.calendarView?.setup(startMonth, endMonth, daysOfWeek.first())
+        binding.calendarView?.scrollToMonth(currentMonth)
 
-        binding.calendarView.monthScrollListener = { month ->
-            binding.calendarMonthYearText.text = month.yearMonth.displayText()
+        binding.calendarView?.monthScrollListener = { month ->
+            binding.calendarMonthYearText!!.text = month.yearMonth.displayText()
 
             selectedDate?.let {
                 selectedDate = null
-                binding.calendarView.notifyDateChanged(it)
+                binding.calendarView?.notifyDateChanged(it)
                 updateAdapterForDate(null)
             }
         }
 
-        binding.calendarNextMonthImage.setOnClickListener {
-            binding.calendarView.findFirstVisibleMonth()?.let {
-                binding.calendarView.smoothScrollToMonth(it.yearMonth.nextMonth)
+        binding.calendarNextMonthImage?.setOnClickListener {
+            binding.calendarView?.findFirstVisibleMonth()?.let {
+                binding.calendarView!!.smoothScrollToMonth(it.yearMonth.nextMonth)
             }
         }
 
-        binding.calendarPreviousMonthImage.setOnClickListener {
-            binding.calendarView.findFirstVisibleMonth()?.let {
-                binding.calendarView.smoothScrollToMonth(it.yearMonth.previousMonth)
+        binding.calendarPreviousMonthImage?.setOnClickListener {
+            binding.calendarView?.findFirstVisibleMonth()?.let {
+                binding.calendarView!!.smoothScrollToMonth(it.yearMonth.previousMonth)
             }
         }
 
-        binding.calendarBackArrow.setOnClickListener {
+        binding.calendarBackArrow?.setOnClickListener {
             val intent = Intent(requireActivity(), MainActivity::class.java)
             startActivity(intent)
         }
@@ -145,7 +145,7 @@ class MonthViewFragment : Fragment() {
     private fun updateAdapterForDate(date: LocalDate?) {
         val eventsForDate = events[date].orEmpty().sortedBy { it.time.toLocalDateTime().toLocalTime() }
         eventsAdapter = EventListAdapter(requireContext(), this, viewModel, eventsForDate)
-        binding.calendarRv.adapter = eventsAdapter
+        binding.calendarRv?.adapter = eventsAdapter
     }
 
     private fun configureBinders(daysOfWeek: List<DayOfWeek>) {
@@ -159,9 +159,9 @@ class MonthViewFragment : Fragment() {
                         if (selectedDate != day.date) {
                             val oldDate = selectedDate
                             selectedDate = day.date
-                            this@MonthViewFragment.binding.calendarView.notifyDateChanged(day.date)
+                            this@MonthViewFragment.binding.calendarView?.notifyDateChanged(day.date)
                             oldDate?.let {
-                                this@MonthViewFragment.binding.calendarView.notifyDateChanged(it)
+                                this@MonthViewFragment.binding.calendarView?.notifyDateChanged(it)
                             }
                             updateAdapterForDate(day.date)
                         }
@@ -170,7 +170,7 @@ class MonthViewFragment : Fragment() {
             }
         }
 
-        binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
+        binding.calendarView?.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
             override fun bind(container: DayViewContainer, data: CalendarDay) {
                 container.day = data
@@ -274,7 +274,7 @@ class MonthViewFragment : Fragment() {
         }
 
         val typeFace = Typeface.create("sans-serif-light", Typeface.BOLD)
-        binding.calendarView.monthHeaderBinder =
+        binding.calendarView?.monthHeaderBinder =
             object : MonthHeaderFooterBinder<MonthViewContainer> {
                 override fun create(view: View) = MonthViewContainer(view)
                 override fun bind(container: MonthViewContainer, data: CalendarMonth) {

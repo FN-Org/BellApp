@@ -24,9 +24,7 @@ import android.widget.TableRow
 import android.widget.Toast
 import androidx.core.view.children
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.databinding.MelodyFragmentRecordMelodyBinding
@@ -35,9 +33,9 @@ import it.fnorg.bellapp.melody_activity.MelodyViewModel
 import java.io.File
 
 /**
- * A simple [Fragment] subclass.
- * Use the [RecordMelodyFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * This class represents a Fragment used for recording a melody.
+ * The fragment manages user interactions like recording, saving, and playing a melody.
+ * It also connects with Firebase to upload and store melodies.
  */
 class RecordMelodyFragment : Fragment() {
 
@@ -80,11 +78,12 @@ class RecordMelodyFragment : Fragment() {
 
         viewModel.fetchMelodies()
 
-        // Navbar buttons
+        // Back button action - navigates to the previous fragment
         binding.backArrow.setOnClickListener {
             navController.navigate(R.id.action_recordMelodyFragment_to_personalMelodiesFragment)
         }
 
+        // Save button action - shows a save dialog if the internet is available
         binding.saveMelodyButton.setOnClickListener {
             // Update or create the event only if you are connected
             if (!isInternetAvailable(requireContext())) {
@@ -95,7 +94,7 @@ class RecordMelodyFragment : Fragment() {
             }
         }
 
-        // Control panel buttons
+        // Start recording button - begins countdown and starts recording
         binding.micPlay.setOnClickListener {
             if (!isRecording) {
                 recordList.clear()
@@ -103,12 +102,14 @@ class RecordMelodyFragment : Fragment() {
             }
         }
 
+        // Stop recording button - stops the current recording session
         binding.micStop.setOnClickListener {
             if (isRecording) {
                 stopRecording()
             }
         }
 
+        // Play recorded melody - starts playback of the recorded melody
         binding.play.setOnClickListener {
             if (recordList.isNotEmpty() && !viewModel.isPlaying) {
                 val dButtons = listOf(binding.micStop, binding.play, binding.micPlay)
@@ -124,6 +125,7 @@ class RecordMelodyFragment : Fragment() {
             }
         }
 
+        // Pause playback button - pauses the playback of the melody
         binding.pause.setOnClickListener {
             if (viewModel.isPlaying) {
                 val dButtons = listOf(binding.micStop, binding.pause, binding.micPlay)
@@ -138,11 +140,12 @@ class RecordMelodyFragment : Fragment() {
             }
         }
 
+        // Stop playback button - stops playback and resets buttons
         binding.stop.setOnClickListener {
             recordMelodyFragmentStopPlayback()
         }
 
-        // New melody button
+        // Clear melody button - clears the current recorded melody
         binding.melodyBin.setOnClickListener {
             recordList.clear()
             binding.newMelodyLayout.visibility = View.GONE
@@ -153,19 +156,21 @@ class RecordMelodyFragment : Fragment() {
             }
         }
 
-        // Disable unusable control panel buttons
         val buttons = listOf(binding.micStop, binding.pause, binding.play, binding.stop)
         buttons.forEach { button ->
             disableButton(button)
         }
 
-        // Bells generation
+        // Generate bell buttons dynamically based on the number of bells
         generateBellButtons(viewModel.nBells)
 
-        // Countdown sound
+        // Load the countdown sound for the recording
         bipSoundId = viewModel.soundPool.load(activity, R.raw.countdown, 1)
     }
 
+    /**
+     * This function stops the playback and resets the button states.
+     */
     private fun recordMelodyFragmentStopPlayback() {
         // Disable and enable buttons
         val dButtons = listOf(binding.micStop, binding.pause, binding.stop)
@@ -179,6 +184,9 @@ class RecordMelodyFragment : Fragment() {
         viewModel.stopPlayback()
     }
 
+    /**
+     * Generates bell buttons dynamically based on the number of bells. It arranges them in a grid layout.
+     */
     private fun generateBellButtons(numBells: Int) {
         val bellTable = binding.bellsTable
         bellTable.removeAllViews()
@@ -250,6 +258,9 @@ class RecordMelodyFragment : Fragment() {
         }
     }
 
+    /**
+     * Handles the bell button click event.
+     */
     private fun onBellClick(button: Button) {
         // Save the clicked bell (note)
         val bellNumber = button.tag as Int
@@ -273,6 +284,12 @@ class RecordMelodyFragment : Fragment() {
         }
     }
 
+    /**
+     * Starts a scaling animation on the provided button, making it appear to "grow" and "shrink".
+     * The animation scales the button slightly larger and then back to its original size.
+     *
+     * @param button The button on which to apply the scaling animation.
+     */
     private fun startBellAnimation(button: Button) {
         val scaleAnimation = ScaleAnimation(
             1f, 1.1f, 1f, 1.1f,
@@ -287,6 +304,9 @@ class RecordMelodyFragment : Fragment() {
         button.startAnimation(scaleAnimation)
     }
 
+    /**
+     * Starts a countdown and then begins recording.
+     */
     private fun startCountdownAndRecording() {
         isCountdown = true
         binding.countdownTv.visibility = View.VISIBLE
@@ -322,16 +342,28 @@ class RecordMelodyFragment : Fragment() {
         updateCountdown(countdownTime)
     }
 
+    /**
+     * Disables the given button.
+     */
     private fun disableButton(button: ImageView) {
         button.isEnabled = false
         button.setColorFilter(resources.getColor(R.color.gray, null))
     }
 
+    /**
+     * Enables the given button.
+     */
     private fun enableButton(button: ImageView) {
         button.isEnabled = true
         button.setColorFilter(resources.getColor(R.color.black, null))
     }
 
+    /**
+     * Records a bell click and calculates the elapsed time since the last bell click.
+     * Adds the bell number and elapsed time to the record list.
+     *
+     * @param bellNumber The identifier (number) of the bell clicked.
+     */
     private fun recordBellClick(bellNumber: String) {
         val currentTime: Double = System.currentTimeMillis() / 1000.0
 
@@ -348,6 +380,9 @@ class RecordMelodyFragment : Fragment() {
         lastClickTime = currentTime
     }
 
+    /**
+     * Stops recording the melody.
+     */
     private fun stopRecording() {
         binding.countdownTv.visibility = View.GONE
         binding.saveMelodyButton.visibility = View.VISIBLE
@@ -374,6 +409,12 @@ class RecordMelodyFragment : Fragment() {
         lastClickTime = null
     }
 
+    /**
+     * Saves the recorded melody to a file with a given title.
+     *
+     * @param recordTitle The title of the melody to be saved.
+     * @return The created File object if successful, or null in case of an error.
+     */
     private fun saveRecordToFile(recordTitle: String): File? {
         // Create the file
         val personalMelodiesNum = if (viewModel.melodyList.value.isNullOrEmpty()) {
@@ -402,6 +443,11 @@ class RecordMelodyFragment : Fragment() {
         }
     }
 
+    /**
+     * Enables or disables all the bell buttons in the UI.
+     *
+     * @param enabled If true, enables the bell buttons; if false, disables them.
+     */
     private fun enableBellButtons(enabled: Boolean) {
         val bellButtons = binding.bellsTable.children
         for (button in bellButtons) {
@@ -411,6 +457,9 @@ class RecordMelodyFragment : Fragment() {
         }
     }
 
+    /**
+     * Displays a dialog to save the recorded melody.
+     */
     private fun showSaveMelodyDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Enter the title of the melody and click SAVE to save it")

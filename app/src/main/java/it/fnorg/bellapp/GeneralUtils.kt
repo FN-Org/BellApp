@@ -13,13 +13,10 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.messaging.FirebaseMessagingService.NOTIFICATION_SERVICE
-import it.fnorg.bellapp.main_activity.MainViewModel
 
 /**
  * Checks if the internet connection is available.
@@ -69,7 +66,7 @@ fun checkConnection(context: Context, view: View) {
             warningMessage.visibility = View.VISIBLE
         }
         else {
-            Log.w("Check Connection", "Warning message is null")
+            Log.w("General Utils", "Warning message is null")
         }
     }
     else {
@@ -77,12 +74,16 @@ fun checkConnection(context: Context, view: View) {
             warningMessage.visibility = View.GONE
         }
         else {
-            Log.w("Check Connection", "Warning message is null")
+            Log.w("General Utils", "Warning message is null")
         }
     }
 }
 
-
+/**
+ * Adds the given FCM (Firebase Cloud Messaging) token to the current user in the Firestore database.
+ *
+ * @param token The FCM token to be added to the user's Firestore document.
+ */
 fun addFCMTokenToUser(token: String){
     val db = Firebase.firestore
     val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -91,14 +92,20 @@ fun addFCMTokenToUser(token: String){
             .document(uid)
             .update("fcmToken",token)
             .addOnSuccessListener {
-                Log.w("addFCMTokenToUser", "Refreshed token: $token added to firebase")
+                Log.w("General Utils", "Refreshed token: $token added to firebase")
             }
             .addOnFailureListener{
-                Log.w("addFCMTokenToUser", "Something went wrong with token $token")
+                Log.w("General Utils", "Something went wrong with token $token")
             }
     }
 }
 
+/**
+ * Updates the FCM token in all the system documents associated with the given system IDs.
+ *
+ * @param token The FCM token to be updated.
+ * @param systemsId List of system IDs where the token will be updated.
+ */
 fun updateFCMTokenToSystems(token: String, systemsId:List<String>) {
     val db = Firebase.firestore
     val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -110,16 +117,21 @@ fun updateFCMTokenToSystems(token: String, systemsId:List<String>) {
                 .document(uid)
                 .set(mapOf("token" to token))
                 .addOnSuccessListener {
-                    Log.d(TAG, "Documento aggiornato per l'ID $id")
+                    Log.d(TAG, "Document updated with ID: $id")
                 }
                 .addOnFailureListener{
-                    Log.d(TAG, "Documento NON aggiornato per l'ID $id")
+                    Log.d(TAG, "Document NOT updated with ID: $id")
                 }
 
         }
     }
 }
 
+/**
+ * Removes the current user's FCM token from the specified system document in Firestore.
+ *
+ * @param sysId The system ID from which the token will be removed.
+ */
 fun removeFCMTokenFromSystem(sysId: String){
     val db = Firebase.firestore
     val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -132,6 +144,11 @@ fun removeFCMTokenFromSystem(sysId: String){
     }
 }
 
+/**
+ * Retrieves the list of system IDs associated with the current user and returns them through a callback.
+ *
+ * @param onComplete A callback function that receives a list of system IDs once retrieved.
+ */
 fun getSystemsIds(onComplete: (List<String>) -> Unit) {
     val db = Firebase.firestore
     val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -141,19 +158,17 @@ fun getSystemsIds(onComplete: (List<String>) -> Unit) {
             .collection("systems")
             .get()
             .addOnSuccessListener { documents ->
-                val systemsId = documents.map { it.id } // Mappiamo direttamente gli ID
+                val systemsId = documents.map { it.id }
                 onComplete(systemsId)
             }
             .addOnFailureListener { exception ->
                 Log.e(
                     "General Utils",
-                    "Errore nel recuperare gli ID: ${exception.message}")
+                    "Error fetching ID: ${exception.message}")
                 onComplete(emptyList())
             }
     }
 }
-
-
 
 /**
  * Creates a notification channel for devices running Android O or higher.

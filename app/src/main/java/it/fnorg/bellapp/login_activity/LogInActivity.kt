@@ -45,11 +45,10 @@ class LogInActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Only light mode
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity_log_in)
-
-        // Forza il tema chiaro prima di chiamare super.onCreate
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         // Handle back button press to navigate to WelcomeActivity
         this.onBackPressedDispatcher.addCallback(this){

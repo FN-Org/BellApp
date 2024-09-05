@@ -65,6 +65,7 @@
     <!-- Month View fragment -->
     <string name="delete_confirmation_event">Delete event</string>
     <string name="delete_event_message">Are you sure you want to delete this old event?</string>
+
     <!-- Add Event fragment -->
     <string name="add_time">Time</string>
     <string name="add_date">Date</string>
@@ -81,6 +82,22 @@
     <string name="event_updated">Event successfully updated!</string>
     <string name="event_already_happened">This event already happened!</string>
 
+    <!-- MELODY ACTIVITY -->
+
+    <!-- Personal Melodies fragment -->
+    <string name="noMelodies">
+        You don\'t have any personal melodies yet.
+        Press the button below and try to create one from scratch
+    </string>
+    <string name="melody_deleted">Melody deleted successfully</string>
+    <string name="sync_message_1">Melody NOT yet synchronized. \n Push the physical button in the system</string>
+    <string name="sync_message_2">Default SYNC</string>
+    <string name="not_sync">NOT SYNC</string>
+    <string name="sync">SYNC</string>
+
+    <!-- Create Melody fragment -->
+    <string name="melody_created">Melody created and saved successfully</string>
+
     <!-- ALERT DIALOGS -->
 
     <!-- Remove sys (HomeListAdapter) -->
@@ -96,8 +113,18 @@
     <!-- Change profile image (Home fragment)-->
     <string name="change_image">Are you sure you want to change your profile image?</string>
 
-    <!-- Main information dialog -->
+    <!-- Main information dialog (Home fragment) -->
     <string name="informations">Informations</string>
+
+    <!-- Delete melody dialog (Personal Melodies fragment) -->
+    <string name="delete_melody_message_1">Are you sure you want to delete the melody "%1$s"?</string>
+    <string name="delete_melody_message_2">
+        Are you sure you want to delete the melody "%1$s"? \n
+        If you click "yes" remember that, \n
+        for the correct functioning of the next scheduled events and all future melody performances, \n
+        it is mandatory to perform a synchronization via the physical button of the system.
+    </string>
+    <string name="delete_confirmation">Delete melody</string>
 
     <!-- GENERAL MESSAGES -->
 
@@ -113,29 +140,5 @@
     <!-- General Toast -->
     <string name="back_before_exit_toast">Press back again to exit from the application</string>
     <string name="coming_soon">COMING SOON!</string>
-
-    <!-- NUOVI MESSAGGI -->
-    <string name="noMelodies">
-        You don\'t have any personal melodies yet.
-        Press the button below and try to create one from scratch
-    </string>
-
-    <string name="melody_created">Melody created and saved successfully</string>
-
-    <string name="melody_deleted">Melody deleted successfully</string>
-
-    <string name="delete_confirmation">Delete melody</string>
-    <string name="delete_melody_message_1">Are you sure you want to delete the melody "%1$s"?</string>
-    <string name="delete_melody_message_2">
-        Are you sure you want to delete the melody "%1$s"? \n
-        If you click "yes" remember that, \n
-        for the correct functioning of the next scheduled events and all future melody performances, \n
-        it is mandatory to perform a synchronization via the physical button of the system.
-    </string>
-
-    <string name="sync_message_1">Melody NOT yet synchronized. \n Push the physical button in the system</string>
-    <string name="sync_message_2">Default SYNC</string>
-    <string name="not_sync">NOT SYNC</string>
-    <string name="sync">SYNC</string>
 
 </resources>

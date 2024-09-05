@@ -11,6 +11,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 
+// Data class representing a melody file
 data class MelodyFile(
     val number: Int = 0,
     val title: String = "",
@@ -19,12 +20,15 @@ data class MelodyFile(
 
 class MelodyViewModel : ViewModel() {
 
+    // LiveData holding the list of melody files.
     private val _melodyList = MutableLiveData<List<MelodyFile>>()
     val melodyList: LiveData<List<MelodyFile>> get() = _melodyList
 
+    // Variables to store the system ID and number of bells.
     var sysId: String = ""
     var nBells: Int = 0
 
+    // Boolean to track synchronization state of the system.
     var isSync: Boolean? = null
 
     // Firebase Storage reference
@@ -44,6 +48,10 @@ class MelodyViewModel : ViewModel() {
     val notes = listOf("C", "D", "E", "F", "G", "A", "B")
     private var pauseTime: Double = 0.0
 
+    /**
+     * Fetches the list of melodies stored in Firebase Storage for the current system.
+     * Updates the LiveData with the downloaded melodies.
+     */
     fun fetchMelodies() {
         val melodies = mutableListOf<MelodyFile>()
 
@@ -76,15 +84,22 @@ class MelodyViewModel : ViewModel() {
                         _melodyList.value = melodies
 
                     }.addOnFailureListener { e ->
-                        Log.e("Download melody", "Failed to download file", e)
+                        Log.e("MelodyViewModel - Download melody", "Failed to download file", e)
                     }
                 }
             }
             .addOnFailureListener { e ->
-                Log.e("Download melody", "Failed to list files", e)
+                Log.e("MelodyViewModel - Download melody", "Failed to list files", e)
             }
     }
 
+    /**
+     * Starts playback of a list of notes, each followed by a pause duration.
+     * Handles note timing and stopping logic.
+     *
+     * @param recordList List of notes and their respective pause durations.
+     * @param stopFunction A function that gets called when playback ends.
+     */
     fun startPlayback(recordList: MutableList<String>, stopFunction: () -> Unit) {
         isPlaying = true
         isPaused = false
@@ -100,9 +115,9 @@ class MelodyViewModel : ViewModel() {
                     val entry = recordList[index].trim().split(" ")
                     if (entry.size == 2) {
                         val note = entry[0]
-                        val pauseDurationStr = entry[1].replace(',', '.') // Converti la virgola in punto
+                        val pauseDurationStr = entry[1].replace(',', '.')
                         var pauseDuration = try {
-                            (pauseDurationStr.toDouble() * 1000).toLong() - 500 // Converti in millisecondi
+                            (pauseDurationStr.toDouble() * 1000).toLong() - 500
                         } catch (e: NumberFormatException) {
                             e.printStackTrace()
                             0L
@@ -136,6 +151,13 @@ class MelodyViewModel : ViewModel() {
         playbackHandler?.post(playbackRunnable!!)
     }
 
+    /**
+     * Plays a specific note using SoundPool.
+     * Converts note number to actual musical note and plays the corresponding sound.
+     *
+     * @param note The note to be played (as a number).
+     * @return The stream ID of the played note.
+     */
     private fun playNote(note: String): Int {
         val noteIndex = note.toIntOrNull()
 
@@ -146,11 +168,14 @@ class MelodyViewModel : ViewModel() {
             val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
             return streamId
         } else {
-            Log.e("Playback", "Nota non valida: $note")
+            Log.e("MelodyViewModel - Play Note", "Invalid note: $note")
             return 0
         }
     }
 
+    /**
+     * Stops the current playback, resetting all related variables.
+     */
     fun stopPlayback() {
         isPlaying = false
         isPaused = false
@@ -160,6 +185,9 @@ class MelodyViewModel : ViewModel() {
         playbackRunnable = null
     }
 
+    /**
+     * Pauses the current playback, saving the time at which it was paused.
+     */
     fun pausePlayback() {
         if (isPlaying && !isPaused) {
             isPaused = true
@@ -170,6 +198,9 @@ class MelodyViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Resumes playback from the point where it was paused.
+     */
     fun resumePlayback() {
         if (isPaused && !isPlaying) {
             isPlaying = true
@@ -179,6 +210,12 @@ class MelodyViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Retrieves the synchronization status of the system from Firestore.
+     * Passes the result to a callback function.
+     *
+     * @param callback A function to handle the result of the synchronization status query.
+     */
     fun getSystemSync(callback: (Boolean?) -> Unit) {
         if (sysId.isNotEmpty()) {
             val syncBoolRef = db.collection("systems").document(sysId)
@@ -203,7 +240,13 @@ class MelodyViewModel : ViewModel() {
         }
     }
 
-
+    /**
+     * Sets the synchronization status of the system in Firestore.
+     * Updates the local sync state as well.
+     *
+     * @param bool The new synchronization state to be set.
+     * @param callback A function to handle the result of the update operation.
+     */
     fun setSystemSync(bool: Boolean, callback: (Boolean) -> Unit) {
         if (sysId.isNotEmpty()) {
             val syncBoolRef = db.collection("systems").document(sysId)
@@ -222,5 +265,4 @@ class MelodyViewModel : ViewModel() {
             callback(false) // Operation failed due to empty sysId
         }
     }
-
 }

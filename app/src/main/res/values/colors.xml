@@ -7,15 +7,15 @@
     <color name="lapis">#3562A3</color>
     <color name="persianorange">#EC985C</color>
     <color name="seasalt">#F9F9F9</color>
+    <color name="gray">#7A7A7A</color>
 
     <!-- Events color -->
     <color name="naples">#F8DB64</color>
     <color name="lightred">#F87575</color>
     <color name="jade">#57A773</color>
-
-    <color name="warning">#FF0F0F</color>
-
-    <color name="gray">#7A7A7A</color>
     <color name="silver">#B3B3B3</color>
+
+    <!-- Messages -->
+    <color name="warning">#FF0F0F</color>
 
 </resources>

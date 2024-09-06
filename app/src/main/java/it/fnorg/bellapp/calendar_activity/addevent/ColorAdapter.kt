@@ -34,10 +34,13 @@ class ColorAdapter(
             val view = convertView ?: LayoutInflater.from(context)
                 .inflate(R.layout.calendar_spinner_colors, parent, false)
 
+            // Find and configure the TextViews within the view
             val colorNameTextView: TextView = view.findViewById(R.id.colorName)
             val colorPreviewView: View = view.findViewById(R.id.colorPreview)
 
             val option = options[position]
+
+            // Set the text for the TextViews based on the color item
             colorNameTextView.text = option.name
             colorPreviewView.background.setTint(ContextCompat.getColor(context, option.color))
 

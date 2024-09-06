@@ -43,9 +43,6 @@ class ReminderReceiver : BroadcastReceiver() {
         }
     }
 
-
-
-
     /**
      * Shows a notification to remind the user of a task.
      *

@@ -18,6 +18,8 @@ import it.fnorg.bellapp.databinding.MelodyPersonalListItemBinding
 import it.fnorg.bellapp.melody_activity.MelodyFile
 import it.fnorg.bellapp.melody_activity.MelodyViewModel
 
+// MelodyAdapter manages a list of MelodyFile objects displayed in a RecyclerView.
+// It handles user interaction such as playing, pausing, and deleting melodies.
 class MelodyAdapter(
     private val mContext: Context,
     private var melodyList: List<MelodyFile>,
@@ -26,6 +28,7 @@ class MelodyAdapter(
     private val lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<MelodyAdapter.MelodyViewHolder>() {
 
+    // Variables to track the last clicked melody and its ViewHolder
     private var lastClickedMelody = -1
     private var lastClickedViewHolder: MelodyViewHolder? = null
 
@@ -70,16 +73,13 @@ class MelodyAdapter(
                         val storageReference = FirebaseStorage.getInstance().reference
                         val fileRef = storageReference.child("melodies/${melodyViewModel.sysId}/${melody.number}.txt")
 
+                        // Delete melody metadata from Firestore
                         val firestore = FirebaseFirestore.getInstance()
                         val documentReference = firestore
                             .collection("systems")
                             .document(melodyViewModel.sysId)
                             .collection("melodies")
                             .document(melody.title)
-
-                        val syncBoolRef = firestore
-                            .collection("systems")
-                            .document(melodyViewModel.sysId)
 
                         fileRef.delete()
                             .addOnSuccessListener {
@@ -89,6 +89,7 @@ class MelodyAdapter(
                                 updateMelodyNumbers()
                                 notifyItemRangeChanged(position, it.size)
 
+                                // Delete melody document from Firestore
                                 documentReference.delete()
                                     .addOnSuccessListener {
                                         melodyViewModel.setSystemSync(false) { result ->
@@ -113,7 +114,7 @@ class MelodyAdapter(
                     }
 
                     val alert = builder.create()
-                    alert.show()
+                    alert.show() // Show delete confirmation dialog
                 }
             }
             else {
@@ -129,6 +130,7 @@ class MelodyAdapter(
                         val storageReference = FirebaseStorage.getInstance().reference
                         val fileRef = storageReference.child("melodies/${melodyViewModel.sysId}/${melody.number}.txt")
 
+                        // Delete file from Firebase Storage
                         fileRef.delete().addOnSuccessListener {
                             (melodyList as? MutableList)?.let {
                                 it.removeAt(position)
@@ -150,11 +152,12 @@ class MelodyAdapter(
                     }
 
                     val alert = builder.create()
-                    alert.show()
+                    alert.show() // Show delete confirmation dialog
                 }
             }
         }
 
+        // Play melody on click if not playing and records are available
         holder.binding.playMelody.setOnClickListener {
             lastClickedViewHolder = holder
             val currentPosition = position
@@ -175,6 +178,7 @@ class MelodyAdapter(
             }
         }
 
+        // Pause melody playback
         holder.binding.pauseMelody.setOnClickListener {
             lastClickedViewHolder = null
             melodyViewModel.pausePlayback()
@@ -187,12 +191,14 @@ class MelodyAdapter(
         return melodyList.size
     }
 
+    // Stop playback and reset UI elements
     private fun personalMelodiesFragmentStopPlayback(holder: MelodyViewHolder) {
         holder.binding.playMelody.visibility = View.VISIBLE
         holder.binding.pauseMelody.visibility = View.GONE
         melodyViewModel.stopPlayback()
     }
 
+    // Download melody file from Firebase Storage
     private fun downloadFile(fileRef: StorageReference, callback: (ByteArray) -> Unit) {
         fileRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
             callback(bytes)
@@ -201,6 +207,7 @@ class MelodyAdapter(
         }
     }
 
+    // Upload file to Firebase Storage
     private fun uploadFile(newFileRef: StorageReference, fileBytes: ByteArray) {
         newFileRef.putBytes(fileBytes).addOnSuccessListener {
             Log.d("MelodyAdapter", "File uploaded successfully")
@@ -209,6 +216,7 @@ class MelodyAdapter(
         }
     }
 
+    // Delete original melody file
     private fun deleteOriginalFile(fileRef: StorageReference) {
         fileRef.delete().addOnSuccessListener {
             Log.d("MelodyAdapter", "Original file deleted successfully")
@@ -217,6 +225,7 @@ class MelodyAdapter(
         }
     }
 
+    // Renaming files after one is deleted to maintain sequential order
     private fun renameFilesAfterDeletion(deletedPosition: Int) {
         val storage = FirebaseStorage.getInstance()
         val storageReference = storage.reference
@@ -229,28 +238,23 @@ class MelodyAdapter(
             val newFileName = "${deletedPosition + index + 1}.txt"
             val newFileRef = storageReference.child("melodies/${melodyViewModel.sysId}/$newFileName")
 
-            // Scarica il file esistente
             downloadFile(fileRef) { fileBytes ->
-                // Carica il file con il nuovo nome
                 uploadFile(newFileRef, fileBytes)
-                // Elimina il file originale
                 deleteOriginalFile(fileRef)
             }
         }
     }
 
+    // Update melody numbers after a deletion
     private fun updateMelodyNumbers() {
-        // Crea una nuova lista con i numeri aggiornati
         val updatedMelodyList = melodyList.mapIndexed { index, melody ->
             melody.copy(number = index + 1)
         }.sortedBy { it.number }.toMutableList()
 
-        // Usa una nuova lista temporanea per aggiornare l'adapter
         val tempMelodyList = updatedMelodyList.toMutableList()
         (melodyList as MutableList).clear()
         (melodyList as MutableList).addAll(tempMelodyList)
 
-        // Notifica l'adapter del cambiamento
         notifyDataSetChanged()
     }
 

@@ -40,6 +40,7 @@ class AddEventFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Fetch event and melody data when the fragment is created
         viewModel.fetchEventsData()
         viewModel.fetchMelodiesData()
     }
@@ -54,6 +55,7 @@ class AddEventFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Initialize UI components
         val spinnerMelodies: Spinner = view.findViewById(R.id.spinner_options_melodies)
         val spinnerColors: Spinner = view.findViewById(R.id.spinner_options_colors)
         val timeTextView: EditText = view.findViewById(R.id.editTextTime)
@@ -63,6 +65,7 @@ class AddEventFragment : Fragment() {
         val saveButton: Button = view.findViewById(R.id.save_button)
         val deleteButton: Button = view.findViewById(R.id.delete_button)
 
+        // Handle back navigation
         backArrow.setOnClickListener {
             view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
         }
@@ -83,7 +86,7 @@ class AddEventFragment : Fragment() {
             adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerMelodies.adapter = adapter1
 
-            // Safe args
+            // Handle modification of existing events with safe args
             if (args.eventId != "default") {
                 fragmentTitle.text = requireContext().getString(R.string.modify_event)
 
@@ -180,6 +183,7 @@ class AddEventFragment : Fragment() {
             datePickerDialog.show()
         }
 
+        // Handle save button click
         saveButton.setOnClickListener {
             // Update or create the event only if you are connected
             if (!isInternetAvailable(requireContext())) {
@@ -220,6 +224,7 @@ class AddEventFragment : Fragment() {
                     color = color
                 )
 
+                // Save or update the event and handle result
                 viewModel.saveEvent(event, args.eventId) { result ->
                     when(result){
                         1-> Toast.makeText(context,R.string.event_created, Toast.LENGTH_SHORT).show()
@@ -229,6 +234,7 @@ class AddEventFragment : Fragment() {
                     }
                 }
 
+                // Navigate back to the month view fragment
                 view.findNavController().navigate(R.id.action_addEventFragment_to_monthViewFragment)
             }
         }

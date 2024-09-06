@@ -14,6 +14,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
+// Data class representing an event
 data class Event(
     var id: String = "",
     val time: Timestamp = Timestamp.now(),
@@ -22,20 +23,21 @@ data class Event(
     val color: Int = 1
 )
 
+// Data class representing a melody
 data class Melody(
     val number: Int = 0,
     val name: String = ""
 )
 
+// Data class representing a color
 data class Color(
     val name: String = "",
     @ColorRes val color: Int = 0
 )
 
+// Formatters
 val eventDateTimeFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("EEE'\n'dd MMM'\n'HH:mm")
-
-// Formattatori
 val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -81,7 +83,7 @@ class CalendarViewModel : ViewModel() {
      */
     fun fetchEventsData() {
         if (sysId.isEmpty()) {
-            Log.w("BellAppDB", "sysId is empty, cannot fetch events.")
+            Log.w("CalendarViewModel - fetchEventsData", "sysId is empty, cannot fetch events.")
             return
         }
         val eventList = mutableListOf<Event>()
@@ -113,11 +115,11 @@ class CalendarViewModel : ViewModel() {
                         Log.w("BellAppDB", "Success events: $sysId")
                     }
                     .addOnFailureListener { exception ->
-                        Log.w("BellAppDB", "Error getting old events documents.", exception)
+                        Log.w("CalendarViewModel - fetchEventsData", "Error getting old events documents.", exception)
                     }
             }
             .addOnFailureListener { exception ->
-                Log.w("BellAppDB", "Error getting new events documents.", exception)
+                Log.w("CalendarViewModel - fetchEventsData", "Error getting new events documents.", exception)
             }
     }
 
@@ -126,7 +128,7 @@ class CalendarViewModel : ViewModel() {
      */
     fun fetchMelodiesData() {
         if (sysId.isEmpty()) {
-            Log.w("BellAppDB", "sysId is empty, cannot fetch melodies.")
+            Log.w("CalendarViewModel - fetchMelodiesData", "sysId is empty, cannot fetch melodies.")
             return
         }
         db.collection("systems")
@@ -141,10 +143,10 @@ class CalendarViewModel : ViewModel() {
                     }
                 }
                 _melodies.value = melodyList
-                Log.w("BellAppDB", "Success melodies: $sysId")
+                Log.w("CalendarViewModel - fetchMelodiesData", "Success melodies: $sysId")
             }
             .addOnFailureListener { exception ->
-                Log.w("BellAppDB", "Error getting documents.", exception)
+                Log.w("CalendarViewModel - fetchMelodiesData", "Error getting documents.", exception)
             }
     }
 
@@ -167,12 +169,12 @@ class CalendarViewModel : ViewModel() {
             newEvent.set(event)
                 .addOnSuccessListener {
 
-                    Log.d("BellAppDB", "Event successfully created!")
+                    Log.d("CalendarViewModel - saveEvent", "Event successfully created!")
                     callback(1)
                 }
                 .addOnFailureListener {
 
-                    Log.d("BellAppDB", "Error creating event")
+                    Log.d("CalendarViewModel - saveEvent", "Error creating event")
                     callback(-1)
                 }
         } else {
@@ -187,12 +189,12 @@ class CalendarViewModel : ViewModel() {
                 "time", event.time)
                 .addOnSuccessListener {
 
-                    Log.d("BellAppDB", "Event successfully updated!")
+                    Log.d("CalendarViewModel - saveEvent", "Event successfully updated!")
                     callback(2)
                 }
                 .addOnFailureListener { e ->
 
-                    Log.w("BellAppDB", "Error updating document", e)
+                    Log.w("CalendarViewModel - saveEvent", "Error updating document", e)
                     callback(-2)
                 }
         }
@@ -209,29 +211,29 @@ class CalendarViewModel : ViewModel() {
             .collection("events")
             .document(eventId).delete()
             .addOnSuccessListener {
-                Log.d("BellAppDB", "Event successfully deleted from events")
+                Log.d("CalendarViewModel - deleteEvent", "Event successfully deleted from events")
                 callback(1)
             }
             .addOnFailureListener{ e ->
-                Log.w("BellAppDB", "Error deleting document in events", e)
+                Log.w("CalendarViewModel - deleteEvent", "Error deleting document in events", e)
                 callback(-1)
             }
     }
 
+    // Function to delete an old event from the "oldEvents" collection in Firestore
     fun deleteOldEvent(eventId: String,callback: (Int) -> Unit){
         db.collection("systems")
             .document(sysId)
             .collection("oldEvents")
             .document(eventId).delete()
             .addOnSuccessListener {
-                Log.d("BellAppDB", "Event successfully deleted from oldEvents")
+                Log.d("CalendarViewModel - deleteOldEvent", "Event successfully deleted from oldEvents")
 
-                // Aggiorna la lista degli eventi nel ViewModel
                 _events.value = _events.value?.filter { it.id != eventId }
                 callback(1)
             }
             .addOnFailureListener{ e ->
-                Log.w("BellAppDB", "Error deleting document in oldEvents", e)
+                Log.w("CalendarViewModel - deleteOldEvent", "Error deleting document in oldEvents", e)
                 callback(-1)
             }
     }

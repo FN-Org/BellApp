@@ -25,17 +25,13 @@ import it.fnorg.bellapp.updateFCMTokenToSystems
  */
 class AddSysFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = AddSysFragment()
-    }
-
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var binding: MainFragmentAddSysBinding // Declare binding variable
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout using view binding
         binding = MainFragmentAddSysBinding.inflate(inflater, container, false)
         return binding.root
@@ -63,6 +59,7 @@ class AddSysFragment : Fragment() {
         var sysLocation = ""
         var sysName = ""
 
+        // Observe the system Live Data in the Main View Model
         viewModel.system.observe(viewLifecycleOwner, Observer { system ->
             numBellTv.text = system.nBells.toString()
             numMelodiesTv.text = system.nMelodies.toString()
@@ -76,6 +73,7 @@ class AddSysFragment : Fragment() {
             sysLocation = system.location
         })
 
+        // Set a click listener to the button to search the system
         searchButton.setOnClickListener {
             val enteredId = idEditTV.text.toString().trim()
             if (enteredId.isNotBlank()) {
@@ -111,6 +109,7 @@ class AddSysFragment : Fragment() {
             }
         }
 
+        // Set a click listener to the button to add a new system
         addSysButton.setOnClickListener {
             if ((pinEditTv.text.toString().isNotBlank()
                         && sysId.isNotBlank() && sysLocation.isNotBlank() && sysName.isNotBlank()

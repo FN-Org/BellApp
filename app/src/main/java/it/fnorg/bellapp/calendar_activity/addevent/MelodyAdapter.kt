@@ -32,10 +32,13 @@ class MelodyAdapter (
         val view = convertView ?: LayoutInflater.from(context)
             .inflate(R.layout.calendar_spinner_melodies, parent, false)
 
+        // Find and configure the TextViews within the view
         val melodyNameTextView: TextView = view.findViewById(R.id.melodyName)
         val melodyNumberTextView: TextView = view.findViewById(R.id.melodyNumber)
 
         val option = options[position]
+
+        // Set the text for the TextViews based on the melody item
         melodyNameTextView.text = option.name
         melodyNumberTextView.text = option.number.toString()
 

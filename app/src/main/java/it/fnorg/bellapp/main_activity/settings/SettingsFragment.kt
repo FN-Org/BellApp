@@ -93,7 +93,7 @@ class SettingsFragment : Fragment() {
             builder.setTitle(R.string.change_image)
             // Set up the buttons
             builder.setPositiveButton(requireContext().getString(R.string.yes).uppercase()) { dialog, which ->
-                Log.d("PhotoPicker", "Selected URI: $uri")
+                Log.d("SettingsFragment - PhotoPicker", "Selected URI: $uri")
                 Toast.makeText(requireContext(), requireContext().getString(R.string.image_uploading), Toast.LENGTH_SHORT).show()
                 viewModel.uploadImageToFirebase(requireContext(), uri)
                 binding.binIv.visibility = View.VISIBLE
@@ -103,7 +103,7 @@ class SettingsFragment : Fragment() {
             }
             builder.show()
         } else {
-            Log.d("PhotoPicker", "No media selected")
+            Log.d("SettingsFragment - PhotoPicker", "No media selected")
         }
     }
 
@@ -124,7 +124,7 @@ class SettingsFragment : Fragment() {
 
         // Observes userImage changes and updates ImageView using Glide
         viewModel.userImage.observe(viewLifecycleOwner) { userImage ->
-            Log.w("Image", "Uri. " + userImage)
+            Log.w("SettingsFragment - Image", "Uri. $userImage")
             Glide.with(this)
                 .load(userImage)
                 .apply(RequestOptions.circleCropTransform())
@@ -160,7 +160,6 @@ class SettingsFragment : Fragment() {
                 hour = parts[0].toInt()
                 minute = parts[1].toInt()
             }
-
 
             val timePickerDialog = TimePickerDialog(
                 requireContext(),
@@ -220,8 +219,11 @@ class SettingsFragment : Fragment() {
             binding.binIv.visibility = View.GONE
         }
 
+        // Set a click listener for the event notification switch
         binding.eventsNotificationSwitch.setOnClickListener {
+            // If the switch is turned on
             if (binding.eventsNotificationSwitch.isChecked) {
+                // Check if the app has the permission to send notifications
                 if (checkNotifyPermission()) {
                     FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
                         if (task.isSuccessful) {
@@ -241,6 +243,7 @@ class SettingsFragment : Fragment() {
                     binding.eventsNotificationSwitch.isChecked = false
                 }
             }
+            // If the switch is turned off
             else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val notificationManager = requireContext().getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -250,10 +253,10 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        // Set a checked change listener for the event notification switch to persist the preference
         binding.eventsNotificationSwitch.setOnCheckedChangeListener { _, _ ->
             viewLifecycleOwner.lifecycleScope.launch { setEventNotificationPreference(binding.eventsNotificationSwitch.isChecked) }
         }
-
 
         // Set click listeners for external links (GitHub profiles)
         binding.githubFede.setOnClickListener {
@@ -295,7 +298,7 @@ class SettingsFragment : Fragment() {
         }
 
         val intent = Intent(requireContext(), ReminderReceiver::class.java)
-        Log.w("ReminderReceiver","created the intent")
+        Log.w("SettingsFragment - ReminderReceiver","created the intent")
         pendingIntent = PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
@@ -303,7 +306,7 @@ class SettingsFragment : Fragment() {
             AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
-        Log.w("ReminderReceiver","setted the intent")
+        Log.w("SettingsFragment - ReminderReceiver","setted the intent")
         Toast.makeText(requireContext(), "Daily Alarm Set", Toast.LENGTH_SHORT).show()
     }
 
@@ -317,7 +320,7 @@ class SettingsFragment : Fragment() {
             alarmManager.cancel(pendingIntent)
 
             if (show) Toast.makeText(requireContext(), "Alarm Cancelled", Toast.LENGTH_SHORT).show()
-            Log.w("ReminderReceiver","Deleted the intent")
+            Log.w("SettingsFragment - ReminderReceiver","Deleted the intent")
         }
     }
 

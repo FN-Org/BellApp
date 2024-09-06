@@ -86,10 +86,10 @@ class MainViewModel : ViewModel() {
                     _systems.value = systemsList
                 }
                 .addOnFailureListener { exception ->
-                    Log.d("HomeViewModel", "get failed with ", exception)
+                    Log.d("MainViewModel - FetchSysHomeData", "get failed with ", exception)
                 }
         }
-        else Log.d("HomeViewModelFetchSysdata", "uid was null")
+        else Log.d("MainViewModel - FetchSysHomeData", "uid was null")
     }
 
     /**
@@ -112,10 +112,10 @@ class MainViewModel : ViewModel() {
                             _userImage.value = uri
                         }
                         .addOnFailureListener {e ->
-                            Log.e("Download image", "ERROR", e)
+                            Log.e("MainViewModel - FetchUserData", "Error downloading image", e)
                             // Failed to fetch the user image
                             _userImage.value = Uri.parse("android.resource://it.fnorg.bellapp/drawable/ic_profile_default")
-                            Log.w("Image", "Uri. " + _userImage.value)
+                            Log.w("MainViewModel - FetchUserData", "Uri. " + _userImage.value)
                         }
                     }
                 }
@@ -123,7 +123,7 @@ class MainViewModel : ViewModel() {
                     // Failed to fetch the user data
                 }
         }
-        else Log.d("HomeViewModelFetchUserData", "uid was null")
+        else Log.d("MainViewModel - FetchUserData", "Uid was null")
     }
 
     /**
@@ -143,10 +143,10 @@ class MainViewModel : ViewModel() {
                     // Successfully changed the name
                 }
                 .addOnFailureListener { exception ->
-                    Log.d("HomeViewModel", "change name failed with ", exception)
+                    Log.d("MainViewModel - changeSysName", "change name failed with ", exception)
                 }
         }
-        else Log.d("HomeViewModelChangeSysName", "uid was null or name was blank")
+        else Log.d("MainViewModel - changeSysName", "uid was null or name was blank")
     }
 
     /**
@@ -172,7 +172,7 @@ class MainViewModel : ViewModel() {
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.d("MainViewModel", "get failed with ", exception)
+                    Log.d("MainViewModel", "Get failed with ", exception)
                     _system.value = System()
                     callback(false)
                 }
@@ -198,15 +198,15 @@ class MainViewModel : ViewModel() {
                 .document(sysId)
                 .set(selectedFields)
                 .addOnSuccessListener {
-                    Log.d("HomeViewModelAddSys", "Document successfully created")
+                    Log.d("MainViewModel - addSys", "Document successfully created")
                     callback(true) // Success
                 }
                 .addOnFailureListener { e ->
-                    Log.w("HomeViewModelAddSys", "Error writing document", e)
+                    Log.w("MainViewModel - addSys", "Error writing document", e)
                     callback(false) // Failure
                 }
         } else {
-            Log.d("HomeViewModelAddSys", "uid was null")
+            Log.d("MainViewModel - addSys", "Uid was null")
             callback(false) // Failure due to null uid
         }
     }
@@ -228,7 +228,7 @@ class MainViewModel : ViewModel() {
                 }
             }
             .addOnFailureListener { e ->
-                Log.e("Firebase", "Image upload failed", e)
+                Log.e("MainViewModel - uploadImageToFirebase", "Image upload failed", e)
             }
     }
 

@@ -66,6 +66,8 @@ class HomeFragment : Fragment() {
         val searchBar = binding.searchView
         val fab = binding.homeSearchButton
 
+        // Set a click listener for the floating action button
+        // to open the search bar and filter systems
         fab.setOnClickListener {
             if (searchBar.visibility == View.GONE) {
                 searchBar.visibility = View.VISIBLE

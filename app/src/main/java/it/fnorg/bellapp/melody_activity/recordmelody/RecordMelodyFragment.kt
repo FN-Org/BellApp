@@ -513,6 +513,7 @@ class RecordMelodyFragment : Fragment() {
         builder.show()
     }
 
+    // Called when the fragment's view is destroyed
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.stopPlayback()

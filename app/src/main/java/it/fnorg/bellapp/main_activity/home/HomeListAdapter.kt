@@ -156,6 +156,7 @@ class HomeListAdapter (
         builder.show()
     }
 
+    // Function to show an information dialog for a selected system
     private fun showInfoDialog(sys : System){
 
         val inflater = LayoutInflater.from(mContext)
@@ -184,6 +185,7 @@ class HomeListAdapter (
         builder.show()
     }
 
+    // Function to filter the system list based on a search query
     fun filter(query: String) {
         val lowerCaseQuery = query.lowercase()
 

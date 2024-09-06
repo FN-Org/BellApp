@@ -2,18 +2,14 @@ package it.fnorg.bellapp.calendar_activity.monthview
 
 import android.app.AlertDialog
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CalendarView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.storage.FirebaseStorage
 import it.fnorg.bellapp.R
 import it.fnorg.bellapp.calendar_activity.CalendarViewModel
 import it.fnorg.bellapp.calendar_activity.Event
@@ -24,6 +20,7 @@ import it.fnorg.bellapp.calendar_activity.toLocalDateTime
 import it.fnorg.bellapp.databinding.CalendarEventItemViewBinding
 import it.fnorg.bellapp.isInternetAvailable
 
+// Adapter class to manage a list of events in a RecyclerView for a calendar view
 class EventListAdapter(
     private val mContext: Context,
     private val fragment: Fragment,
@@ -52,16 +49,21 @@ class EventListAdapter(
                 setBackgroundColor(ContextCompat.getColor(context, viewModel.colorsList[event.color-1].color))
             }
 
+            // Set the melody number and name for the event
             binding.itemMelodyNumberText.text = event.melodyNumber.toString()
             binding.itemMelodyNameText.text = event.melodyName
 
+            // Find the index of the event in the list of events from the ViewModel
             val indexOfEvent = viewModel.events.value?.indexOfFirst { it.id == event.id }
 
+            // Check if the event is an old event (by comparing its index)
             if (indexOfEvent != null) {
                 if (indexOfEvent >= (viewModel.oldEventsStartingIndex)) {
+                    // Show the delete button and set a different background color for old events
                     binding.deleteEvent.visibility = View.VISIBLE
                     binding.itemEventDateText.setBackgroundColor(ContextCompat.getColor(mContext, R.color.silver))
 
+                    // Handle the delete event action when the delete button is clicked
                     binding.deleteEvent.setOnClickListener {
                         if (!isInternetAvailable(mContext)) {
                             Toast.makeText(mContext,R.string.sww_connection, Toast.LENGTH_SHORT).show()
@@ -91,18 +93,19 @@ class EventListAdapter(
                             alert.show()
 
                         }
-
                     }
                 }
                 else {
+                    // Hide the delete button for future events
                     binding.deleteEvent.visibility = View.GONE
 
-                    // On click, goes to the add event fragment passing safe args
+                    // Set up an onClick listener for future events to navigate to event details
                     itemView.setOnClickListener {
                         if (!isInternetAvailable(mContext)) {
                             Toast.makeText(mContext, mContext.getString(R.string.connection_warning_1), Toast.LENGTH_SHORT).show()
                         }
                         else {
+                            // Navigate to the AddEventFragment with event details passed as arguments
                             val id = event.id
                             val time = event.time.toLocalDateTime().toLocalTime().format(
                                 timeFormatter

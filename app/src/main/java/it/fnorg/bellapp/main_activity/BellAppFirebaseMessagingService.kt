@@ -11,7 +11,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.fragment.app.activityViewModels
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import it.fnorg.bellapp.R
@@ -27,20 +26,24 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-
-
 class BellAppFirebaseMessagingService : FirebaseMessagingService() {
 
+    // Constants for notification settings
     val CHANNELID = "Firebase Notification"
     private val channelName = "Firebase cloud messaging"
     private val channelDescription = "Firebase cloud messaging notification after event execution"
     private val NOTIFICATIONID = 2
     private val EVENT_NOTIFICATION = booleanPreferencesKey("event_notification")
 
-    private val scope = CoroutineScope(NonCancellable) // Crea un CoroutineScope dedicato per il servizio
+    // Coroutine scope for managing asynchronous tasks
+    private val scope = CoroutineScope(NonCancellable)
 
     private val TAG = "BellAppFirebaseMessagingService"
 
+    /**
+     * Called when the FCM token is updated.
+     * Registers the token to the user and updates the systems with the new token.
+     */
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
 
@@ -50,21 +53,26 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
+    /**
+     * Handles incoming messages from Firebase Cloud Messaging.
+     * If a notification is included, it checks the user's preferences and may send a local notification.
+     */
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
         Log.d(TAG, "Message from ${message.from}")
 
-        message.notification?.let { notification -> // Usare ?.let per evitare null checks multipli
+        message.notification?.let { notification ->
             Log.d(TAG, "Message notification from ${message.from}")
 
             scope.launch {
                 try {
+                    // Check if event notifications are enabled in user preferences
                     val eventNotificationEnabled = this@BellAppFirebaseMessagingService.dataStore.data
                         .map { settings ->
                             settings[EVENT_NOTIFICATION] == true
                         }
-                        .first() // Colleziona il primo valore emesso dal Flow
+                        .first()
 
                     if (eventNotificationEnabled) {
                         Log.w(TAG, "Events notification enabled. Sending notification.")
@@ -81,18 +89,27 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
+    /**
+     * Called when the service is destroyed.
+     * Cancels the CoroutineScope to avoid memory leaks.
+     */
     override fun onDestroy() {
         super.onDestroy()
-        scope.cancel() // Cancella il CoroutineScope quando il servizio viene distrutto
+        scope.cancel()
     }
 
+    /**
+     * Sends a notification using Firebase message data.
+     * The notification includes an intent to open the main activity when clicked.
+     */
     private fun sendFirebaseNotification(title: String, messageBody: String){
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
+        // Creates a PendingIntent to open the MainActivity when the notification is clicked
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 
-
+        // Build the notification
         val notificationBuilder = NotificationCompat.Builder(this, CHANNELID)
             .setSmallIcon(R.mipmap.ic_bell_app)
             .setContentTitle(title)
@@ -101,6 +118,7 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
+        // Get the NotificationManager system service
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         // Check if the notification channel exists for API 26+
@@ -110,7 +128,7 @@ class BellAppFirebaseMessagingService : FirebaseMessagingService() {
             }
         }
 
-        // Check for permission before showing the notification
+        // Check for notification permission before displaying the notification
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             with(NotificationManagerCompat.from(this)) {
                 notify(NOTIFICATIONID, notificationBuilder.build())

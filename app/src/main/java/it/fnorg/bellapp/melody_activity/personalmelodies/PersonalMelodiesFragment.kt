@@ -18,12 +18,12 @@ import it.fnorg.bellapp.main_activity.MainActivity
 import it.fnorg.bellapp.melody_activity.MelodyViewModel
 
 /**
- * A simple [Fragment] subclass.
- * Use the [PersonalMelodiesFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * This fragment displays a list of personal melodies and allows the user
+ * to navigate to other screens such as recording a new melody or returning to the main activity.
  */
 class PersonalMelodiesFragment : Fragment() {
 
+    // Shared ViewModel instances between the fragment and its activity
     private val melodyViewModel: MelodyViewModel by activityViewModels()
     private val calendarViewModel : CalendarViewModel by activityViewModels()
 
@@ -46,12 +46,16 @@ class PersonalMelodiesFragment : Fragment() {
 
         val navController = findNavController()
 
+        // Set click listener on the back arrow to return to the main activity
         binding.backArrow.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
             requireContext().startActivity(intent)
         }
 
+        // Set up RecyclerView with a linear layout manager
         binding.rvMelody.layoutManager = LinearLayoutManager(requireContext())
+
+        // Observe the list of melodies from the ViewModel
         melodyViewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
             if (melodies.isEmpty()) {
                 binding.noMelodiesTV.visibility = View.VISIBLE
@@ -59,6 +63,8 @@ class PersonalMelodiesFragment : Fragment() {
             } else {
                 binding.noMelodiesTV.visibility = View.GONE
                 binding.rvMelody.visibility = View.VISIBLE
+
+                // Set the adapter with the melody list
                 binding.rvMelody.adapter =
                     MelodyAdapter(
                         requireContext(),
@@ -69,6 +75,7 @@ class PersonalMelodiesFragment : Fragment() {
             }
         })
 
+        // Set click listener on the button to create a new melody
         binding.createMelodyButton.setOnClickListener {
             navController.navigate(R.id.action_personalMelodiesFragment_to_recordMelodyFragment)
         }
@@ -77,9 +84,11 @@ class PersonalMelodiesFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        // Refresh system data when fragment resumes
+        // Fetch system melodies and sync status when the fragment resumes
         melodyViewModel.fetchMelodies() // Fetch system melodies from firebase storage
         calendarViewModel.fetchMelodiesData() // Fetch system melodies from firebase firestore
+
+        // Check the sync status of the system
         melodyViewModel.getSystemSync { result ->
             when (result) {
                 false -> {
@@ -96,6 +105,7 @@ class PersonalMelodiesFragment : Fragment() {
             }
         }
 
+        // Re-observe the melody list to update the UI
         melodyViewModel.melodyList.observe(viewLifecycleOwner , Observer { melodies ->
             if (melodies.isEmpty()) {
                 binding.noMelodiesTV.visibility = View.VISIBLE
@@ -114,6 +124,7 @@ class PersonalMelodiesFragment : Fragment() {
         })
     }
 
+    // Called when the fragment's view is destroyed
     override fun onDestroyView() {
         super.onDestroyView()
         melodyViewModel.stopPlayback()

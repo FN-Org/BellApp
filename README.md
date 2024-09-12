@@ -32,6 +32,12 @@ This project offers a concrete solution to the modernization needs of the sector
 - **Firebase Cloud Messaging**: Used to send and receive real-time notifications.
 - **Firebase Authentication**: It manages the authentication for the application.
 
+This project uses the following **library**:
+
+- **[Kizitonwose/Calendar](https://github.com/kizitonwose/Calendar)**: A highly customizable calendar library for Android.
+
+For more information about the creator, visit their [GitHub Profile](https://github.com/kizitonwose).
+
 ## Installation
 
 1. Clone this repository:

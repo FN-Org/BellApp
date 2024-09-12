@@ -36,7 +36,7 @@ This project offers a concrete solution to the modernization needs of the sector
 
 1. Clone this repository:
     ```bash
-    git clone https://github.com/yourusername/bellapp.git
+    git clone https://github.com/FN-Org/BellApp.git
     ```
 
 2. Open the project in [Android Studio](https://developer.android.com/studio).
@@ -82,23 +82,18 @@ This project offers a concrete solution to the modernization needs of the sector
 6. Click the save button and insert the melody title.
 
 ## Screenshots
-### Welcome Activity
-| Fragment 1 | Fragment 2 | Fragment 3 |
-|----------------|-----------------|---------------|
-| ![Event Creation](screenshots/event_creation.png) | ![Color Selection](screenshots/color_selection.png) | ![Calendar View](screenshots/calendar_view.png) |
-### Login Activity
-| Authentication |
-|----------------|
-| ![Event Creation](screenshots/event_creation.png) |
+### Welcome & Login Activities
+| Fragment 1 | Fragment 2 | Fragment 3 | Authentication |
+|----------------|-----------------|---------------|----------------|
+| <img src="screenshots/Fragment 1.jpg" width="200"> | <img src="screenshots/Fragment 2.jpg" width="200"> | <img src="screenshots/Fragment 3.jpg" width="200"> | <img src="screenshots/Authentication.png" width="200"> |
+
 ### Main Activity
 | Home Page | Add System | Settings |
 |----------------|-----------------|---------------|
-| ![Event Creation](screenshots/event_creation.png) | ![Color Selection](screenshots/color_selection.png) | ![Calendar View](screenshots/calendar_view.png) |
-### Calendar Activity
-| Month View | Add Event |
-|----------------|-----------------|
-| ![Event Creation](screenshots/event_creation.png) | ![Color Selection](screenshots/color_selection.png) |
-### Melody Activity
-| Personal Melodies | Create Melody |
-|----------------|-----------------|
-| ![Event Creation](screenshots/event_creation.png) | ![Color Selection](screenshots/color_selection.png) |
+| <img src="screenshots/HomePage.png" width="200"> | <img src="screenshots/AddSys.png" width="200"> | <img src="screenshots/Settings.png" width="200"> |
+
+### Calendar & Melody Activities
+| Month View | Add Event | Personal Melodies | Create Melody |
+|----------------|-----------------|-----------------|---------------|
+| <img src="screenshots/MonthView.png" width="200"> | <img src="screenshots/AddEvent.png" width="200"> | <img src="screenshots/PersonalMelodies.png" width="200"> | <img src="screenshots/CreateMelody.png" width="200"> |
+

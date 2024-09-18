@@ -12,6 +12,28 @@
     <string name="next_button">NEXT</string>
     <string name="previous_button">PREVIOUS</string>
 
+    <!-- Fragment 1 -->
+    <string name="title_1">Manage All Your Bell Systems in One App</string>
+    <string name="descriprion_1">
+        With our app, you can manage all your bell systems from one place.
+        Control everything remotely or directly connected to the system, as long as you have an internet connection.
+    </string>
+
+    <!-- Fragment 2 -->
+    <string name="title_2">Complete Freedom with Calendar View</string>
+    <string name="description_2">
+        Enjoy full control with the calendar view.
+        Schedule and manage events for your bell systems day by day, ensuring everything runs smoothly.
+    </string>
+
+    <!-- Fragment 3 -->
+    <string name="title_3">Customize Your Own Melody</string>
+    <string name="description_3">
+        Create a unique melody directly within the app!
+        With our melody creation feature, you have full control to compose and personalize the sounds that accompany your events.
+        Whether it\'s a simple tune or a more complex melody, the choice is yours.
+    </string>
+
     <!-- MAIN ACTIVITY -->
 
     <!-- Navigation drawer -->
@@ -140,5 +162,4 @@
     <!-- General Toast -->
     <string name="back_before_exit_toast">Press back again to exit from the application</string>
     <string name="coming_soon">COMING SOON!</string>
-
 </resources>
